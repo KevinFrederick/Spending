@@ -1,0 +1,28 @@
+<resources>
+    <string name="app_name">Spending</string>
+
+    <!-- Card Title -->
+    <string name="balance_info">Balance Information</string>
+    <string name="recent_transaction">Recent Transaction</string>
+    <string name="spending_report">Spending Report</string>
+    <string name="categories_percentage">Categories Percentage</string>
+    <string name="category_detail">Category Detail</string>
+    <string name="transaction_detail">Transaction Detail</string>
+
+    <!-- Label -->
+    <string name="total_balance">Total Balance</string>
+    <string name="income">Income</string>
+    <string name="spending">Spending</string>
+    <string name="amount">Amount</string>
+    <string name="type">Type</string>
+    <string name="category">Category</string>
+    <string name="date">Date</string>
+
+    <!-- Button -->
+    <string name="save_transaction">Save Transaction</string>
+    <string name="edit_transaction">Edit Transaction</string>
+
+    <!-- Currency -->
+    <string name="rupiah">Rp %1$s</string>
+    <string name="taiwan_dollar">NT$ %1$s</string>
+</resources>
