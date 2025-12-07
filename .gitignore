@@ -13,3 +13,14 @@
 .externalNativeBuild
 .cxx
 local.properties
+/.idea/appInsightsSettings.xml
+google-services.json
+*.jks
+*.keystore
+*.pem
+*.p12
+*.hprof
+*.stacktrace
+.idea/dictionaries
+.idea/jarRepositories.xml
+.idea/compiler.xml

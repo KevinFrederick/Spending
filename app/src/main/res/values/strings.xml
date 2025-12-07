@@ -1,5 +1,9 @@
 <resources>
-    <string name="app_name">Spending</string>
+    <string name="app_name">JetSpending</string>
+
+    <!-- Screen Name -->
+    <string name="dashboard">Dashboard</string>
+    <string name="report">Report</string>
 
     <!-- Card Title -->
     <string name="balance_info">Balance Information</string>
@@ -17,12 +21,19 @@
     <string name="type">Type</string>
     <string name="category">Category</string>
     <string name="date">Date</string>
+    <string name="transaction_name">Transaction Name</string>
+    <string name="transaction_amount">Transaction Amount</string>
 
     <!-- Button -->
+    <string name="cancel">Cancel</string>
+    <string name="confirm">Confirm</string>
     <string name="save_transaction">Save Transaction</string>
     <string name="edit_transaction">Edit Transaction</string>
+    <string name="see_all">See All</string>
+    <string name="add_transaction">Add Transaction</string>
+    <string name="back">Back</string>
 
     <!-- Currency -->
-    <string name="rupiah">Rp %1$s</string>
-    <string name="taiwan_dollar">NT$ %1$s</string>
+<!--    <string name="rupiah">Rp %1$s</string>-->
+<!--    <string name="taiwan_dollar">NT$ %1$s</string>-->
 </resources>

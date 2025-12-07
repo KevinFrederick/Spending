@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -28,20 +29,27 @@ import com.kevinfreyap.jetspending.ui.theme.Green500
 import com.kevinfreyap.jetspending.ui.theme.Grey400
 import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
 import com.kevinfreyap.jetspending.ui.theme.Orange700
+import com.kevinfreyap.jetspending.ui.theme.Theme
 
 @Composable
 fun SummaryCard(
+    totalBalance: String,
+    dateSelectorSlot: @Composable () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
+        colors = CardDefaults.cardColors(
+            containerColor = Theme.custom.cardColor
+        ),
         shape = RoundedCornerShape(16.dp),
         modifier = modifier.fillMaxWidth()
     ){
         Column(
-            modifier = modifier
+            modifier = Modifier
                 .padding(12.dp)
         ) {
             Text(
+                color = Theme.custom.textColor,
                 text = stringResource(R.string.balance_info),
                 style = MaterialTheme.typography.titleLarge
             )
@@ -50,6 +58,7 @@ fun SummaryCard(
 
             Text(
                 text = stringResource(R.string.total_balance),
+                color = Theme.custom.textColor,
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.titleSmall,
                 modifier = Modifier
@@ -57,7 +66,8 @@ fun SummaryCard(
                     .align(Alignment.CenterHorizontally)
             )
             Text(
-                text = stringResource(R.string.rupiah, "100.000"),
+                text = totalBalance,
+                color = Theme.custom.textColor,
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.headlineSmall,
                 modifier = Modifier
@@ -76,13 +86,7 @@ fun SummaryCard(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            ViewDateSelector(
-                centerText = "December",
-                onPreviousClick = {  },
-                onPreviousBtnEnabled = true,
-                onNextClick = {  },
-                onNextBtnEnabled = true,
-            )
+            dateSelectorSlot()
             
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -98,6 +102,7 @@ fun SummaryCard(
                 ) {
                     Text(
                         text = stringResource(R.string.income),
+                        color = Theme.custom.textColor,
                         fontWeight = FontWeight.SemiBold
                     )
                     Text(
@@ -119,6 +124,7 @@ fun SummaryCard(
                 ) {
                     Text(
                         text = stringResource(R.string.spending),
+                        color = Theme.custom.textColor,
                         fontWeight = FontWeight.SemiBold
                     )
                     Text(
@@ -141,7 +147,18 @@ fun SummaryCard(
 @Composable
 fun SummaryCardLightPreview() {
     JetSpendingTheme {
-        SummaryCard()
+        SummaryCard(
+            totalBalance = "Rp 100.000",
+            dateSelectorSlot = {
+                ViewDateSelector(
+                    centerText = "December",
+                    onPreviousClick = {  },
+                    onPreviousBtnEnabled = true,
+                    onNextClick = {  },
+                    onNextBtnEnabled = true,
+                )
+            }
+        )
     }
 }
 
@@ -154,6 +171,17 @@ fun SummaryCardLightPreview() {
 @Composable
 fun SummaryCardDarkPreview() {
     JetSpendingTheme {
-        SummaryCard()
+        SummaryCard(
+            totalBalance = "Rp 100.000",
+            dateSelectorSlot = {
+                ViewDateSelector(
+                    centerText = "December",
+                    onPreviousClick = {  },
+                    onPreviousBtnEnabled = true,
+                    onNextClick = {  },
+                    onNextBtnEnabled = true,
+                )
+            }
+        )
     }
 }
