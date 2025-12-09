@@ -28,7 +28,7 @@ import com.kevinfreyap.jetspending.ui.theme.Theme
 
 @Composable
 fun BottomSheetInputAmount(
-    amountValue: String,
+    amountInputSlot: @Composable () -> Unit,
     onPositiveClick: () -> Unit,
     onNegativeClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -43,19 +43,7 @@ fun BottomSheetInputAmount(
             style = MaterialTheme.typography.titleLarge,
         )
 
-        ViewTextField(
-            value = amountValue,
-            onValueChange = {},
-            label = stringResource(R.string.amount),
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number,
-                imeAction = ImeAction.Done
-            ),
-            modifier = Modifier
-                .padding(
-                    top = 4.dp
-                )
-        )
+        amountInputSlot()
 
         Row(
             horizontalArrangement = Arrangement.End,
@@ -100,7 +88,21 @@ fun BottomSheetInputAmount(
 fun BottomSheetInputAmountPreview(){
     JetSpendingTheme {
         BottomSheetInputAmount(
-            amountValue = "100.000",
+            amountInputSlot = {
+                ViewTextField(
+                    value = "100.000",
+                    onValueChange = {  },
+                    label = stringResource(R.string.amount),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done
+                    ),
+                    modifier = Modifier
+                        .padding(
+                            top = 4.dp
+                        )
+                )
+            },
             onPositiveClick = {},
             onNegativeClick = {}
         )

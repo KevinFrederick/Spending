@@ -2,7 +2,6 @@ package com.kevinfreyap.jetspending.ui.components
 
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -18,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
@@ -30,19 +30,20 @@ import com.kevinfreyap.jetspending.ui.theme.Theme
 fun ViewCategoryItem(
     categoryImage: Int,
     categoryName: String,
-    onClick: () -> Unit,
+    isSelected: Boolean,
     modifier: Modifier = Modifier
 ) {
+    val backgroundColor = if (isSelected) MaterialTheme.colorScheme.primary else Theme.custom.cardColor
+    val iconColor = if (isSelected) MaterialTheme.colorScheme.onPrimary else Theme.custom.iconColor
+    val textColor = if (isSelected) MaterialTheme.colorScheme.onPrimary else Theme.custom.textColor
+
     Card(
         colors = CardDefaults.cardColors(
-            containerColor = Theme.custom.cardColor
+            containerColor = backgroundColor
         ),
         modifier = modifier
             .size(100.dp)
             .clip(RoundedCornerShape(16.dp))
-            .clickable(
-                onClick = onClick
-            )
     ) {
         Box(
             modifier = Modifier
@@ -50,10 +51,10 @@ fun ViewCategoryItem(
         ) {
             Image(
                 painter = painterResource(categoryImage),
-                colorFilter = ColorFilter.tint(Theme.custom.iconColor),
+                colorFilter = ColorFilter.tint(iconColor),
                 contentDescription = "Category Image",
                 modifier = Modifier
-                    .size(48.dp)
+                    .size(40.dp)
                     .align(
                         BiasAlignment(
                             horizontalBias = 0f,
@@ -63,8 +64,9 @@ fun ViewCategoryItem(
             )
             Text(
                 text = categoryName,
-                color = Theme.custom.textColor,
-                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.SemiBold,
+                color = textColor,
+                style = MaterialTheme.typography.bodySmall,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .padding(
@@ -92,7 +94,7 @@ fun ViewCategoryItemPreview(){
         ViewCategoryItem(
             categoryImage = R.drawable.ic_salary_icon,
             categoryName = "Salary",
-            onClick = {}
+            isSelected = false
         )
     }
 }

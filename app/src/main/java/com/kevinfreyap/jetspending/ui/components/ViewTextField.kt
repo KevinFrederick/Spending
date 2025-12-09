@@ -10,6 +10,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -23,6 +24,7 @@ fun ViewTextField(
     label: String,
     modifier: Modifier = Modifier,
     isError: Boolean = false,
+    visualTransformation: VisualTransformation? = null,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default
 ) {
     TextField(
@@ -43,6 +45,7 @@ fun ViewTextField(
             unfocusedIndicatorColor = Color.Transparent,
             disabledIndicatorColor = Color.Transparent
         ),
+        visualTransformation = visualTransformation ?: VisualTransformation.None,
         modifier = modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)

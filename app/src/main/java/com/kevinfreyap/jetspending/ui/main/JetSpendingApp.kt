@@ -1,4 +1,4 @@
-package com.kevinfreyap.jetspending.ui
+package com.kevinfreyap.jetspending.ui.main
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
@@ -11,6 +11,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -26,6 +27,7 @@ import com.kevinfreyap.jetspending.ui.screen.dashboard.DashboardScreen
 @Composable
 fun JetSpendingApp(
     modifier: Modifier = Modifier,
+    viewModel: MainViewModel = hiltViewModel(),
     navController: NavHostController = rememberNavController()
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()

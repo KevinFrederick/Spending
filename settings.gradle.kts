@@ -21,3 +21,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "JetSpending"
 include(":app")
+include(":domain")
+include(":data")

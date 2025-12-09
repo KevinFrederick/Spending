@@ -1,4 +1,4 @@
-package com.kevinfreyap.jetspending.data.model
+package com.kevinfreyap.domain.model
 
 enum class TransactionType {
     INCOME,
