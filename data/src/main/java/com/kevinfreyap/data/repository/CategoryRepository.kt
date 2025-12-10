@@ -31,6 +31,15 @@ class CategoryRepository @Inject constructor(
             }
     }
 
+    override suspend fun getCategoryById(categoryId: String): Category? {
+        val transactionEntity = categoryDao.getCategoryById(categoryId)
+        return if (transactionEntity != null){
+            transactionCategoryMapper.mapCategoryEntityToDomain(transactionEntity)
+        } else {
+            null
+        }
+    }
+
     override suspend fun syncCategoriesFromFirestore() {
         firestore.collection(CATEGORY_COLLECTION)
             .addSnapshotListener { snapshot, error ->
@@ -46,7 +55,7 @@ class CategoryRepository @Inject constructor(
                 }
 
                 CoroutineScope(Dispatchers.IO).launch {
-                    categoryDao.insertAll(categories)
+                    categoryDao.upsertCategories(categories)
                 }
             }
     }

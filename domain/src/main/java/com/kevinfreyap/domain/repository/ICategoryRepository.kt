@@ -5,5 +5,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface ICategoryRepository {
     fun getAllCategories(): Flow<List<Category>>
+    suspend fun getCategoryById(categoryId: String): Category?
     suspend fun syncCategoriesFromFirestore()
 }

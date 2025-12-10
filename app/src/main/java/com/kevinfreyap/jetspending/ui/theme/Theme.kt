@@ -46,7 +46,7 @@ data class CustomColors(
     val nestedCardColor: Color,
     val textColor: Color,
     val iconColor: Color,
-    val hintColor: Color
+    val hintColor: Color,
 )
 
 // Define the default/fallback
@@ -56,7 +56,7 @@ val LocalCustomColors = staticCompositionLocalOf {
         nestedCardColor = Color.Unspecified,
         textColor = Color.Unspecified,
         iconColor = Color.Unspecified,
-        hintColor = Color.Unspecified
+        hintColor = Color.Unspecified,
     )
 }
 
@@ -83,7 +83,7 @@ fun JetSpendingTheme(
             nestedCardColor = Grey950,
             textColor = OffWhite,
             iconColor = Grey400,
-            hintColor = Color.White.copy(alpha = 0.2f)
+            hintColor = Color.White.copy(alpha = 0.2f),
         )
     } else {
         CustomColors(
@@ -91,7 +91,7 @@ fun JetSpendingTheme(
             nestedCardColor = Grey200,
             textColor = Grey900,
             iconColor = Grey800,
-            hintColor = Grey400
+            hintColor = Grey400,
         )
     }
 

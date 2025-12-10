@@ -4,8 +4,9 @@ import androidx.sqlite.db.SimpleSQLiteQuery
 import com.kevinfreyap.domain.model.TimeFilterOption
 import com.kevinfreyap.domain.model.TransactionFilter
 import java.util.Calendar
+import javax.inject.Inject
 
-class TransactionQuery {
+class TransactionQuery @Inject constructor() {
     fun searchTransactionQuery(query: String, filter: TransactionFilter): SimpleSQLiteQuery{
         val queryBuilder = StringBuilder(
             "SELECT * FROM transactions WHERE name LIKE ?"

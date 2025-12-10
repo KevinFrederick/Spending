@@ -1,5 +1,6 @@
 package com.kevinfreyap.jetspending.ui.main
 
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -9,6 +10,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -30,6 +33,8 @@ fun JetSpendingApp(
     viewModel: MainViewModel = hiltViewModel(),
     navController: NavHostController = rememberNavController()
 ) {
+    val focusManager = LocalFocusManager.current
+
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
@@ -41,7 +46,11 @@ fun JetSpendingApp(
                 BottomBar(navController = navController)
             }
         },
-        modifier = modifier
+        modifier = modifier.pointerInput(Unit) {
+            detectTapGestures(onTap = {
+                focusManager.clearFocus()
+            })
+        }
     ){ innerPadding ->
         NavHost(
             navController = navController,
@@ -57,6 +66,7 @@ fun JetSpendingApp(
             }
             composable(Screen.AddTransaction.route) {
                 AddTransactionScreen(
+                    navController = navController,
                     onBackClick = {
                         navController.navigateUp()
                     }

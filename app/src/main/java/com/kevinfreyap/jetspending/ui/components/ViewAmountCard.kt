@@ -1,6 +1,8 @@
 package com.kevinfreyap.jetspending.ui.components
 
 import android.content.res.Configuration
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Spacer
@@ -12,7 +14,9 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -27,9 +31,15 @@ import com.kevinfreyap.jetspending.ui.theme.Theme
 fun ViewAmountCard(
     onTransactionAmountClick: () -> Unit,
     transactionAmount: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isError: Boolean = false,
+    errorMessage: String = ""
 ) {
     Card(
+        border = BorderStroke(
+            width = 2.dp,
+            color = if (isError) MaterialTheme.colorScheme.error else Color.Transparent
+        ),
         colors = CardDefaults.cardColors(
             containerColor = Theme.custom.cardColor
         ),
@@ -39,39 +49,52 @@ fun ViewAmountCard(
         modifier = modifier
             .fillMaxWidth()
     ) {
-        Column (
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(IntrinsicSize.Min)
         ) {
-            Text(
-                text = stringResource(R.string.amount),
-                color = Theme.custom.textColor,
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier
-                    .padding(
-                        top = 8.dp,
-                        start = 12.dp
-                    )
-            )
-
-            Spacer(
-                modifier = Modifier.height(16.dp)
-            )
-
-            Text(
-                text = transactionAmount,
-                color = Theme.custom.textColor,
-                fontWeight = FontWeight.SemiBold,
-                style = MaterialTheme.typography.headlineMedium,
-                textAlign = TextAlign.Center,
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-            )
+                    .height(IntrinsicSize.Min)
+            ) {
+                Text(
+                    text = stringResource(R.string.amount),
+                    color = if (isError) MaterialTheme.colorScheme.error else Theme.custom.textColor,
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier
+                        .padding(
+                            top = 8.dp,
+                            start = 12.dp
+                        )
+                )
 
-            Spacer(
-                modifier = Modifier.height(32.dp)
-            )
+                Spacer(
+                    modifier = Modifier.height(16.dp)
+                )
+
+                Text(
+                    text = transactionAmount,
+                    color = if (isError) MaterialTheme.colorScheme.error else Theme.custom.textColor,
+                    fontWeight = FontWeight.SemiBold,
+                    style = MaterialTheme.typography.headlineMedium,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                )
+
+                Spacer(
+                    modifier = Modifier.height(32.dp)
+                )
+            }
+
+            if (isError) {
+                ViewErrorTooltip(
+                    errorMessage = errorMessage,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                )
+            }
         }
     }
 }
@@ -85,7 +108,8 @@ fun ViewAmountCardPreview() {
     JetSpendingTheme {
         ViewAmountCard(
             onTransactionAmountClick = {},
-            transactionAmount = "Rp 1.000.000"
+            transactionAmount = "Rp 1.000.000",
+            isError = false
         )
     }
 }
@@ -100,7 +124,8 @@ fun ViewAmountCardDarkPreview() {
     JetSpendingTheme {
         ViewAmountCard(
             onTransactionAmountClick = {},
-            transactionAmount = "Rp 1.000.000"
+            transactionAmount = "Rp 1.000.000",
+            isError = false
         )
     }
 }

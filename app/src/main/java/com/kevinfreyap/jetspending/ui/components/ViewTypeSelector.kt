@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
@@ -37,6 +38,8 @@ fun ViewTypeSelector(
     onSelectOption: (TransactionType) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val focusManager = LocalFocusManager.current
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
@@ -65,6 +68,7 @@ fun ViewTypeSelector(
                 text = text,
                 selected = (type == selectedOption),
                 onClick = {
+                    focusManager.clearFocus()
                     onSelectOption(type)
                 }
             )
