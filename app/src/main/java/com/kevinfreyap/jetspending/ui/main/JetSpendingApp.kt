@@ -14,7 +14,6 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -26,11 +25,14 @@ import com.kevinfreyap.jetspending.ui.navigation.NavigationItem
 import com.kevinfreyap.jetspending.ui.navigation.Screen
 import com.kevinfreyap.jetspending.ui.screen.add_transaction.AddTransactionScreen
 import com.kevinfreyap.jetspending.ui.screen.dashboard.DashboardScreen
+import com.kevinfreyap.jetspending.ui.screen.onboarding.OnboardingScreen
+import com.kevinfreyap.jetspending.ui.screen.signin.SignInScreen
+import com.kevinfreyap.jetspending.ui.screen.signup.SignUpScreen
 
 @Composable
 fun JetSpendingApp(
     modifier: Modifier = Modifier,
-    viewModel: MainViewModel = hiltViewModel(),
+    startDestination: String,
     navController: NavHostController = rememberNavController()
 ) {
     val focusManager = LocalFocusManager.current
@@ -54,9 +56,63 @@ fun JetSpendingApp(
     ){ innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = Screen.Dashboard.route,
+            startDestination = startDestination,
             modifier = Modifier.padding(innerPadding)
         ) {
+            composable(Screen.OnBoarding.route) {
+                OnboardingScreen(
+                    onGetStartedClicked = {
+                        navController.navigate(Screen.SignUp.route)
+                    },
+                    onSignInClicked = {
+                        navController.navigate(Screen.SignIn.route)
+                    },
+                )
+            }
+            composable(Screen.SignUp.route) {
+                SignUpScreen(
+                    onBackClick = {
+                        navController.popBackStack()
+                    },
+                    onSignInClicked = {
+                        navController.navigate(Screen.SignIn.route) {
+                            popUpTo(Screen.OnBoarding.route) {
+                                inclusive = false
+                            }
+                        }
+                    },
+                    navigateToDashboard = {
+                        navController.navigate(Screen.Dashboard.route) {
+                            popUpTo(Screen.OnBoarding.route) {
+                                inclusive = true
+                            }
+                            launchSingleTop = true
+                        }
+                    }
+                )
+            }
+            composable(Screen.SignIn.route) {
+                SignInScreen(
+                    onBackClick = {
+                        navController.popBackStack()
+                    },
+                    onSignUpClicked = {
+                        navController.navigate(Screen.SignUp.route) {
+                            popUpTo(Screen.OnBoarding.route) {
+                                inclusive = false
+                            }
+                        }
+                    },
+                    navigateToDashboard = {
+                        navController.navigate(Screen.Dashboard.route) {
+                            popUpTo(Screen.OnBoarding.route) {
+                                inclusive = true
+                            }
+                            launchSingleTop = true
+                        }
+                    }
+                )
+            }
             composable(Screen.Dashboard.route) {
                 DashboardScreen(
                     navigateToAddTransaction = {
@@ -66,9 +122,8 @@ fun JetSpendingApp(
             }
             composable(Screen.AddTransaction.route) {
                 AddTransactionScreen(
-                    navController = navController,
                     onBackClick = {
-                        navController.navigateUp()
+                        navController.popBackStack()
                     }
                 )
             }

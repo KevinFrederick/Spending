@@ -51,7 +51,7 @@ fun ViewCustomDialog(
         Card(
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(
-                containerColor = Theme.custom.cardColor
+                containerColor = MaterialTheme.colorScheme.background
             )
         ) {
             Column(
@@ -120,7 +120,7 @@ fun ViewCustomDialog(
 @Preview(
     showBackground = true,
     device = Devices.PIXEL_9_PRO,
-    uiMode = Configuration.UI_MODE_NIGHT_YES
+    uiMode = Configuration.UI_MODE_NIGHT_NO
 )
 @Composable
 fun ViewCustomDialogPreview() {

@@ -51,9 +51,7 @@ fun DashboardContent(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = {
-                    navigateToAddTransaction()
-                },
+                onClick = navigateToAddTransaction,
                 containerColor = Blue500,
                 contentColor = Color.White,
                 shape = RoundedCornerShape(16.dp)

@@ -47,6 +47,7 @@ data class CustomColors(
     val textColor: Color,
     val iconColor: Color,
     val hintColor: Color,
+    val onBoardCardColor: Color
 )
 
 // Define the default/fallback
@@ -57,6 +58,7 @@ val LocalCustomColors = staticCompositionLocalOf {
         textColor = Color.Unspecified,
         iconColor = Color.Unspecified,
         hintColor = Color.Unspecified,
+        onBoardCardColor = Color.Unspecified
     )
 }
 
@@ -84,6 +86,7 @@ fun JetSpendingTheme(
             textColor = OffWhite,
             iconColor = Grey400,
             hintColor = Color.White.copy(alpha = 0.2f),
+            onBoardCardColor = Blue500.copy(alpha = 0.9f)
         )
     } else {
         CustomColors(
@@ -92,6 +95,7 @@ fun JetSpendingTheme(
             textColor = Grey900,
             iconColor = Grey800,
             hintColor = Grey400,
+            onBoardCardColor = Blue200.copy(alpha = 0.8f)
         )
     }
 

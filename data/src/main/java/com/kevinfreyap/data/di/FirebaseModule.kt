@@ -1,5 +1,6 @@
 package com.kevinfreyap.data.di
 
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.PersistentCacheSettings
 import com.google.firebase.firestore.firestoreSettings
@@ -22,4 +23,8 @@ class FirebaseModule {
         firestore.firestoreSettings = settings
         return firestore
     }
+
+    @Provides
+    @Singleton
+    fun provideFireAuth(): FirebaseAuth = FirebaseAuth.getInstance()
 }

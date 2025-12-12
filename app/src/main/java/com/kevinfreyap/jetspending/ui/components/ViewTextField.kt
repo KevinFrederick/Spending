@@ -2,6 +2,7 @@ package com.kevinfreyap.jetspending.ui.components
 
 import android.content.res.Configuration
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -34,6 +35,7 @@ fun ViewTextField(
     modifier: Modifier = Modifier,
     isError: Boolean = false,
     errorMessage: String = "",
+    trailingIcon: @Composable (() -> Unit)? = null,
     visualTransformation: VisualTransformation? = null,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default
 ) {
@@ -66,10 +68,14 @@ fun ViewTextField(
         ),
         visualTransformation = visualTransformation ?: VisualTransformation.None,
         trailingIcon = {
-            if (isError) {
-                ViewErrorTooltip(
-                    errorMessage = errorMessage
-                )
+            Row {
+                trailingIcon?.invoke()
+
+                if (isError) {
+                    ViewErrorTooltip(
+                        errorMessage = errorMessage
+                    )
+                }
             }
         },
         modifier = modifier

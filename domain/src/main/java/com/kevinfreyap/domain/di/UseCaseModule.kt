@@ -1,5 +1,7 @@
 package com.kevinfreyap.domain.di
 
+import com.kevinfreyap.domain.usecase.authentication.AuthenticationInteractor
+import com.kevinfreyap.domain.usecase.authentication.AuthenticationUseCase
 import com.kevinfreyap.domain.usecase.category.CategoryInteractor
 import com.kevinfreyap.domain.usecase.category.CategoryUseCase
 import com.kevinfreyap.domain.usecase.transaction.TransactionInteractor
@@ -13,6 +15,10 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class UseCaseModule {
+    @Binds
+    @Singleton
+    abstract fun provideAuthenticationUseCase(authenticationInteractor: AuthenticationInteractor): AuthenticationUseCase
+
     @Binds
     @Singleton
     abstract fun provideTransactionUseCase(transactionInteractor: TransactionInteractor): TransactionUseCase

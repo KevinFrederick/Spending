@@ -46,7 +46,12 @@ dependencies {
     api(libs.androidx.credentials)
     api(libs.androidx.credentials.play.services.auth)
     api(platform(libs.firebase.bom))
+    implementation(libs.googleid)
     implementation(libs.firebase.firestore)
+    implementation(libs.firebase.fireauth)
+
+    implementation(libs.androidx.datastore)
+    implementation(libs.androidx.datastore.preference)
 
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)

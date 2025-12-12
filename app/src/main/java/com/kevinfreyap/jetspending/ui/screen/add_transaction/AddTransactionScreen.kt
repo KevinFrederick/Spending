@@ -11,7 +11,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.navigation.NavController
 import com.kevinfreyap.domain.model.AppCurrency
 import kotlinx.coroutines.launch
 
@@ -19,7 +18,6 @@ import kotlinx.coroutines.launch
 @Composable
 fun AddTransactionScreen(
     onBackClick: () -> Unit,
-    navController: NavController,
     modifier: Modifier = Modifier,
     viewModel: AddTransactionViewModel = hiltViewModel(),
 ) {
@@ -106,7 +104,7 @@ fun AddTransactionScreen(
         showSuccessDialog = showSuccessDialog,
         onDismissDialog = {
             viewModel.onDialogDismissed()
-            navController.popBackStack()
+            onBackClick()
         },
         errors = errors,
         modifier = modifier,
