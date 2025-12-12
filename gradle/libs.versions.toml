@@ -23,6 +23,7 @@ firebaseFirestore = "26.0.2"
 firebaseAuth = "24.0.1"
 datastore = "1.2.0"
 splashScreen = "1.2.0"
+coil = "3.3.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -65,6 +66,9 @@ androidx-datastore = { group = "androidx.datastore", name = "datastore-core", ve
 androidx-datastore-preference = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore" }
 # Splash Screen
 androidx-splash-screen = { group = "androidx.core", name = "core-splashscreen", version.ref = "splashScreen"}
+# Coil (Load Image)
+coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
+coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coil" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -51,6 +51,8 @@ class AuthenticationInteractor @Inject constructor(
         return authenticationRepository.login(authRequest)
     }
 
+    override suspend fun logout(): DomainResult<Unit> = authenticationRepository.logout()
+
     private fun validateEmailAndPassword(
         email: String,
         password: String,

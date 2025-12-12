@@ -6,6 +6,8 @@ import com.kevinfreyap.domain.usecase.category.CategoryInteractor
 import com.kevinfreyap.domain.usecase.category.CategoryUseCase
 import com.kevinfreyap.domain.usecase.transaction.TransactionInteractor
 import com.kevinfreyap.domain.usecase.transaction.TransactionUseCase
+import com.kevinfreyap.domain.usecase.user.UserInteractor
+import com.kevinfreyap.domain.usecase.user.UserUseCase
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -27,4 +29,7 @@ abstract class UseCaseModule {
     @Singleton
     abstract fun provideCategoryUseCase(categoryInteractor: CategoryInteractor): CategoryUseCase
 
+    @Binds
+    @Singleton
+    abstract fun provideUserUseCase(userInteractor: UserInteractor): UserUseCase
 }

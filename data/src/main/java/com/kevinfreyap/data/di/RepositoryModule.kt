@@ -3,9 +3,11 @@ package com.kevinfreyap.data.di
 import com.kevinfreyap.data.repository.AuthenticationRepository
 import com.kevinfreyap.data.repository.CategoryRepository
 import com.kevinfreyap.data.repository.TransactionRepository
+import com.kevinfreyap.data.repository.UserRepository
 import com.kevinfreyap.domain.repository.IAuthenticationRepository
 import com.kevinfreyap.domain.repository.ICategoryRepository
 import com.kevinfreyap.domain.repository.ITransactionRepository
+import com.kevinfreyap.domain.repository.IUserRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -27,4 +29,7 @@ abstract class RepositoryModule {
     @Singleton
     abstract fun provideCategoryRepository(categoryRepository: CategoryRepository): ICategoryRepository
 
+    @Binds
+    @Singleton
+    abstract fun provideUserRepository(userRepository: UserRepository): IUserRepository
 }

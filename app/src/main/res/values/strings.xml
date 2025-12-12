@@ -5,6 +5,7 @@
     <!-- Screen Name -->
     <string name="dashboard">Dashboard</string>
     <string name="report">Report</string>
+    <string name="settings">Settings</string>
 
     <!-- Card Title -->
     <string name="balance_info">Balance Information</string>
@@ -31,6 +32,9 @@
     <string name="have_account_already">Have an account already?</string>
     <string name="do_not_have_account_label">Don\'t have an account?</string>
     <string name="forgot_password">Forgot Password?</string>
+    <string name="general">General</string>
+    <string name="preference">Preferences</string>
+    <string name="support">Support</string>
 
     <!-- Button -->
     <string name="cancel">Cancel</string>
@@ -44,10 +48,34 @@
     <string name="continue_with_google">Continue with Google</string>
     <string name="sign_in">Sign In</string>
     <string name="sign_up">Sign Up</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="notifications">Notifications</string>
+    <string name="security">Privacy &amp; Security</string>
+    <string name="language">Language</string>
+    <string name="currency">Currency</string>
+    <string name="logout">Log Out</string>
 
     <!-- Currency -->
 <!--    <string name="rupiah">Rp %1$s</string>-->
 <!--    <string name="taiwan_dollar">NT$ %1$s</string>-->
+
+    <!-- Theme -->
+    <string name="theme">Theme</string>
+    <string name="follow_system">Follow System</string>
+    <string name="light_mode">Light Mode</string>
+    <string name="dark_mode">Dark Mode</string>
+
+    <!-- Currency & Country Name -->
+    <string name="currency_idr">Rp | Indonesia (Rupiah)</string>
+    <string name="currency_twd">NT$ | Taiwan (New Taiwan Dollar)</string>
+    <string name="currency_usd">US$ | USA (US Dollar)</string>
+    <string name="currency_myr">RM | Malaysia (Ringgit)</string>
+
+    <!-- Country Name -->
+    <string name="country_id">Indonesia</string>
+    <string name="country_tw">Taiwan</string>
+    <string name="country_us">USA</string>
+    <string name="country_my">Malaysia</string>
 
     <!-- Success Message -->
     <string name="success">Success</string>
@@ -72,4 +100,5 @@
     <!-- Description -->
     <string name="description_sign_up">Let\'s get started with a free account</string>
     <string name="description_sign_in">Please enter your details</string>
+    <string name="description_log_out">Are you sure you want to log out?</string>
 </resources>

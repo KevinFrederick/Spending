@@ -26,6 +26,7 @@ import com.kevinfreyap.jetspending.ui.navigation.Screen
 import com.kevinfreyap.jetspending.ui.screen.add_transaction.AddTransactionScreen
 import com.kevinfreyap.jetspending.ui.screen.dashboard.DashboardScreen
 import com.kevinfreyap.jetspending.ui.screen.onboarding.OnboardingScreen
+import com.kevinfreyap.jetspending.ui.screen.settings.SettingsScreen
 import com.kevinfreyap.jetspending.ui.screen.signin.SignInScreen
 import com.kevinfreyap.jetspending.ui.screen.signup.SignUpScreen
 
@@ -40,7 +41,11 @@ fun JetSpendingApp(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    val bottomBarRoutes = listOf(Screen.Dashboard.route)
+    val bottomBarRoutes = listOf(
+        Screen.Dashboard.route,
+        Screen.Report.route,
+        Screen.Settings.route
+    )
 
     Scaffold(
         bottomBar = {
@@ -120,6 +125,17 @@ fun JetSpendingApp(
                     }
                 )
             }
+            composable(Screen.Settings.route) {
+                SettingsScreen(
+                    navigateToOnBoarding = {
+                        navController.navigate(Screen.OnBoarding.route) {
+                            popUpTo(0) {
+                                inclusive = true
+                            }
+                        }
+                    }
+                )
+            }
             composable(Screen.AddTransaction.route) {
                 AddTransactionScreen(
                     onBackClick = {
@@ -152,6 +168,11 @@ fun BottomBar(
                 title = stringResource(R.string.report),
                 icon = R.drawable.ic_bar_chart_24,
                 screen = Screen.Report
+            ),
+            NavigationItem(
+                title = stringResource(R.string.settings),
+                icon = R.drawable.ic_settings_24,
+                screen = Screen.Settings
             )
         )
 

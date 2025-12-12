@@ -1,16 +1,22 @@
 package com.kevinfreyap.data.repository
 
+import android.util.Log
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.userProfileChangeRequest
 import com.kevinfreyap.data.mapper.UserMapper
+import com.kevinfreyap.data.source.local.AppDatabase
 import com.kevinfreyap.data.source.local.UserPreferences
 import com.kevinfreyap.domain.error.ValidationError
 import com.kevinfreyap.domain.model.AuthenticationRequest
 import com.kevinfreyap.domain.repository.IAuthenticationRepository
 import com.kevinfreyap.domain.resource.DomainResult
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import java.lang.Exception
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -19,6 +25,7 @@ import javax.inject.Singleton
 class AuthenticationRepository @Inject constructor(
     private val firebaseAuth: FirebaseAuth,
     private val userPreferences: UserPreferences,
+    private val database: AppDatabase,
     private val userMapper: UserMapper
 ): IAuthenticationRepository {
     override suspend fun isUserLoggedIn(): Boolean {
@@ -32,7 +39,18 @@ class AuthenticationRepository @Inject constructor(
                 authRequest.password
             ).await()
 
-            handleAuthResult(response)
+            val user = response.user ?: return DomainResult.Failure(Throwable("Firebase returned null user"))
+
+            val defaultName = authRequest.email
+                .substringBefore("@")
+                .replaceFirstChar { it.uppercase() }
+
+            val profileUpdates = userProfileChangeRequest {
+                displayName = defaultName
+            }
+            user.updateProfile(profileUpdates).await()
+
+            handleAuthResult(user)
         } catch (_: FirebaseAuthUserCollisionException) {
             DomainResult.ValidationFailed(listOf(
                 ValidationError.AuthenticationEmailAlreadyUsed
@@ -50,7 +68,9 @@ class AuthenticationRepository @Inject constructor(
                 authRequest.password
             ).await()
 
-            handleAuthResult(response)
+            val user = response.user ?: return DomainResult.Failure(Throwable("Firebase returned null user"))
+
+            handleAuthResult(user)
         } catch (_: FirebaseAuthInvalidCredentialsException) {
             DomainResult.ValidationFailed(listOf(
                 ValidationError.AuthenticationWrongPassword
@@ -61,8 +81,26 @@ class AuthenticationRepository @Inject constructor(
         }
     }
 
-    private suspend fun handleAuthResult(response: AuthResult): DomainResult<Unit> {
-        val user = response.user ?: return DomainResult.Failure(Throwable("Firebase returned null user"))
+    override suspend fun logout(): DomainResult<Unit> {
+        return try {
+            userPreferences.clearSession()
+            withContext(Dispatchers.IO) {
+                database.clearAllTables()
+            }
+
+            try {
+                firebaseAuth.signOut()
+            } catch (e: Exception) {
+                Log.e(TAG, "Server logout failed", e)
+            }
+
+            DomainResult.Success(Unit)
+        } catch (e: Exception) {
+            DomainResult.Failure(e)
+        }
+    }
+
+    private suspend fun handleAuthResult(user: FirebaseUser): DomainResult<Unit> {
         return try {
             val domainUser = userMapper.mapFirebaseUserToUser(user)
             userPreferences.saveUser(domainUser)
@@ -71,5 +109,9 @@ class AuthenticationRepository @Inject constructor(
         } catch (e: Exception) {
             DomainResult.Failure(e)
         }
+    }
+
+    companion object {
+        private const val TAG = "AuthenticationRepository"
     }
 }

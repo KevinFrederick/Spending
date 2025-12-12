@@ -91,7 +91,7 @@ fun ViewCustomDialog(
                 if (message != null) {
                     Text(
                         text = message,
-                        style = MaterialTheme.typography.titleMedium,
+                        style = MaterialTheme.typography.bodyLarge,
                         color = Theme.custom.textColor,
                         textAlign = TextAlign.Center,
                         modifier = Modifier
