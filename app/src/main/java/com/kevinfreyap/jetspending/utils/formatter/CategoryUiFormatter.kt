@@ -1,11 +1,10 @@
-package com.kevinfreyap.jetspending.utils.mapper
+package com.kevinfreyap.jetspending.utils.formatter
 
 import com.kevinfreyap.domain.model.Category
 import com.kevinfreyap.jetspending.R
 import com.kevinfreyap.jetspending.ui.model.CategoryUI
-import javax.inject.Inject
 
-class CategoryUiMapper @Inject constructor() {
+object CategoryUiFormatter {
     fun mapCategoryDomainToUi(domain: Category): CategoryUI {
         return CategoryUI(
             id = domain.id,

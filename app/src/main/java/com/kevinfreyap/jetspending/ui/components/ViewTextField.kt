@@ -33,19 +33,33 @@ fun ViewTextField(
     onValueChange: (String) -> Unit,
     label: String,
     modifier: Modifier = Modifier,
+    placeholder: String? = null,
     isError: Boolean = false,
     errorMessage: String = "",
     trailingIcon: @Composable (() -> Unit)? = null,
     visualTransformation: VisualTransformation? = null,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    shape: RoundedCornerShape = RoundedCornerShape(16.dp)
 ) {
     val focusManager = LocalFocusManager.current
 
     TextField(
         value = value,
         onValueChange = onValueChange,
-        label = {
-            Text(label)
+        label = if (placeholder.isNullOrBlank()) {
+            @Composable { Text(label) }
+        } else {
+            null
+        },
+        placeholder = if (!placeholder.isNullOrBlank()) {
+            @Composable {
+                Text(
+                    placeholder,
+                    color = Theme.custom.hintColor
+                )
+            }
+        } else {
+            null
         },
         isError = isError,
         keyboardOptions = keyboardOptions,
@@ -55,7 +69,7 @@ fun ViewTextField(
             }
         ),
         singleLine = true,
-        shape = RoundedCornerShape(16.dp),
+        shape = shape,
         colors = TextFieldDefaults.colors(
             unfocusedContainerColor = Theme.custom.cardColor,
             focusedContainerColor = Theme.custom.cardColor,
@@ -84,7 +98,7 @@ fun ViewTextField(
             .border(
                 width = if (isError) 2.dp else 0.dp,
                 color = if (isError) MaterialTheme.colorScheme.error else Color.Transparent,
-                shape = RoundedCornerShape(16.dp)
+                shape = shape
             )
     )
 }
@@ -104,6 +118,7 @@ fun ViewTextFieldPreview(){
                 testTextInput = it
             },
             label = "Text Field Label",
+            placeholder = "Text",
             isError = true,
             errorMessage = "Required"
         )

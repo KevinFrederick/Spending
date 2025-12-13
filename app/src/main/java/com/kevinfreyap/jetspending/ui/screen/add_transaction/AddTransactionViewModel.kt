@@ -3,7 +3,6 @@ package com.kevinfreyap.jetspending.ui.screen.add_transaction
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kevinfreyap.domain.error.ErrorMessage
 import com.kevinfreyap.domain.error.Field
 import com.kevinfreyap.domain.error.ValidationError
 import com.kevinfreyap.domain.model.AppCurrency
@@ -11,13 +10,12 @@ import com.kevinfreyap.domain.model.TransactionType
 import com.kevinfreyap.domain.resource.DomainResult
 import com.kevinfreyap.domain.usecase.category.CategoryUseCase
 import com.kevinfreyap.domain.usecase.transaction.TransactionUseCase
-import com.kevinfreyap.jetspending.utils.mapper.CategoryUiMapper
 import com.kevinfreyap.jetspending.ui.model.CategoryUI
 import com.kevinfreyap.jetspending.ui.model.UiState
 import com.kevinfreyap.jetspending.utils.ErrorHelper
+import com.kevinfreyap.jetspending.utils.formatter.CategoryUiFormatter
 import com.kevinfreyap.jetspending.utils.formatter.CurrencyUiFormatter
 import com.kevinfreyap.jetspending.utils.formatter.DateFormatter
-import com.kevinfreyap.jetspending.utils.formatter.ErrorFormatter
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -34,7 +32,6 @@ import javax.inject.Inject
 class AddTransactionViewModel @Inject constructor(
     private val transactionUseCase: TransactionUseCase,
     private val categoryUseCase: CategoryUseCase,
-    private val categoryUiMapper: CategoryUiMapper
 ): ViewModel(){
     private val _currencyCode = AppCurrency.IDR
 
@@ -142,7 +139,7 @@ class AddTransactionViewModel @Inject constructor(
             categoryUseCase.getCategoryByType(type).collect { categories ->
                 _categories.value = categories
                     .map { category ->
-                        categoryUiMapper.mapCategoryDomainToUi(category)
+                        CategoryUiFormatter.mapCategoryDomainToUi(category)
                     }
                     .sortedBy { it.sortOrder }
             }

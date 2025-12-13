@@ -28,4 +28,10 @@ object DateFormatter {
             "${dayFormatter.format(localDate)}, ${dateFormatter.format(localDate)}"
         }
     }
+
+    fun formatToMonthYear(instant: Instant): String {
+        val monthYearFormatter = DateTimeFormatter.ofPattern("MMMM yyyy")
+            .withZone(zoneId)
+        return monthYearFormatter.format(instant)
+    }
 }

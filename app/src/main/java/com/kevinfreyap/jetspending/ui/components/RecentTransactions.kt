@@ -24,14 +24,18 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kevinfreyap.jetspending.R
+import com.kevinfreyap.jetspending.ui.model.TransactionItemUi
 import com.kevinfreyap.jetspending.ui.theme.Green500
 import com.kevinfreyap.jetspending.ui.theme.Grey600
 import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
 import com.kevinfreyap.jetspending.ui.theme.Theme
+import java.time.Instant
 
 @Composable
 fun RecentTransactions(
-    transactions: List<Int>,
+    transactions: List<TransactionItemUi>,
+    navigateToTransactionList: () -> Unit,
+    navigateToDetail: (String) -> Unit,
     modifier: Modifier = Modifier
 ){
     Card(
@@ -39,6 +43,7 @@ fun RecentTransactions(
         colors = CardDefaults.cardColors(
             containerColor = Theme.custom.cardColor,
         ),
+        onClick = navigateToTransactionList,
         modifier = modifier
             .fillMaxWidth()
     ) {
@@ -78,13 +83,12 @@ fun RecentTransactions(
             ) {
                 transactions.forEach { transaction ->
                     // Key -> transaction.id
-                    key(transaction) {
+                    key(transaction.transactionId) {
                         ViewTransactionItem(
-                            transactionName = "Salary",
-                            transactionDate = "24 Oct 2025",
-                            transactionAmount = "+ Rp 1.000.000",
-                            transactionIcon = R.drawable.ic_salary_icon,
-                            transactionTypeColor = Green500,
+                            transaction = transaction,
+                            navigateToDetail = {
+                                navigateToDetail(transaction.transactionId)
+                            }
                         )
                     }
                 }
@@ -102,7 +106,37 @@ fun RecentTransactions(
 fun RecentTransactionsPreview() {
     JetSpendingTheme {
         RecentTransactions(
-            transactions = listOf(1,2,3)
+            transactions = listOf(
+                TransactionItemUi(
+                    transactionId = "1",
+                    transactionName = "Salary",
+                    transactionAmount = "+ Rp 1.000.000",
+                    transactionDate = "24 November 2025",
+                    transactionDateRaw = Instant.now(),
+                    transactionTypeBackground = Green500,
+                    transactionCategoryIcon = R.drawable.ic_salary_icon,
+                ),
+                TransactionItemUi(
+                    transactionId = "2",
+                    transactionName = "Salary",
+                    transactionAmount = "+ Rp 1.000.000",
+                    transactionDate = "24 November 2025",
+                    transactionDateRaw = Instant.now(),
+                    transactionTypeBackground = Green500,
+                    transactionCategoryIcon = R.drawable.ic_salary_icon,
+                ),
+                TransactionItemUi(
+                    transactionId = "3",
+                    transactionName = "Salary",
+                    transactionAmount = "+ Rp 1.000.000",
+                    transactionDate = "24 November 2025",
+                    transactionDateRaw = Instant.now(),
+                    transactionTypeBackground = Green500,
+                    transactionCategoryIcon = R.drawable.ic_salary_icon,
+                )
+            ),
+            navigateToDetail = {},
+            navigateToTransactionList = {}
         )
     }
 }
@@ -116,7 +150,37 @@ fun RecentTransactionsPreview() {
 fun RecentTransactionsDarkPreview() {
     JetSpendingTheme {
         RecentTransactions(
-            transactions = listOf(1,2,3)
+            transactions = listOf(
+                TransactionItemUi(
+                    transactionId = "1",
+                    transactionName = "Salary",
+                    transactionAmount = "+ Rp 1.000.000",
+                    transactionDate = "24 November 2025",
+                    transactionDateRaw = Instant.now(),
+                    transactionTypeBackground = Green500,
+                    transactionCategoryIcon = R.drawable.ic_salary_icon,
+                ),
+                TransactionItemUi(
+                    transactionId = "2",
+                    transactionName = "Salary",
+                    transactionAmount = "+ Rp 1.000.000",
+                    transactionDate = "24 November 2025",
+                    transactionDateRaw = Instant.now(),
+                    transactionTypeBackground = Green500,
+                    transactionCategoryIcon = R.drawable.ic_salary_icon,
+                ),
+                TransactionItemUi(
+                    transactionId = "3",
+                    transactionName = "Salary",
+                    transactionAmount = "+ Rp 1.000.000",
+                    transactionDate = "24 November 2025",
+                    transactionDateRaw = Instant.now(),
+                    transactionTypeBackground = Green500,
+                    transactionCategoryIcon = R.drawable.ic_salary_icon,
+                )
+            ),
+            navigateToDetail = {},
+            navigateToTransactionList = {}
         )
     }
 }

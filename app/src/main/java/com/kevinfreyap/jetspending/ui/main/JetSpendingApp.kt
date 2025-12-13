@@ -25,6 +25,7 @@ import com.kevinfreyap.jetspending.ui.navigation.NavigationItem
 import com.kevinfreyap.jetspending.ui.navigation.Screen
 import com.kevinfreyap.jetspending.ui.screen.add_transaction.AddTransactionScreen
 import com.kevinfreyap.jetspending.ui.screen.dashboard.DashboardScreen
+import com.kevinfreyap.jetspending.ui.screen.list.TransactionListScreen
 import com.kevinfreyap.jetspending.ui.screen.onboarding.OnboardingScreen
 import com.kevinfreyap.jetspending.ui.screen.settings.SettingsScreen
 import com.kevinfreyap.jetspending.ui.screen.signin.SignInScreen
@@ -122,6 +123,12 @@ fun JetSpendingApp(
                 DashboardScreen(
                     navigateToAddTransaction = {
                         navController.navigate(Screen.AddTransaction.route)
+                    },
+                    navigateToTransactionList = {
+                        navController.navigate(Screen.TransactionList.route)
+                    },
+                    navigateToDetail = {
+
                     }
                 )
             }
@@ -140,6 +147,16 @@ fun JetSpendingApp(
                 AddTransactionScreen(
                     onBackClick = {
                         navController.popBackStack()
+                    }
+                )
+            }
+            composable(Screen.TransactionList.route) {
+                TransactionListScreen(
+                    onBackClick = {
+                        navController.popBackStack()
+                    },
+                    navigateToDetail = {
+
                     }
                 )
             }

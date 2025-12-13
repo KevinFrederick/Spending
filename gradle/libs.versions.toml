@@ -17,13 +17,14 @@ room = "2.8.4"
 desugarJdkLibs = "2.1.5"
 googleGmsGoogleServices = "4.4.4"
 credentials = "1.5.0"
-firebaseBom = "34.6.0"
+firebaseBom = "34.7.0"
 googleid = "1.1.1"
 firebaseFirestore = "26.0.2"
 firebaseAuth = "24.0.1"
 datastore = "1.2.0"
 splashScreen = "1.2.0"
 coil = "3.3.0"
+paging = "3.3.6"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -51,6 +52,9 @@ hilt-navigation = { group = "androidx.hilt", name = "hilt-navigation-compose", v
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+# Paging
+androidx-paging-runtime = { group = "androidx.paging", name = "paging-runtime", version.ref = "paging" }
+androidx-paging-compose = { group = "androidx.paging", name = "paging-compose", version.ref = "paging" }
 androidx-room-paging = { group = "androidx.room", name = "room-paging", version.ref = "room" }
 # Desugar
 android-desugarJdkLibs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "desugarJdkLibs" }

@@ -64,6 +64,8 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.splash.screen)
 
+    implementation(libs.androidx.paging.compose)
+
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
 

@@ -61,6 +61,8 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
 
+    implementation(libs.androidx.paging.runtime)
+
     coreLibraryDesugaring(libs.android.desugarJdkLibs)
 
     testImplementation(libs.junit)
