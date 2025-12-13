@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kevinfreyap.domain.error.ErrorMessage
 import com.kevinfreyap.domain.error.Field
+import com.kevinfreyap.domain.error.ValidationError
 import com.kevinfreyap.domain.model.AppCurrency
 import com.kevinfreyap.domain.model.TransactionType
 import com.kevinfreyap.domain.resource.DomainResult
@@ -12,6 +13,8 @@ import com.kevinfreyap.domain.usecase.category.CategoryUseCase
 import com.kevinfreyap.domain.usecase.transaction.TransactionUseCase
 import com.kevinfreyap.jetspending.utils.mapper.CategoryUiMapper
 import com.kevinfreyap.jetspending.ui.model.CategoryUI
+import com.kevinfreyap.jetspending.ui.model.UiState
+import com.kevinfreyap.jetspending.utils.ErrorHelper
 import com.kevinfreyap.jetspending.utils.formatter.CurrencyUiFormatter
 import com.kevinfreyap.jetspending.utils.formatter.DateFormatter
 import com.kevinfreyap.jetspending.utils.formatter.ErrorFormatter
@@ -78,23 +81,9 @@ class AddTransactionViewModel @Inject constructor(
             initialValue = DateFormatter.formatToDateWithDay(Instant.now())
         )
 
-    // Error
-    private val _errors = MutableStateFlow<Map<Field, ErrorMessage>>(emptyMap())
-    val errors: StateFlow<Map<Field, Int>> = _errors
-        .map { values ->
-            values.mapValues { entry ->
-                ErrorFormatter.getErrorMessage(entry.value)
-            }
-        }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = emptyMap()
-        )
-
-    // Loading
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading = _isLoading.asStateFlow()
+    // UiState
+    private val _uiState = MutableStateFlow<UiState<Unit>>(UiState.Idle)
+    val uiState = _uiState.asStateFlow()
 
     // Success
     private val _showSuccessDialog = MutableStateFlow(false)
@@ -108,11 +97,7 @@ class AddTransactionViewModel @Inject constructor(
     fun onNameChange(name: String) {
         _transactionName.value = name
 
-        if (_errors.value.containsKey(Field.TRANSACTION_NAME)) {
-            val newErrors = _errors.value.toMutableMap()
-            newErrors.remove(Field.TRANSACTION_NAME)
-            _errors.value = newErrors
-        }
+        _uiState.value = ErrorHelper.removeError(_uiState.value, Field.TRANSACTION_NAME)
     }
 
     // Amount
@@ -136,11 +121,7 @@ class AddTransactionViewModel @Inject constructor(
 
         _transactionAmountInput.value = cleanAmount
 
-        if (_errors.value.containsKey(Field.TRANSACTION_AMOUNT)) {
-            val newErrors = _errors.value.toMutableMap()
-            newErrors.remove(Field.TRANSACTION_AMOUNT)
-            _errors.value = newErrors
-        }
+        _uiState.value = ErrorHelper.removeError(_uiState.value, Field.TRANSACTION_AMOUNT)
     }
 
     fun onPositiveBtnAmount() {
@@ -171,11 +152,7 @@ class AddTransactionViewModel @Inject constructor(
     fun onSelectCategory(item: CategoryUI) {
         _selectedCategory.value = item
 
-        if (_errors.value.containsKey(Field.TRANSACTION_CATEGORY)) {
-            val newErrors = _errors.value.toMutableMap()
-            newErrors.remove(Field.TRANSACTION_CATEGORY)
-            _errors.value = newErrors
-        }
+        _uiState.value = ErrorHelper.removeError(_uiState.value, Field.TRANSACTION_CATEGORY)
     }
 
     // Date
@@ -190,65 +167,52 @@ class AddTransactionViewModel @Inject constructor(
         name: String,
         amount: BigDecimal,
         category: CategoryUI?
-    ) {
-        val currentErrors = _errors.value.toMutableMap()
+    ): List<ValidationError> {
+        val currentErrors = mutableListOf<ValidationError>()
 
-        if (name.isBlank()) {
-            currentErrors[Field.TRANSACTION_NAME] = ErrorMessage.TRANSACTION_NAME_REQUIRED
-        } else {
-            currentErrors.remove(Field.TRANSACTION_NAME)
-        }
+        if (name.isBlank()) currentErrors.add(ValidationError.TransactionNameRequired)
+        if (amount <= BigDecimal.ZERO) currentErrors.add(ValidationError.TransactionAmountInvalid)
+        if (category == null) currentErrors.add(ValidationError.TransactionCategoryMissing)
 
-        if (amount <= BigDecimal.ZERO){
-            currentErrors[Field.TRANSACTION_AMOUNT] = ErrorMessage.TRANSACTION_AMOUNT_ZERO
-        } else {
-            currentErrors.remove(Field.TRANSACTION_AMOUNT)
-        }
-
-        if (category == null) {
-            currentErrors[Field.TRANSACTION_CATEGORY] = ErrorMessage.TRANSACTION_CATEGORY_NOT_SELECTED
-        } else {
-            currentErrors.remove(Field.TRANSACTION_CATEGORY)
-        }
-
-        _errors.value = currentErrors
+        return currentErrors
     }
 
     fun onSaveTransaction() {
-        validateTransaction(
+        _uiState.value = UiState.Loading
+
+        val validationRes = validateTransaction(
             name = _transactionName.value,
             amount = _transactionRawAmount.value,
             category = _selectedCategory.value
         )
-        if (_errors.value.isEmpty()) {
-            val transactionCategoryId = _selectedCategory.value?.id ?: ""
 
-            _isLoading.value = true
+        if (validationRes.isNotEmpty()) {
+            _uiState.value = UiState.ValidationErrors(ErrorHelper.validationErrorsToUiError(validationRes))
+            return
+        }
 
-            viewModelScope.launch {
-                try {
-                    val result = transactionUseCase.insertTransaction(
-                        name = _transactionName.value,
-                        amount = _transactionRawAmount.value,
-                        type = _type.value,
-                        categoryId = transactionCategoryId,
-                        date = _selectedDate.value
-                    )
+        val transactionCategoryId = _selectedCategory.value?.id ?: ""
 
-                    when(result) {
-                        is DomainResult.Success -> {
-                            _showSuccessDialog.value = true
-                            _errors.value = emptyMap()
-                        }
-                        is DomainResult.Failure -> {
-                            Log.e(VIEWMODEL_TAG, result.throwable.message ?: "Something Wrong")
-                        }
-                        is DomainResult.ValidationFailed -> {
-                            _errors.value = result.errors.associate { it.field to it.message }
-                        }
-                    }
-                } finally {
-                    _isLoading.value = false
+        viewModelScope.launch {
+            val result = transactionUseCase.insertTransaction(
+                name = _transactionName.value,
+                amount = _transactionRawAmount.value,
+                type = _type.value,
+                categoryId = transactionCategoryId,
+                date = _selectedDate.value
+            )
+
+            when(result) {
+                is DomainResult.Success -> {
+                    _uiState.value = UiState.Success(Unit)
+                    _showSuccessDialog.value = true
+                }
+                is DomainResult.ValidationFailed -> {
+                    _uiState.value = UiState.ValidationErrors(ErrorHelper.validationErrorsToUiError(result.errors))
+                }
+                is DomainResult.Failure -> {
+                    Log.e(VIEWMODEL_TAG, result.throwable.message ?: "Something Wrong")
+                    _uiState.value = UiState.Failure(result.throwable)
                 }
             }
         }

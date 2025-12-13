@@ -125,7 +125,8 @@ fun SignInContent(
         topBar = {
             ViewTopBar(
                 title = "",
-                onBackClick = onBackClick
+                onBackClick = onBackClick,
+                isLoading = uiState is UiState.Loading
             )
         }
     ) { innerPadding ->

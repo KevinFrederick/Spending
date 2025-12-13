@@ -18,7 +18,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -54,6 +53,7 @@ import com.kevinfreyap.jetspending.ui.components.ViewTextField
 import com.kevinfreyap.jetspending.ui.components.ViewTopBar
 import com.kevinfreyap.jetspending.ui.components.ViewTypeSelector
 import com.kevinfreyap.jetspending.ui.model.CategoryUI
+import com.kevinfreyap.jetspending.ui.model.UiState
 import com.kevinfreyap.jetspending.ui.theme.Green500
 import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
 import com.kevinfreyap.jetspending.ui.theme.Theme
@@ -91,20 +91,32 @@ fun AddTransactionContent(
     onShowDatePicker: (Boolean) -> Unit,
     categories: List<CategoryUI>,
     onSaveBtnClicked: () -> Unit,
-    isLoading: Boolean,
     showSuccessDialog: Boolean,
     onDismissDialog: () -> Unit,
-    errors: Map<Field, Int>,
+    uiState: UiState<Unit>,
     modifier: Modifier = Modifier
 ) {
     val focusManager = LocalFocusManager.current
+
+    val nameError = if (uiState is UiState.ValidationErrors){
+        uiState.errors[Field.TRANSACTION_NAME]
+    } else null
+
+    val amountError = if (uiState is UiState.ValidationErrors){
+        uiState.errors[Field.TRANSACTION_AMOUNT]
+    } else null
+
+    val categoryError = if (uiState is UiState.ValidationErrors){
+        uiState.errors[Field.TRANSACTION_CATEGORY]
+    } else null
 
     Scaffold(
         topBar = {
             ViewTopBar(
                 title = stringResource(R.string.add_transaction),
                 onCurrencyIconClick = {},
-                onBackClick = { onBackClick() }
+                onBackClick = { onBackClick() },
+                isLoading = uiState is UiState.Loading
             )
         }
     ) { innerPadding ->
@@ -124,12 +136,11 @@ fun AddTransactionContent(
                 style = MaterialTheme.typography.titleMedium
             )
 
-            val nameError = errors[Field.TRANSACTION_NAME]
             ViewTextField(
                 value = transactionName,
                 onValueChange = onTransactionNameChange,
                 isError = nameError != null,
-                errorMessage = if (nameError != null) stringResource(nameError) else "",
+                errorMessage = nameError?.let { stringResource(it) } ?: "",
                 label = stringResource(R.string.transaction_name),
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Done
@@ -141,7 +152,6 @@ fun AddTransactionContent(
                     .height(8.dp)
             )
 
-            val amountError = errors[Field.TRANSACTION_AMOUNT]
             ViewAmountCard(
                 onTransactionAmountClick = {
                     focusManager.clearFocus()
@@ -150,7 +160,7 @@ fun AddTransactionContent(
                 },
                 transactionAmount = transactionAmountFormatted,
                 isError = amountError != null,
-                errorMessage = if (amountError != null) stringResource(amountError) else ""
+                errorMessage = amountError?.let { stringResource(it) } ?: ""
             )
 
             Spacer(
@@ -169,11 +179,9 @@ fun AddTransactionContent(
             )
 
             Box {
-                val categoryErrorMessage = errors[Field.TRANSACTION_CATEGORY]
-                val isCategoryError = categoryErrorMessage != null
-                if (isCategoryError) {
+                if (categoryError != null) {
                     ViewErrorTooltip(
-                        errorMessage = stringResource(categoryErrorMessage),
+                        errorMessage = stringResource(categoryError),
                         modifier = Modifier
                             .align(Alignment.TopEnd)
                             .offset(y = (-12).dp)
@@ -183,7 +191,7 @@ fun AddTransactionContent(
                 Column {
                     Text(
                         text = stringResource(R.string.category),
-                        color = if (isCategoryError) MaterialTheme.colorScheme.error else Theme.custom.textColor,
+                        color = if (categoryError != null) MaterialTheme.colorScheme.error else Theme.custom.textColor,
                         style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier
                             .padding(start = 8.dp)
@@ -268,19 +276,11 @@ fun AddTransactionContent(
                 modifier = Modifier
                     .fillMaxWidth()
             ) {
-                if (isLoading) {
-                    CircularProgressIndicator(
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        strokeWidth = 2.dp,
-                        modifier = Modifier.size(24.dp)
-                    )
-                } else {
-                    Text(
-                        text = stringResource(R.string.save_transaction),
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        style = MaterialTheme.typography.titleLarge
-                    )
-                }
+                Text(
+                    text = stringResource(R.string.save_transaction),
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    style = MaterialTheme.typography.titleLarge
+                )
             }
         }
 
@@ -428,8 +428,7 @@ fun AddTransactionContentPreview() {
             onSaveBtnClicked = {},
             showSuccessDialog = false,
             onDismissDialog = {},
-            isLoading = false,
-            errors = emptyMap()
+            uiState = UiState.Idle
         )
     }
 }

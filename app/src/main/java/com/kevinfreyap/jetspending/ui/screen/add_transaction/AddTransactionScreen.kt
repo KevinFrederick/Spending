@@ -31,8 +31,7 @@ fun AddTransactionScreen(
     val selectedCategory by viewModel.selectedCategory.collectAsState()
     val date by viewModel.selectedDate.collectAsState()
     val dateText by viewModel.selectedDateText.collectAsState()
-    val errors by viewModel.errors.collectAsState()
-    val loading by viewModel.isLoading.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
     val showSuccessDialog by viewModel.showSuccessDialog.collectAsState()
 
     // If close with button or other action put in stateful
@@ -100,13 +99,12 @@ fun AddTransactionScreen(
         onSaveBtnClicked = {
             viewModel.onSaveTransaction()
         },
-        isLoading = loading,
         showSuccessDialog = showSuccessDialog,
         onDismissDialog = {
             viewModel.onDialogDismissed()
             onBackClick()
         },
-        errors = errors,
+        uiState = uiState,
         modifier = modifier,
     )
 }
