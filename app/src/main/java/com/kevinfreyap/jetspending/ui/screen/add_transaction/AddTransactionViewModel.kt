@@ -11,7 +11,7 @@ import com.kevinfreyap.domain.resource.DomainResult
 import com.kevinfreyap.domain.usecase.category.CategoryUseCase
 import com.kevinfreyap.domain.usecase.transaction.TransactionUseCase
 import com.kevinfreyap.jetspending.ui.model.CategoryUI
-import com.kevinfreyap.jetspending.ui.model.UiState
+import com.kevinfreyap.jetspending.ui.state.UiState
 import com.kevinfreyap.jetspending.utils.ErrorHelper
 import com.kevinfreyap.jetspending.utils.formatter.CategoryUiFormatter
 import com.kevinfreyap.jetspending.utils.formatter.CurrencyUiFormatter
@@ -104,17 +104,9 @@ class AddTransactionViewModel @Inject constructor(
     }
 
     fun onRawAmountChanged(amount: String) {
-        var cleanAmount = amount.replace(',', '.')
+        val cleanAmount = CurrencyUiFormatter.cleanAmount(amount, _currencyCode)
 
-        val decimalIndex = cleanAmount.indexOf('.')
-        if (decimalIndex >= 0) {
-            val decimalsAfterDot = cleanAmount.substring(decimalIndex + 1)
-            if (decimalsAfterDot == "00") return
-            if (decimalsAfterDot.length > 2) return
-        }
-
-        if (cleanAmount.count { it == '.' } > 1) return
-        cleanAmount = cleanAmount.filter { it.isDigit() || it == '.' }
+        if (cleanAmount == null) return
 
         _transactionAmountInput.value = cleanAmount
 

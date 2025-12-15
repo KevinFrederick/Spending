@@ -1,4 +1,4 @@
-package com.kevinfreyap.jetspending.ui.model
+package com.kevinfreyap.jetspending.ui.state
 
 import com.kevinfreyap.domain.error.Field
 

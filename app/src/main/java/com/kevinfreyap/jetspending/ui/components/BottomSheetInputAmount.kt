@@ -1,5 +1,6 @@
 package com.kevinfreyap.jetspending.ui.components
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,9 +11,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -20,6 +24,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.kevinfreyap.domain.model.AppCurrency
 import com.kevinfreyap.jetspending.R
 import com.kevinfreyap.jetspending.ui.theme.Blue500
 import com.kevinfreyap.jetspending.ui.theme.Grey500
@@ -31,6 +36,7 @@ fun BottomSheetInputAmount(
     amountInputSlot: @Composable () -> Unit,
     onPositiveClick: () -> Unit,
     onNegativeClick: () -> Unit,
+    currencyCode: AppCurrency,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -43,7 +49,29 @@ fun BottomSheetInputAmount(
             style = MaterialTheme.typography.titleLarge,
         )
 
-        amountInputSlot()
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Card(
+                colors = CardDefaults.cardColors(
+                    containerColor = Theme.custom.cardColor
+                ),
+            ) {
+                Text(
+                    text = currencyCode.symbol,
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier
+                        .padding(16.dp)
+                )
+            }
+
+            Spacer(
+                modifier = Modifier
+                    .width(8.dp)
+            )
+            amountInputSlot()
+        }
+
 
         Row(
             horizontalArrangement = Arrangement.End,
@@ -82,7 +110,7 @@ fun BottomSheetInputAmount(
 
 @Preview(
     showBackground = true,
-    device = Devices.PIXEL_9_PRO
+    device = Devices.PIXEL_9_PRO,
 )
 @Composable
 fun BottomSheetInputAmountPreview(){
@@ -97,12 +125,9 @@ fun BottomSheetInputAmountPreview(){
                         keyboardType = KeyboardType.Number,
                         imeAction = ImeAction.Done
                     ),
-                    modifier = Modifier
-                        .padding(
-                            top = 4.dp
-                        )
                 )
             },
+            currencyCode = AppCurrency.IDR,
             onPositiveClick = {},
             onNegativeClick = {}
         )

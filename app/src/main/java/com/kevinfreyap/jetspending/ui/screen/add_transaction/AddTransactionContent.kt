@@ -20,13 +20,10 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SelectableDates
-import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -34,7 +31,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -42,7 +38,6 @@ import com.kevinfreyap.domain.error.Field
 import com.kevinfreyap.domain.model.AppCurrency
 import com.kevinfreyap.domain.model.TransactionType
 import com.kevinfreyap.jetspending.R
-import com.kevinfreyap.jetspending.ui.components.BottomSheetInputAmount
 import com.kevinfreyap.jetspending.ui.components.ViewAmountCard
 import com.kevinfreyap.jetspending.ui.components.ViewCalendarInput
 import com.kevinfreyap.jetspending.ui.components.ViewCategoryItem
@@ -53,18 +48,16 @@ import com.kevinfreyap.jetspending.ui.components.ViewTextField
 import com.kevinfreyap.jetspending.ui.components.ViewTopBar
 import com.kevinfreyap.jetspending.ui.components.ViewTypeSelector
 import com.kevinfreyap.jetspending.ui.model.CategoryUI
-import com.kevinfreyap.jetspending.ui.model.UiState
+import com.kevinfreyap.jetspending.ui.state.UiState
 import com.kevinfreyap.jetspending.ui.theme.Green500
 import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
 import com.kevinfreyap.jetspending.ui.theme.Theme
-import com.kevinfreyap.jetspending.utils.CurrencyVisualTransformation
 import kotlinx.coroutines.delay
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
 import kotlin.collections.forEach
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddTransactionContent(
     onBackClick: () -> Unit,
@@ -73,13 +66,9 @@ fun AddTransactionContent(
     currencyCode: AppCurrency,
     transactionAmountFormatted: String,
     onPositiveBtnBottomSheet: () -> Unit,
-    onNegativeBtnBottomSheet: () -> Unit,
     transactionAmountInput: String,
     onTransactionAmountChange: (String) -> Unit,
-    showBottomSheet: Boolean,
-    sheetState: SheetState,
     onInitBottomSheet: () -> Unit,
-    onShowBottomSheet: (Boolean) -> Unit,
     selectedOption: TransactionType,
     onSelectOption: (TransactionType) -> Unit,
     selectedCategory: CategoryUI?,
@@ -156,11 +145,15 @@ fun AddTransactionContent(
                 onTransactionAmountClick = {
                     focusManager.clearFocus()
                     onInitBottomSheet()
-                    onShowBottomSheet(true)
                 },
                 transactionAmount = transactionAmountFormatted,
                 isError = amountError != null,
-                errorMessage = amountError?.let { stringResource(it) } ?: ""
+                errorMessage = amountError?.let { stringResource(it) } ?: "",
+                cardTitle = stringResource(R.string.amount),
+                transactionAmountInput = transactionAmountInput,
+                onTransactionAmountChange = onTransactionAmountChange,
+                currencyCode = currencyCode,
+                onPositiveBtnBottomSheet = onPositiveBtnBottomSheet,
             )
 
             Spacer(
@@ -215,7 +208,7 @@ fun AddTransactionContent(
 
                             ViewCategoryItem(
                                 categoryImage = item.iconRes,
-                                categoryName = item.name,
+                                categoryName = stringResource(item.name),
                                 isSelected = isSelected,
                                 modifier = Modifier
                                     .clickable(
@@ -284,38 +277,6 @@ fun AddTransactionContent(
             }
         }
 
-        if (showBottomSheet) {
-            ModalBottomSheet(
-                containerColor = MaterialTheme.colorScheme.background,
-                // User swipe or click background to close
-                onDismissRequest = {
-                    onShowBottomSheet(false)
-                },
-                sheetState = sheetState
-            ) {
-                BottomSheetInputAmount(
-                    amountInputSlot = {
-                        ViewTextField(
-                            value = transactionAmountInput,
-                            onValueChange = onTransactionAmountChange,
-                            label = stringResource(R.string.amount),
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Decimal,
-                                imeAction = ImeAction.Done
-                            ),
-                            visualTransformation = CurrencyVisualTransformation(currencyCode),
-                            modifier = Modifier
-                                .padding(
-                                    top = 4.dp
-                                )
-                        )
-                    },
-                    onPositiveClick = onPositiveBtnBottomSheet,
-                    onNegativeClick = onNegativeBtnBottomSheet
-                )
-            }
-        }
-
         if (showDatePicker) {
             val today = LocalDate.now()
             val startYear = today.minusYears(5)
@@ -371,31 +332,31 @@ fun AddTransactionContentPreview() {
     val listCategory = listOf(
         CategoryUI(
             id = "CAT_FOOD",
-            name = "Food & Dining",
+            name = R.string.category_food,
             sortOrder = 1,
             iconRes = R.drawable.ic_food_icon
         ),
         CategoryUI(
             id = "CAT_FOOD",
-            name = "Food & Dining",
+            name = R.string.category_food,
             sortOrder = 2,
             iconRes = R.drawable.ic_food_icon
         ),
         CategoryUI(
             id = "CAT_FOOD",
-            name = "Food & Dining",
+            name = R.string.category_food,
             sortOrder = 3,
             iconRes = R.drawable.ic_food_icon
         ),
         CategoryUI(
             id = "CAT_FOOD",
-            name = "Food & Dining",
+            name = R.string.category_food,
             sortOrder = 4,
             iconRes = R.drawable.ic_food_icon
         ),
         CategoryUI(
             id = "CAT_FOOD",
-            name = "Food & Dining",
+            name = R.string.category_food,
             sortOrder = 5,
             iconRes = R.drawable.ic_food_icon
         ),
@@ -408,13 +369,9 @@ fun AddTransactionContentPreview() {
             currencyCode = AppCurrency.IDR,
             transactionAmountFormatted = "Rp 0",
             onPositiveBtnBottomSheet = {},
-            onNegativeBtnBottomSheet = {},
             transactionAmountInput = "",
             onTransactionAmountChange = {},
-            showBottomSheet = false,
-            sheetState = rememberModalBottomSheetState(),
             onInitBottomSheet = {},
-            onShowBottomSheet = {},
             selectedOption = TransactionType.SPENDING,
             onSelectOption = {},
             selectedCategory = null,

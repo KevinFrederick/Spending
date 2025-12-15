@@ -86,15 +86,30 @@ object CurrencyUiFormatter {
     }
 
     fun formatWithCode(amount: String, currencyCode: AppCurrency): String {
-        val currencySymbol = when(currencyCode) {
-            AppCurrency.USD -> "US$"
-            AppCurrency.IDR -> "Rp"
-            AppCurrency.TWD -> "NT$"
-            AppCurrency.MYR -> "RM"
-        }
+        val currencySymbol = currencyCode.symbol
 
         val formattedAmount = formatNumber(amount, currencyCode)
 
         return "$currencySymbol $formattedAmount"
+    }
+
+    fun cleanAmount(amount: String, currencyCode: AppCurrency): String? {
+        var cleanAmount = amount.replace(',', '.')
+
+        if (currencyCode == AppCurrency.IDR) {
+            if (cleanAmount.contains('.')) return null
+        }
+
+        val decimalIndex = cleanAmount.indexOf('.')
+        if (decimalIndex >= 0) {
+            val decimalsAfterDot = cleanAmount.substring(decimalIndex + 1)
+            if (decimalsAfterDot == "00") return null
+            if (decimalsAfterDot.length > 2) return null
+        }
+
+        if (cleanAmount.count { it == '.' } > 1) return null
+        cleanAmount = cleanAmount.filter { it.isDigit() || it == '.' }
+
+        return cleanAmount
     }
 }

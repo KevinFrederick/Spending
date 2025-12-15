@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.kevinfreyap.domain.error.Field
 import com.kevinfreyap.domain.resource.DomainResult
 import com.kevinfreyap.domain.usecase.authentication.AuthenticationUseCase
-import com.kevinfreyap.jetspending.ui.model.UiState
+import com.kevinfreyap.jetspending.ui.state.UiState
 import com.kevinfreyap.jetspending.utils.AuthUiValidation
 import com.kevinfreyap.jetspending.utils.ErrorHelper
 import dagger.hilt.android.lifecycle.HiltViewModel

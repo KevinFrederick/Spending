@@ -16,6 +16,22 @@
     <string name="category_detail">Category Detail</string>
     <string name="transaction_detail">Transaction Detail</string>
 
+    <!-- Categories -->
+    <string name="category_gift">Gifts</string>
+    <string name="category_incoming">Incoming</string>
+    <string name="category_investment">Investment</string>
+    <string name="category_salary">Salary</string>
+    <string name="category_education">Education</string>
+    <string name="category_entertainment">Entertainment</string>
+    <string name="category_food">Food &amp; Dining</string>
+    <string name="category_grocery">Grocery</string>
+    <string name="category_healthcare">Healthcare</string>
+    <string name="category_household">Household</string>
+    <string name="category_payment_transfer">Payment &amp; Transfer</string>
+    <string name="category_shopping">Shopping</string>
+    <string name="category_transportation">Transportation</string>
+    <string name="category_others">Others</string>
+
     <!-- Label -->
     <string name="total_balance">Total Balance</string>
     <string name="income">Income</string>
@@ -26,6 +42,7 @@
     <string name="date">Date</string>
     <string name="transaction_name">Transaction Name</string>
     <string name="transaction_amount">Transaction Amount</string>
+    <string name="transaction_category">Transaction Category</string>
     <string name="email">Email</string>
     <string name="password">Password</string>
     <string name="confirm_password">Confirm Password</string>
@@ -37,6 +54,17 @@
     <string name="preference">Preferences</string>
     <string name="support">Support</string>
     <string name="search_transactions">Search Transactions</string>
+    <string name="transaction_filter">Transaction Filter</string>
+    <string name="date_range">Date Range</string>
+    <string name="by_time">By Time</string>
+    <string name="by_amount">By Amount</string>
+    <string name="by_type">By Type</string>
+    <string name="by_category">By Category</string>
+    <string name="last_7_days">Last 7 days</string>
+    <string name="this_month">This Month</string>
+    <string name="pick_date">Pick Date</string>
+    <string name="from">From</string>
+    <string name="to">To</string>
 
     <!-- Button -->
     <string name="cancel">Cancel</string>
@@ -50,12 +78,15 @@
     <string name="continue_with_google">Continue with Google</string>
     <string name="sign_in">Sign In</string>
     <string name="sign_up">Sign Up</string>
+    <string name="logout">Log Out</string>
     <string name="edit_profile">Edit Profile</string>
     <string name="notifications">Notifications</string>
     <string name="security">Privacy &amp; Security</string>
     <string name="language">Language</string>
     <string name="currency">Currency</string>
-    <string name="logout">Log Out</string>
+    <string name="reset">Reset</string>
+    <string name="see_result">See Result</string>
+    <string name="set_date">Set Date</string>
 
     <!-- Currency -->
 <!--    <string name="rupiah">Rp %1$s</string>-->
@@ -89,6 +120,7 @@
     <!-- Error Message -->
     <string name="error_required_transaction_name">Please enter a name for this transaction.</string>
     <string name="error_required_transaction_amount">Please enter a valid amount.</string>
+    <string name="error_transaction_from_greater_than_to">Please enter a valid amount range</string>
     <string name="error_required_transaction_category">Please select a category.</string>
     <string name="error_authentication_email_blank">Email is required</string>
     <string name="error_authentication_email_wrong_format">Please enter a valid email address</string>
@@ -103,4 +135,5 @@
     <string name="description_sign_up">Let\'s get started with a free account</string>
     <string name="description_sign_in">Please enter your details</string>
     <string name="description_log_out">Are you sure you want to log out?</string>
+    <string name="description_date_range">Select a date or range of date</string>
 </resources>

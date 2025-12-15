@@ -3,7 +3,10 @@ package com.kevinfreyap.data.utils
 import androidx.sqlite.db.SimpleSQLiteQuery
 import com.kevinfreyap.domain.model.TimeFilterOption
 import com.kevinfreyap.domain.model.TransactionFilter
-import java.util.Calendar
+import java.math.BigDecimal
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 
 class TransactionQuery @Inject constructor() {
@@ -22,40 +25,66 @@ class TransactionQuery @Inject constructor() {
                 args.add(sevenDaysAgo)
             }
             TimeFilterOption.THIS_MONTH -> {
-                val calendar = Calendar.getInstance()
-                val start =calendar.apply {
-                    set(Calendar.DAY_OF_MONTH, 1)
-                }.timeInMillis
+                val userTimeZone = ZoneId.systemDefault()
+                val today = LocalDate.now(userTimeZone)
+
+                val sevenDaysAgoDate = today.minusDays(7)
+
+                val startOfDay = sevenDaysAgoDate.atStartOfDay(userTimeZone)
+
+                val startMillis = startOfDay.toInstant().toEpochMilli()
+
                 queryBuilder.append(" AND date >= ?")
-                args.add(start)
+                args.add(startMillis)
             }
             TimeFilterOption.PICK_DATE -> {
-                filter.customStartDate?.let {
-                    queryBuilder.append(" AND date >= ?")
-                    args.add(it)
-                }
+                val startDate = filter.customStartDate
+                val endDate = filter.customEndDate
 
-                filter.customEndDate?.let {
-                    queryBuilder.append(" AND date <= ?")
-                    args.add(it)
+                if ((startDate != null) && (endDate == null)){
+                    queryBuilder.append(" AND date >= ? AND date < ?")
+
+                    val nextDay = startDate.plus(1, ChronoUnit.DAYS)
+
+                    args.add(startDate.toEpochMilli())
+                    args.add(nextDay.toEpochMilli())
+                } else {
+                    if (startDate != null) {
+                        queryBuilder.append(" AND date >= ?")
+                        args.add(startDate.toEpochMilli())
+                    }
+
+                    if (endDate != null) {
+                        val nextDay = endDate.plus(1, ChronoUnit.DAYS)
+
+                        queryBuilder.append(" AND date < ?")
+                        args.add(nextDay.toEpochMilli())
+                    }
                 }
             }
         }
 
         // Amount Filter
-        filter.fromAmount?.let {
-            queryBuilder.append(" AND amount >= ?")
-            args.add(it)
-        }
-        filter.toAmount?.let {
-            queryBuilder.append(" AND amount <= ?")
-            args.add(it)
+        if (filter.fromAmount > BigDecimal.ZERO) {
+            queryBuilder.append(" AND CAST(amount AS REAL) >= ?")
+            args.add(filter.fromAmount.toPlainString())
         }
 
-        // Add category filter
+        if (filter.toAmount > BigDecimal.ZERO) {
+            queryBuilder.append(" AND CAST(amount AS REAL) <= ?")
+            args.add(filter.toAmount.toPlainString())
+        }
+
+        // Type Filter
+        filter.type?.let {
+            queryBuilder.append(" AND type = ?")
+            args.add(it.name)
+        }
+
+        // Category filter
         filter.category?.let {
             queryBuilder.append(" AND categoryId = ?")
-            args.add(it.id)
+            args.add(it)
         }
 
         queryBuilder.append(" ORDER BY date DESC")

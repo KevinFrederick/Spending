@@ -19,8 +19,10 @@ import java.util.UUID
 
 class TransactionInteractor @Inject constructor(
     private val transactionRepository: ITransactionRepository,
-    private val categoryRepository: ICategoryRepository
+    private val categoryRepository: ICategoryRepository,
 ): TransactionUseCase {
+    override val earliestTransactionYear: Int = 2020
+
     override fun getTransactions(
         query: String,
         filter: TransactionFilter

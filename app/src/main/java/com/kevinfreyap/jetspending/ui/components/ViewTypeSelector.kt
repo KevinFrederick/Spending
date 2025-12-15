@@ -18,7 +18,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -34,9 +33,10 @@ import com.kevinfreyap.jetspending.ui.theme.Theme
 
 @Composable
 fun ViewTypeSelector(
-    selectedOption: TransactionType,
+    selectedOption: TransactionType?,
     onSelectOption: (TransactionType) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    label: String? = stringResource(R.string.type)
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -47,16 +47,19 @@ fun ViewTypeSelector(
             .padding(horizontal = 8.dp)
             .selectableGroup()
     ) {
-        Text(
-            text = stringResource(R.string.type),
-            color = Theme.custom.textColor,
-            style = MaterialTheme.typography.titleMedium,
-        )
+        if (label != null) {
+            Text(
+                text = label,
+                color = Theme.custom.textColor,
+                style = MaterialTheme.typography.titleMedium,
+            )
 
-        Spacer(
-            modifier = Modifier
-                .width(16.dp)
-        )
+            Spacer(
+                modifier = Modifier
+                    .width(16.dp)
+            )
+        }
+
 
         TransactionType.entries.forEach { type ->
             val text = when (type) {
@@ -87,7 +90,7 @@ fun PillRadioButton(
     onClick: () -> Unit
 ) {
     val backgroundColor by animateColorAsState(
-        if (selected) MaterialTheme.colorScheme.primary else Color.Transparent,
+        if (selected) MaterialTheme.colorScheme.primary else Theme.custom.nestedCardColor,
         label = "bg"
     )
 

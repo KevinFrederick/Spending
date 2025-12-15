@@ -10,6 +10,7 @@ import java.math.BigDecimal
 import java.time.Instant
 
 interface TransactionUseCase {
+    val earliestTransactionYear: Int
     fun getTransactions(query: String, filter: TransactionFilter): Flow<PagingData<Transaction>>
     fun getLatestTransactions(): Flow<List<Transaction>>
     suspend fun insertTransaction(

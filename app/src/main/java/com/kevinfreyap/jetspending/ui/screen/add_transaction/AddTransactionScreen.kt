@@ -1,20 +1,15 @@
 package com.kevinfreyap.jetspending.ui.screen.add_transaction
 
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.kevinfreyap.domain.model.AppCurrency
-import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddTransactionScreen(
     onBackClick: () -> Unit,
@@ -34,22 +29,7 @@ fun AddTransactionScreen(
     val uiState by viewModel.uiState.collectAsState()
     val showSuccessDialog by viewModel.showSuccessDialog.collectAsState()
 
-    // If close with button or other action put in stateful
-    val sheetState = rememberModalBottomSheetState()
-    val scope = rememberCoroutineScope()
-    var showBottomSheet by remember { mutableStateOf(false) }
-
     var showDatePicker by remember { mutableStateOf(false) }
-
-    fun closeBottomSheet() {
-        scope.launch {
-            sheetState.hide()
-        }.invokeOnCompletion {
-            if (!sheetState.isVisible) {
-                showBottomSheet = false
-            }
-        }
-    }
 
     AddTransactionContent(
         onBackClick = onBackClick,
@@ -61,22 +41,13 @@ fun AddTransactionScreen(
         transactionAmountFormatted = transactionAmountFormatted,
         onPositiveBtnBottomSheet = {
             viewModel.onPositiveBtnAmount()
-            closeBottomSheet()
-        },
-        onNegativeBtnBottomSheet = {
-            closeBottomSheet()
         },
         transactionAmountInput = transactionAmountInput,
         onTransactionAmountChange = { amount ->
             viewModel.onRawAmountChanged(amount)
         },
-        showBottomSheet = showBottomSheet,
-        sheetState = sheetState,
         onInitBottomSheet = {
             viewModel.onInitBottomSheet()
-        },
-        onShowBottomSheet = {
-            showBottomSheet = it
         },
         selectedOption = type,
         onSelectOption = { option ->

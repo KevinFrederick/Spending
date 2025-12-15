@@ -2,7 +2,7 @@ package com.kevinfreyap.jetspending.utils
 
 import com.kevinfreyap.domain.error.Field
 import com.kevinfreyap.domain.error.ValidationError
-import com.kevinfreyap.jetspending.ui.model.UiState
+import com.kevinfreyap.jetspending.ui.state.UiState
 import com.kevinfreyap.jetspending.utils.formatter.ErrorFormatter.getErrorMessage
 
 object ErrorHelper {

@@ -10,12 +10,22 @@ import javax.inject.Inject
 class CategoryInteractor @Inject constructor(
     private val categoryRepository: ICategoryRepository
 ): CategoryUseCase{
+    override fun getAllCategories(): Flow<List<Category>> {
+        return categoryRepository.getAllCategories().map { categories ->
+            categories.sortedBy { it.sortOrder }
+        }
+    }
+
     override fun getCategoryByType(type: TransactionType): Flow<List<Category>> {
         return categoryRepository.getAllCategories().map { categories ->
             categories.filter { category ->
                 category.types.contains(type)
             }
         }
+    }
+
+    override suspend fun getCategoryById(categoryId: String): Category? {
+        return categoryRepository.getCategoryById(categoryId)
     }
 
     override suspend fun syncCategoriesFromFirestore() {
