@@ -23,7 +23,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -39,10 +38,9 @@ import com.kevinfreyap.domain.model.AppCurrency
 import com.kevinfreyap.domain.model.TransactionType
 import com.kevinfreyap.jetspending.R
 import com.kevinfreyap.jetspending.ui.components.ViewAmountCard
-import com.kevinfreyap.jetspending.ui.components.ViewCalendarInput
 import com.kevinfreyap.jetspending.ui.components.ViewCategoryItem
-import com.kevinfreyap.jetspending.ui.components.ViewCustomDateDialog
 import com.kevinfreyap.jetspending.ui.components.ViewCustomDialog
+import com.kevinfreyap.jetspending.ui.components.ViewDatePickerField
 import com.kevinfreyap.jetspending.ui.components.ViewErrorTooltip
 import com.kevinfreyap.jetspending.ui.components.ViewTextField
 import com.kevinfreyap.jetspending.ui.components.ViewTopBar
@@ -76,8 +74,6 @@ fun AddTransactionContent(
     rawDate: Instant,
     dateText: String,
     onDateSelected: (Long?) -> Unit,
-    showDatePicker: Boolean,
-    onShowDatePicker: (Boolean) -> Unit,
     categories: List<CategoryUI>,
     onSaveBtnClicked: () -> Unit,
     showSuccessDialog: Boolean,
@@ -247,12 +243,24 @@ fun AddTransactionContent(
                     .height(8.dp)
             )
 
-            ViewCalendarInput(
+            ViewDatePickerField(
                 value = dateText,
-                onClick = {
-                    focusManager.clearFocus()
-                    onShowDatePicker(true)
-                }
+                rawValue = rawDate,
+                earliestYear = LocalDate.now().minusYears(5).year,
+                selectableDates = object : SelectableDates {
+                    override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                        val dayToCheck = Instant.ofEpochMilli(utcTimeMillis)
+                            .atZone(ZoneOffset.UTC)
+                            .toLocalDate()
+
+                        val today = LocalDate.now()
+                        val startYear = today.minusYears(5)
+
+                        return !dayToCheck.isBefore(startYear) && !dayToCheck.isAfter(today)
+                    }
+                },
+                onDateSelected = onDateSelected,
+                placeholder = ""
             )
 
             Spacer(
@@ -275,33 +283,6 @@ fun AddTransactionContent(
                     style = MaterialTheme.typography.titleLarge
                 )
             }
-        }
-
-        if (showDatePicker) {
-            val today = LocalDate.now()
-            val startYear = today.minusYears(5)
-
-            val datePickerState = rememberDatePickerState(
-                initialSelectedDateMillis = rawDate.toEpochMilli(),
-                yearRange = startYear.year..today.year,
-                selectableDates = object : SelectableDates {
-                    override fun isSelectableDate(utcTimeMillis: Long): Boolean {
-                        val dayToCheck = Instant.ofEpochMilli(utcTimeMillis)
-                            .atZone(ZoneOffset.UTC)
-                            .toLocalDate()
-
-                        return !dayToCheck.isBefore(startYear) && !dayToCheck.isAfter(today)
-                    }
-                }
-            )
-
-            ViewCustomDateDialog(
-                onDateSelected = onDateSelected,
-                onDismiss = {
-                    onShowDatePicker(false)
-                },
-                datePickerState = datePickerState
-            )
         }
 
         if (showSuccessDialog) {
@@ -379,8 +360,6 @@ fun AddTransactionContentPreview() {
             rawDate = Instant.now(),
             dateText = "Today, 10 December 2025",
             onDateSelected = {},
-            showDatePicker = false,
-            onShowDatePicker = {},
             categories = listCategory,
             onSaveBtnClicked = {},
             showSuccessDialog = false,

@@ -3,9 +3,6 @@ package com.kevinfreyap.jetspending.ui.screen.add_transaction
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.kevinfreyap.domain.model.AppCurrency
@@ -28,8 +25,6 @@ fun AddTransactionScreen(
     val dateText by viewModel.selectedDateText.collectAsState()
     val uiState by viewModel.uiState.collectAsState()
     val showSuccessDialog by viewModel.showSuccessDialog.collectAsState()
-
-    var showDatePicker by remember { mutableStateOf(false) }
 
     AddTransactionContent(
         onBackClick = onBackClick,
@@ -61,10 +56,6 @@ fun AddTransactionScreen(
         dateText = dateText,
         onDateSelected = { dateMillis ->
             viewModel.onDateSelected(dateMillis)
-        },
-        showDatePicker = showDatePicker,
-        onShowDatePicker = {
-            showDatePicker = it
         },
         categories = categories,
         onSaveBtnClicked = {
