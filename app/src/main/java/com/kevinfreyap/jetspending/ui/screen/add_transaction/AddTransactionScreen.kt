@@ -12,6 +12,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.kevinfreyap.domain.model.AppCurrency
+import com.kevinfreyap.domain.model.TransactionType
+import com.kevinfreyap.jetspending.ui.state.TransactionAction
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -23,14 +25,7 @@ fun AddTransactionScreen(
 ) {
     val currencyCode = AppCurrency.IDR
 
-    val transactionName by viewModel.transactionName.collectAsState()
-    val transactionAmountInput by viewModel.transactionAmountInput.collectAsState()
-    val transactionAmountFormatted by viewModel.transactionAmountFormatted.collectAsState()
-    val type by viewModel.type.collectAsState()
-    val categories by viewModel.categories.collectAsState()
-    val selectedCategory by viewModel.selectedCategory.collectAsState()
-    val date by viewModel.selectedDate.collectAsState()
-    val dateText by viewModel.selectedDateText.collectAsState()
+    val transactionState by viewModel.transactionState.collectAsState()
     val uiState by viewModel.uiState.collectAsState()
     val showSuccessDialog by viewModel.showSuccessDialog.collectAsState()
 
@@ -48,47 +43,55 @@ fun AddTransactionScreen(
         }
     }
 
+    val transactionAction = remember (viewModel) {
+        object : TransactionAction {
+            override fun onNameChange(name: String) {
+                viewModel.onNameChange(name)
+            }
+
+            override fun onAmountChange(amount: String) {
+                viewModel.onAmountChange(amount)
+            }
+
+            override fun onSetAmount() {
+                viewModel.onSetAmount()
+                closeBottomSheet()
+            }
+
+            override fun initializeAmount() {
+                viewModel.initializeAmount()
+            }
+
+            override fun onSelectType(type: TransactionType) {
+                viewModel.onSelectType(type)
+            }
+
+            override fun onSelectCategory(categoryId: String) {
+                viewModel.onSelectCategory(categoryId)
+            }
+
+            override fun onDateSelected(millis: Long?) {
+                viewModel.onDateSelected(millis)
+            }
+
+            override fun onSaveTransaction() {
+                viewModel.onSaveTransaction()
+            }
+
+            override fun onDismissSuccessDialog() {
+                viewModel.onDialogDismissed()
+                onBackClick()
+            }
+
+        }
+    }
+
     AddTransactionContent(
         onBackClick = onBackClick,
-        transactionName = transactionName,
-        onTransactionNameChange = { newName ->
-            viewModel.onNameChange(newName)
-        },
         currencyCode = currencyCode,
-        transactionAmountFormatted = transactionAmountFormatted,
-        onPositiveBtnBottomSheet = {
-            viewModel.onPositiveBtnAmount()
-            closeBottomSheet()
-        },
-        transactionAmountInput = transactionAmountInput,
-        onTransactionAmountChange = { amount ->
-            viewModel.onRawAmountChanged(amount)
-        },
-        onInitBottomSheet = {
-            viewModel.onInitBottomSheet()
-        },
-        selectedOption = type,
-        onSelectOption = { option ->
-            viewModel.setType(option)
-        },
-        selectedCategory = selectedCategory,
-        onSelectedCategory = { category ->
-            viewModel.onSelectCategory(category)
-        },
-        rawDate = date,
-        dateText = dateText,
-        onDateSelected = { dateMillis ->
-            viewModel.onDateSelected(dateMillis)
-        },
-        categories = categories,
-        onSaveBtnClicked = {
-            viewModel.onSaveTransaction()
-        },
+        transactionState = transactionState,
+        transactionAction = transactionAction,
         showSuccessDialog = showSuccessDialog,
-        onDismissDialog = {
-            viewModel.onDialogDismissed()
-            onBackClick()
-        },
         uiState = uiState,
         amountSheetState = sheetState,
         showAmountSheet = showAmountSheet,

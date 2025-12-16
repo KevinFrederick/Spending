@@ -1,6 +1,5 @@
 package com.kevinfreyap.jetspending.ui.screen.list
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
@@ -54,7 +53,7 @@ class TransactionListViewModel @Inject constructor(
     private val categoryUseCase: CategoryUseCase,
     private val transactionItemUiMapper: TransactionItemUiMapper
 ): ViewModel() {
-    val _currencyCode = AppCurrency.IDR
+    private val _currencyCode = AppCurrency.IDR
 
     private val _query = MutableStateFlow("")
     val query: StateFlow<String> = _query
@@ -237,7 +236,6 @@ class TransactionListViewModel @Inject constructor(
 
     fun onAmountChange(input: String, isFrom: Boolean) {
         val cleanInput = CurrencyUiFormatter.cleanAmount(input, _currencyCode) ?: return
-        Log.d("TransactionListViewModel", cleanInput)
 
         _amountInputState.update {
             if (isFrom) it.copy(fromAmountInput = cleanInput)

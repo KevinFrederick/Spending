@@ -51,6 +51,8 @@ import com.kevinfreyap.jetspending.ui.components.ViewTextField
 import com.kevinfreyap.jetspending.ui.components.ViewTopBar
 import com.kevinfreyap.jetspending.ui.components.ViewTypeSelector
 import com.kevinfreyap.jetspending.ui.model.CategoryUI
+import com.kevinfreyap.jetspending.ui.state.TransactionAction
+import com.kevinfreyap.jetspending.ui.state.TransactionState
 import com.kevinfreyap.jetspending.ui.state.UiState
 import com.kevinfreyap.jetspending.ui.theme.Green500
 import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
@@ -66,25 +68,10 @@ import kotlin.collections.forEach
 @Composable
 fun AddTransactionContent(
     onBackClick: () -> Unit,
-    transactionName: String,
-    onTransactionNameChange: (String) -> Unit,
+    transactionState: TransactionState,
+    transactionAction: TransactionAction,
     currencyCode: AppCurrency,
-    transactionAmountFormatted: String,
-    onPositiveBtnBottomSheet: () -> Unit,
-    transactionAmountInput: String,
-    onTransactionAmountChange: (String) -> Unit,
-    onInitBottomSheet: () -> Unit,
-    selectedOption: TransactionType,
-    onSelectOption: (TransactionType) -> Unit,
-    selectedCategory: CategoryUI?,
-    onSelectedCategory: (CategoryUI) -> Unit,
-    rawDate: Instant,
-    dateText: String,
-    onDateSelected: (Long?) -> Unit,
-    categories: List<CategoryUI>,
-    onSaveBtnClicked: () -> Unit,
     showSuccessDialog: Boolean,
-    onDismissDialog: () -> Unit,
     uiState: UiState<Unit>,
     amountSheetState: SheetState,
     showAmountSheet: Boolean,
@@ -133,8 +120,8 @@ fun AddTransactionContent(
             )
 
             ViewTextField(
-                value = transactionName,
-                onValueChange = onTransactionNameChange,
+                value = transactionState.transactionName,
+                onValueChange = transactionAction::onNameChange,
                 isError = nameError != null,
                 errorMessage = nameError?.let { stringResource(it) } ?: "",
                 label = stringResource(R.string.transaction_name),
@@ -151,10 +138,10 @@ fun AddTransactionContent(
             ViewAmountCard(
                 onTransactionAmountClick = {
                     focusManager.clearFocus()
-                    onInitBottomSheet()
+                    transactionAction.initializeAmount()
                     onShowAmountSheet()
                 },
-                transactionAmount = transactionAmountFormatted,
+                transactionAmount = transactionState.transactionAmountDisplay,
                 isError = amountError != null,
                 errorMessage = amountError?.let { stringResource(it) } ?: "",
                 cardTitle = stringResource(R.string.amount),
@@ -166,8 +153,8 @@ fun AddTransactionContent(
             )
 
             ViewTypeSelector(
-                selectedOption = selectedOption,
-                onSelectOption = onSelectOption,
+                selectedOption = transactionState.transactionType,
+                onSelectOption = transactionAction::onSelectType,
             )
 
             Spacer(
@@ -207,8 +194,8 @@ fun AddTransactionContent(
                             .fillMaxWidth()
                             .padding(horizontal = 8.dp)
                     ) {
-                        categories.forEach { item ->
-                            val isSelected = item == selectedCategory
+                        transactionState.transactionCategories.forEach { item ->
+                            val isSelected = item.id == transactionState.transactionCategoryId
 
                             ViewCategoryItem(
                                 categoryImage = item.iconRes,
@@ -218,13 +205,13 @@ fun AddTransactionContent(
                                     .clickable(
                                         onClick = {
                                             focusManager.clearFocus()
-                                            onSelectedCategory(item)
+                                            transactionAction.onSelectCategory(item.id)
                                         }
                                     )
                             )
                         }
 
-                        if (categories.size == 2 || (categories.size % 3 == 2)) {
+                        if (transactionState.transactionCategories.size == 2 || (transactionState.transactionCategories.size % 3 == 2)) {
                             Spacer(
                                 modifier.size(100.dp)
                             )
@@ -252,8 +239,8 @@ fun AddTransactionContent(
             )
 
             ViewDatePickerField(
-                value = dateText,
-                rawValue = rawDate,
+                value = transactionState.transactionDateDisplay,
+                rawValue = transactionState.transactionDate,
                 earliestYear = LocalDate.now().minusYears(5).year,
                 selectableDates = object : SelectableDates {
                     override fun isSelectableDate(utcTimeMillis: Long): Boolean {
@@ -267,7 +254,7 @@ fun AddTransactionContent(
                         return !dayToCheck.isBefore(startYear) && !dayToCheck.isAfter(today)
                     }
                 },
-                onDateSelected = onDateSelected,
+                onDateSelected = transactionAction::onDateSelected,
                 placeholder = ""
             )
 
@@ -277,7 +264,7 @@ fun AddTransactionContent(
             )
 
             Button (
-                onClick = onSaveBtnClicked,
+                onClick = transactionAction::onSaveTransaction,
                 colors = ButtonDefaults.elevatedButtonColors(
                     containerColor = MaterialTheme.colorScheme.primary
                 ),
@@ -302,8 +289,8 @@ fun AddTransactionContent(
                 BottomSheetInputAmount(
                     amountInputSlot = {
                         ViewTextField(
-                            value = transactionAmountInput,
-                            onValueChange = onTransactionAmountChange,
+                            value = transactionState.transactionAmountInput,
+                            onValueChange = transactionAction::onAmountChange,
                             label = stringResource(R.string.amount),
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Decimal,
@@ -316,7 +303,7 @@ fun AddTransactionContent(
                                 )
                         )
                     },
-                    onPositiveClick = onPositiveBtnBottomSheet,
+                    onPositiveClick = transactionAction::onSetAmount,
                     onNegativeClick = onDismissAmountSheet,
                     currencyCode = currencyCode
                 )
@@ -326,11 +313,11 @@ fun AddTransactionContent(
         if (showSuccessDialog) {
             LaunchedEffect(Unit) {
                 delay(2000)
-                onDismissDialog()
+                transactionAction.onDismissSuccessDialog()
             }
 
             ViewCustomDialog(
-                onDismissRequest = onDismissDialog,
+                onDismissRequest = transactionAction::onDismissSuccessDialog,
                 icon = R.drawable.ic_check_circle_outline_24,
                 iconColor = Green500,
                 title = stringResource(R.string.success),
@@ -383,30 +370,37 @@ fun AddTransactionContentPreview() {
     JetSpendingTheme {
         AddTransactionContent(
             onBackClick = {},
-            transactionName = "",
-            onTransactionNameChange = {},
             currencyCode = AppCurrency.IDR,
-            transactionAmountFormatted = "Rp 0",
-            onPositiveBtnBottomSheet = {},
-            transactionAmountInput = "",
-            onTransactionAmountChange = {},
-            onInitBottomSheet = {},
-            selectedOption = TransactionType.SPENDING,
-            onSelectOption = {},
-            selectedCategory = null,
-            onSelectedCategory = {},
-            rawDate = Instant.now(),
-            dateText = "Today, 10 December 2025",
-            onDateSelected = {},
-            categories = listCategory,
-            onSaveBtnClicked = {},
             showSuccessDialog = false,
-            onDismissDialog = {},
             uiState = UiState.Idle,
             amountSheetState = rememberModalBottomSheetState(),
             showAmountSheet = false,
             onShowAmountSheet = {},
             onDismissAmountSheet = {},
+            transactionState = TransactionState(
+                transactionAmountDisplay = "Rp 0",
+                transactionCategories = listCategory,
+                transactionDateDisplay = "Today, 16 December 2025"
+            ),
+            transactionAction = object : TransactionAction {
+                override fun onNameChange(name: String) {}
+
+                override fun onAmountChange(amount: String) {}
+
+                override fun onSetAmount() {}
+
+                override fun initializeAmount() {}
+
+                override fun onSelectType(type: TransactionType) {}
+
+                override fun onSelectCategory(categoryId: String) {}
+
+                override fun onDateSelected(millis: Long?) {}
+
+                override fun onSaveTransaction() {}
+
+                override fun onDismissSuccessDialog() {}
+            },
         )
     }
 }

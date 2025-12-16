@@ -10,19 +10,27 @@ import com.kevinfreyap.domain.model.TransactionType
 import com.kevinfreyap.domain.resource.DomainResult
 import com.kevinfreyap.domain.usecase.category.CategoryUseCase
 import com.kevinfreyap.domain.usecase.transaction.TransactionUseCase
-import com.kevinfreyap.jetspending.ui.model.CategoryUI
+import com.kevinfreyap.jetspending.ui.state.TransactionDraft
+import com.kevinfreyap.jetspending.ui.state.TransactionState
 import com.kevinfreyap.jetspending.ui.state.UiState
 import com.kevinfreyap.jetspending.utils.ErrorHelper
 import com.kevinfreyap.jetspending.utils.formatter.CategoryUiFormatter
 import com.kevinfreyap.jetspending.utils.formatter.CurrencyUiFormatter
 import com.kevinfreyap.jetspending.utils.formatter.DateFormatter
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 import java.time.Instant
@@ -35,48 +43,57 @@ class AddTransactionViewModel @Inject constructor(
 ): ViewModel(){
     private val _currencyCode = AppCurrency.IDR
 
+    // Draft
+    private val _draftState = MutableStateFlow(TransactionDraft())
+
     // Name
     private val _transactionName = MutableStateFlow("")
-    val transactionName: StateFlow<String> = _transactionName
 
     // Amount
-    private val _transactionRawAmount = MutableStateFlow<BigDecimal>(BigDecimal.ZERO)
-
-    val transactionAmountFormatted: StateFlow<String> = _transactionRawAmount
-        .map {
-            CurrencyUiFormatter.formatWithCode(it.toPlainString(), _currencyCode)
-        }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = ""
-        )
-
     private val _transactionAmountInput = MutableStateFlow("")
-    val transactionAmountInput: StateFlow<String> = _transactionAmountInput
-
-    // Type
-    private val _type = MutableStateFlow(TransactionType.SPENDING)
-    val type: StateFlow<TransactionType> = _type
 
     // Categories
-    private val _categories = MutableStateFlow<List<CategoryUI>>(emptyList())
-    val categories: StateFlow<List<CategoryUI>> = _categories
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val _categories = _draftState
+        .map { it.transactionType }
+        .distinctUntilChanged()
+        .flatMapLatest { type ->
+            categoryUseCase.getCategoryByType(type)
+                .map { categories ->
+                    categories.map { category ->
+                        CategoryUiFormatter.mapCategoryDomainToUi(category)
+                    }
+                        .sortedBy { it.sortOrder }
+                }
+                .flowOn(Dispatchers.Default)
+        }
 
-    private val _selectedCategory = MutableStateFlow<CategoryUI?>(null)
-    val selectedCategory: StateFlow<CategoryUI?> = _selectedCategory
+    // Transaction State
+    val transactionState: StateFlow<TransactionState> = combine(
+        _draftState,
+        _transactionName,
+        _transactionAmountInput,
+        _categories
+    ) { draft, name, amount, categories ->
 
-    // Date
-    private val _selectedDate = MutableStateFlow<Instant>(Instant.now())
-    val selectedDate: StateFlow<Instant> = _selectedDate
+        val validCategory = categories.find { it.id == draft.transactionCategoryId }
+        val dateDisplay = DateFormatter.formatToDateWithDay(draft.transactionDate)
 
-    val selectedDateText: StateFlow<String> = _selectedDate
-        .map { DateFormatter.formatToDateWithDay(it) }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = DateFormatter.formatToDateWithDay(Instant.now())
+        TransactionState(
+            transactionName = name,
+            transactionAmountInput = amount,
+            transactionAmountDisplay = CurrencyUiFormatter.formatWithCode(draft.transactionAmountRaw.toPlainString(), _currencyCode),
+            transactionType = draft.transactionType,
+            transactionCategories = categories,
+            transactionCategoryId = validCategory?.id,
+            transactionDate = draft.transactionDate,
+            transactionDateDisplay = dateDisplay
         )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = TransactionState()
+    )
 
     // UiState
     private val _uiState = MutableStateFlow<UiState<Unit>>(UiState.Idle)
@@ -86,9 +103,6 @@ class AddTransactionViewModel @Inject constructor(
     private val _showSuccessDialog = MutableStateFlow(false)
     val showSuccessDialog = _showSuccessDialog.asStateFlow()
 
-    init {
-        getCategories(_type.value)
-    }
 
     // Name
     fun onNameChange(name: String) {
@@ -98,12 +112,12 @@ class AddTransactionViewModel @Inject constructor(
     }
 
     // Amount
-    fun onInitBottomSheet() {
-        val current = _transactionRawAmount.value
+    fun initializeAmount() {
+        val current = _draftState.value.transactionAmountRaw
         _transactionAmountInput.value = if (current == BigDecimal.ZERO) "" else current.toPlainString()
     }
 
-    fun onRawAmountChanged(amount: String) {
+    fun onAmountChange(amount: String) {
         val cleanAmount = CurrencyUiFormatter.cleanAmount(amount, _currencyCode)
 
         if (cleanAmount == null) return
@@ -113,33 +127,26 @@ class AddTransactionViewModel @Inject constructor(
         _uiState.value = ErrorHelper.removeError(_uiState.value, Field.TRANSACTION_AMOUNT)
     }
 
-    fun onPositiveBtnAmount() {
+    fun onSetAmount() {
         val trimmedFractionZero = CurrencyUiFormatter.trimFractionZero(_transactionAmountInput.value)
 
-        _transactionRawAmount.value = trimmedFractionZero.toBigDecimalOrNull() ?: BigDecimal.ZERO
-    }
-
-    // Type
-    fun setType(type: TransactionType) {
-        _type.value = type
-        getCategories(type)
-    }
-
-    /// Categories
-    fun getCategories(type: TransactionType) {
-        viewModelScope.launch {
-            categoryUseCase.getCategoryByType(type).collect { categories ->
-                _categories.value = categories
-                    .map { category ->
-                        CategoryUiFormatter.mapCategoryDomainToUi(category)
-                    }
-                    .sortedBy { it.sortOrder }
-            }
+        _draftState.update {
+            it.copy(transactionAmountRaw = trimmedFractionZero.toBigDecimalOrNull() ?: BigDecimal.ZERO)
         }
     }
 
-    fun onSelectCategory(item: CategoryUI) {
-        _selectedCategory.value = item
+    // Type
+    fun onSelectType(type: TransactionType) {
+        _draftState.update {
+            it.copy(transactionType = type, transactionCategoryId = null)
+        }
+    }
+
+    /// Categories
+    fun onSelectCategory(categoryId: String) {
+        _draftState.update {
+            it.copy(transactionCategoryId = categoryId)
+        }
 
         _uiState.value = ErrorHelper.removeError(_uiState.value, Field.TRANSACTION_CATEGORY)
     }
@@ -147,32 +154,21 @@ class AddTransactionViewModel @Inject constructor(
     // Date
     fun onDateSelected(millis: Long?) {
         if (millis != null){
-            _selectedDate.value = Instant.ofEpochMilli(millis)
+            _draftState.update {
+                it.copy(transactionDate = Instant.ofEpochMilli(millis))
+            }
         }
     }
 
     // Save Transaction
-    fun validateTransaction(
-        name: String,
-        amount: BigDecimal,
-        category: CategoryUI?
-    ): List<ValidationError> {
-        val currentErrors = mutableListOf<ValidationError>()
-
-        if (name.isBlank()) currentErrors.add(ValidationError.TransactionNameRequired)
-        if (amount <= BigDecimal.ZERO) currentErrors.add(ValidationError.TransactionAmountInvalid)
-        if (category == null) currentErrors.add(ValidationError.TransactionCategoryMissing)
-
-        return currentErrors
-    }
-
     fun onSaveTransaction() {
         _uiState.value = UiState.Loading
+        val draft = _draftState.value
 
         val validationRes = validateTransaction(
             name = _transactionName.value,
-            amount = _transactionRawAmount.value,
-            category = _selectedCategory.value
+            amount = draft.transactionAmountRaw,
+            category = draft.transactionCategoryId
         )
 
         if (validationRes.isNotEmpty()) {
@@ -180,15 +176,13 @@ class AddTransactionViewModel @Inject constructor(
             return
         }
 
-        val transactionCategoryId = _selectedCategory.value?.id ?: ""
-
         viewModelScope.launch {
             val result = transactionUseCase.insertTransaction(
                 name = _transactionName.value,
-                amount = _transactionRawAmount.value,
-                type = _type.value,
-                categoryId = transactionCategoryId,
-                date = _selectedDate.value
+                amount = draft.transactionAmountRaw,
+                type = draft.transactionType,
+                categoryId = draft.transactionCategoryId ?: "",
+                date = draft.transactionDate
             )
 
             when(result) {
@@ -205,6 +199,20 @@ class AddTransactionViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    fun validateTransaction(
+        name: String,
+        amount: BigDecimal,
+        category: String?
+    ): List<ValidationError> {
+        val currentErrors = mutableListOf<ValidationError>()
+
+        if (name.isBlank()) currentErrors.add(ValidationError.TransactionNameRequired)
+        if (amount <= BigDecimal.ZERO) currentErrors.add(ValidationError.TransactionAmountInvalid)
+        if (category == null) currentErrors.add(ValidationError.TransactionCategoryMissing)
+
+        return currentErrors
     }
 
     fun onDialogDismissed() {
