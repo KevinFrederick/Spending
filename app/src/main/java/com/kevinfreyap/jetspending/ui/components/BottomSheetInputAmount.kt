@@ -1,6 +1,5 @@
 package com.kevinfreyap.jetspending.ui.components
 
-import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,11 +12,14 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -37,20 +39,52 @@ fun BottomSheetInputAmount(
     onPositiveClick: () -> Unit,
     onNegativeClick: () -> Unit,
     currencyCode: AppCurrency,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onBackButtonClick: (() -> Unit)? = null,
 ) {
     Column(
         modifier = modifier
-            .padding(16.dp)
+            .fillMaxWidth()
+            .padding(
+                vertical = 16.dp
+            )
     ) {
-        Text(
-            text = stringResource(R.string.transaction_amount),
-            color = Theme.custom.textColor,
-            style = MaterialTheme.typography.titleLarge,
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(
+                    horizontal = if (onBackButtonClick == null) 16.dp else 0.dp
+                )
+        ) {
+            if (onBackButtonClick != null) {
+                IconButton(
+                    onClick = onBackButtonClick
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_arrow_back_24),
+                        contentDescription = stringResource(R.string.back),
+                        tint = Theme.custom.iconColor
+                    )
+                }
+
+                Spacer(
+                    modifier = Modifier
+                        .width(8.dp)
+                )
+            }
+
+            Text(
+                text = stringResource(R.string.transaction_amount),
+                color = Theme.custom.textColor,
+                style = MaterialTheme.typography.titleLarge,
+            )
+        }
 
         Row(
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
         ) {
             Card(
                 colors = CardDefaults.cardColors(
@@ -77,6 +111,7 @@ fun BottomSheetInputAmount(
             horizontalArrangement = Arrangement.End,
             modifier = Modifier
                 .fillMaxWidth()
+                .padding(horizontal = 16.dp)
         ) {
             Button(
                 colors = ButtonDefaults.buttonColors(
@@ -129,7 +164,8 @@ fun BottomSheetInputAmountPreview(){
             },
             currencyCode = AppCurrency.IDR,
             onPositiveClick = {},
-            onNegativeClick = {}
+            onNegativeClick = {},
+            onBackButtonClick = {}
         )
     }
 }

@@ -5,8 +5,8 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -26,25 +27,32 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.paging.LoadState
+import androidx.paging.LoadStates
 import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.kevinfreyap.domain.model.AppCurrency
 import com.kevinfreyap.domain.model.TimeFilterOption
 import com.kevinfreyap.domain.model.TransactionType
 import com.kevinfreyap.jetspending.R
 import com.kevinfreyap.jetspending.ui.components.BottomSheetDateRange
 import com.kevinfreyap.jetspending.ui.components.BottomSheetFilter
+import com.kevinfreyap.jetspending.ui.components.BottomSheetInputAmount
 import com.kevinfreyap.jetspending.ui.components.SearchBarWithFilter
+import com.kevinfreyap.jetspending.ui.components.ViewPageError
+import com.kevinfreyap.jetspending.ui.components.ViewTextField
 import com.kevinfreyap.jetspending.ui.components.ViewTopBar
 import com.kevinfreyap.jetspending.ui.components.ViewTransactionItem
 import com.kevinfreyap.jetspending.ui.components.ViewTransactionItemPlaceholder
@@ -59,6 +67,7 @@ import com.kevinfreyap.jetspending.ui.theme.Green500
 import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
 import com.kevinfreyap.jetspending.ui.theme.Orange700
 import com.kevinfreyap.jetspending.ui.theme.Theme
+import com.kevinfreyap.jetspending.utils.CurrencyVisualTransformation
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import java.time.Instant
@@ -71,25 +80,26 @@ fun TransactionListScreen(
     modifier: Modifier = Modifier,
     viewModel: TransactionListViewModel = hiltViewModel()
 ) {
+    val currencyCode = AppCurrency.IDR
     val transactions = viewModel.transactions.collectAsLazyPagingItems()
 
     val query by viewModel.query.collectAsState()
     val filter by viewModel.filter.collectAsState()
-    val filterState by viewModel.filterState.collectAsState()
+    val filterState by viewModel.filterUiState.collectAsState()
     val uiState by viewModel.uiState.collectAsState()
 
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
     )
     val scope = rememberCoroutineScope()
-    var activeSheet by remember { mutableStateOf<FilterBottomSheetType>(FilterBottomSheetType.None) }
+    val activeSheet by viewModel.activeSheetContent.collectAsState()
 
     fun closeBottomSheet() {
         scope.launch {
             sheetState.hide()
         }.invokeOnCompletion {
             if (!sheetState.isVisible) {
-                activeSheet = FilterBottomSheetType.None
+                viewModel.navigateTo(FilterBottomSheetType.None)
             }
         }
     }
@@ -101,39 +111,42 @@ fun TransactionListScreen(
             override fun onFilterOptionClicked(option: TimeFilterOption) {
                 viewModel.onTimeFilterOptionClicked(option)
                 if (option == TimeFilterOption.PICK_DATE){
-                    viewModel.initializeDateRange()
-                    activeSheet = FilterBottomSheetType.DateFilter
+                    viewModel.navigateTo(FilterBottomSheetType.DateFilter)
                 }
             }
 
-            override fun onFromDateSelected(millis: Long?) {
-                viewModel.onFromDateSelected(millis)
-            }
-
-            override fun onToDateSelected(millis: Long?) {
-                viewModel.onToDateSelected(millis)
+            override fun onDateSelected(millis: Long?, isFrom: Boolean) {
+                viewModel.onDateSelected(millis, isFrom)
             }
 
             override fun onSetSelectedDate() {
-                viewModel.onSetDateRange()
-                activeSheet = FilterBottomSheetType.Filter
+                viewModel.onSetDate()
+                viewModel.navigateTo(FilterBottomSheetType.Filter)
             }
 
             override fun onResetSelectedDate() {
-                viewModel.onResetDateRange()
+                viewModel.onResetDate()
             }
 
             override fun onNavigateToFilter() {
                 viewModel.checkSelectedDate()
-                activeSheet = FilterBottomSheetType.Filter
+                viewModel.navigateTo(FilterBottomSheetType.Filter)
             }
 
-            override fun onFromAmountChanged(amount: String) {
-                viewModel.onFromRawAmountChange(amount)
+            override fun onNavigateToAmount(isFrom: Boolean) {
+                if (isFrom) {
+                    viewModel.navigateTo(FilterBottomSheetType.AmountFrom)
+                } else {
+                    viewModel.navigateTo(FilterBottomSheetType.AmountTo)
+                }
             }
 
-            override fun onToAmountChanged(amount: String) {
-                viewModel.onToRawAmountChange(amount)
+            override fun onAmountCardClicked(isFrom: Boolean) {
+                viewModel.prepareAmountInput(isFrom)
+            }
+
+            override fun onAmountChanged(amount: String, isFrom: Boolean) {
+                viewModel.onAmountChange(amount, isFrom)
             }
 
             override fun onTypeChange(type: TransactionType) {
@@ -141,15 +154,12 @@ fun TransactionListScreen(
             }
 
             override fun onCategorySelected(categoryId: String) {
-                viewModel.onCategorySelected(categoryId)
+                viewModel.onCategoryChange(categoryId)
             }
 
-            override fun onFromPositiveBtnClicked() {
-                viewModel.onFromAmountPositiveBtnClicked()
-            }
-
-            override fun onToPositiveBtnClicked() {
-                viewModel.onToAmountPositiveBtnClicked()
+            override fun onSetAmount(isFrom: Boolean) {
+                viewModel.onSetAmount(isFrom)
+                viewModel.navigateTo(FilterBottomSheetType.Filter)
             }
 
             override fun onApplyFilter() {
@@ -165,19 +175,20 @@ fun TransactionListScreen(
 
 
     TransactionListContent(
+        currencyCode = currencyCode,
         transactions = transactions,
         searchQuery = query,
         sheetState = sheetState,
         activeSheet = activeSheet,
         onQueryChange = {
-
+            viewModel.onQueryChange(it)
         },
         onFilterBtnClicked = {
             viewModel.initializeFilter()
-            activeSheet = FilterBottomSheetType.Filter
+            viewModel.navigateTo(FilterBottomSheetType.Filter)
         },
         onSelectSheet = { sheet ->
-            activeSheet = sheet
+            viewModel.navigateTo(sheet)
         },
         navigateToDetail = navigateToDetail,
         onBackClick = onBackClick,
@@ -192,6 +203,7 @@ fun TransactionListScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TransactionListContent(
+    currencyCode: AppCurrency,
     transactions: LazyPagingItems<TransactionsUi>,
     searchQuery: String,
     sheetState: SheetState,
@@ -211,7 +223,8 @@ fun TransactionListContent(
         topBar = {
             ViewTopBar(
                 title = stringResource(R.string.transactions),
-                onBackClick = onBackClick
+                onBackClick = onBackClick,
+                isLoading = transactions.loadState.refresh is LoadState.Loading
             )
         }
     ) { innerPadding ->
@@ -232,54 +245,93 @@ fun TransactionListContent(
                 showBadge = hasActiveFilters
             )
 
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+            Box(
                 modifier = Modifier
+                    .fillMaxSize()
                     .weight(1f)
             ) {
-                items(
-                    count = transactions.itemCount,
-                    key = { index ->
-                        val item = transactions[index]
-                        when (item) {
-                            is TransactionsUi.Header -> item.header
-                            is TransactionsUi.Item -> item.transaction.transactionId
-                            null -> index
-                        }
-                    },
-                    contentType = { index ->
-                        transactions[index]?.javaClass
+                when (transactions.loadState.refresh) {
+                    is LoadState.Error -> {
+                        ViewPageError(
+                            icon = R.drawable.ic_error_outline_24,
+                            text = stringResource(R.string.error_loading_data),
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                        )
                     }
-                ) { index ->
-                    val item = transactions[index]
-                    when (item) {
-                        is TransactionsUi.Header -> {
-                            Spacer(
+
+                    is LoadState.NotLoading -> {
+                        if (transactions.itemCount == 0 && (hasActiveFilters || searchQuery.isNotBlank())){
+                            ViewPageError(
+                                icon = R.drawable.ic_search_24,
+                                text = stringResource(R.string.error_transaction_not_found),
                                 modifier = Modifier
-                                    .height(8.dp)
-                            )
-
-                            Text(
-                                text = item.header,
-                                style = MaterialTheme.typography.titleLarge,
-                                color = Theme.custom.textColor,
+                                    .align(Alignment.Center)
                             )
                         }
 
-                        is TransactionsUi.Item -> {
-                            ViewTransactionItem(
-                                transaction = item.transaction,
-                                navigateToDetail = {
-                                    navigateToDetail(item.transaction.transactionId)
-                                },
-                                isNestedCard = false,
+                        else if (transactions.itemCount == 0) {
+                            ViewPageError(
+                                icon = R.drawable.ic_no_transactions,
+                                text = stringResource(R.string.error_no_transaction),
+                                modifier = Modifier
+                                    .align(Alignment.Center)
                             )
                         }
 
-                        null -> {
-                            ViewTransactionItemPlaceholder()
+                        else {
+                            LazyColumn(
+                                verticalArrangement = Arrangement.spacedBy(8.dp),
+                            ) {
+                                items(
+                                    count = transactions.itemCount,
+                                    key = { index ->
+                                        val item = transactions[index]
+                                        when (item) {
+                                            is TransactionsUi.Header -> item.header
+                                            is TransactionsUi.Item -> item.transaction.transactionId
+                                            null -> index
+                                        }
+                                    },
+                                    contentType = { index ->
+                                        transactions[index]?.javaClass
+                                    }
+                                ) { index ->
+                                    val item = transactions[index]
+                                    when (item) {
+                                        is TransactionsUi.Header -> {
+                                            Spacer(
+                                                modifier = Modifier
+                                                    .height(8.dp)
+                                            )
+
+                                            Text(
+                                                text = item.header,
+                                                style = MaterialTheme.typography.titleLarge,
+                                                color = Theme.custom.textColor,
+                                            )
+                                        }
+
+                                        is TransactionsUi.Item -> {
+                                            ViewTransactionItem(
+                                                transaction = item.transaction,
+                                                navigateToDetail = {
+                                                    navigateToDetail(item.transaction.transactionId)
+                                                },
+                                                isNestedCard = false,
+                                            )
+                                        }
+
+                                        null -> {
+                                            ViewTransactionItemPlaceholder()
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
+
+                    LoadState.Loading -> {}
                 }
             }
         }
@@ -296,14 +348,8 @@ fun TransactionListContent(
                     targetState = activeSheet,
                     label = "Sheet Navigation",
                     transitionSpec = {
-                        if (targetState == FilterBottomSheetType.DateFilter) {
-                            (slideInHorizontally { it } + fadeIn()) togetherWith
-                            (slideOutHorizontally { -it } + fadeOut())
-                        } else {
-                            // Going "Back" to Main Filter
-                            (slideInHorizontally { -it } + fadeIn()) togetherWith
-                            (slideOutHorizontally { it } + fadeOut())
-                        }
+                        (slideInVertically { it } + fadeIn()) togetherWith
+                        (slideOutVertically { it } + fadeOut())
                     }
                 ) { targetSheet ->
                     Box (
@@ -323,6 +369,72 @@ fun TransactionListContent(
                                 BottomSheetDateRange(
                                     transactionFilterState = transactionFilterState,
                                     transactionFilterAction = transactionFilterAction
+                                )
+                            }
+
+                            FilterBottomSheetType.AmountFrom -> {
+                                BottomSheetInputAmount(
+                                    amountInputSlot = {
+                                        ViewTextField(
+                                            value = transactionFilterState.fromAmountInput,
+                                            onValueChange = { amount ->
+                                                transactionFilterAction.onAmountChanged(amount = amount, isFrom = true)
+                                            },
+                                            label = stringResource(R.string.amount),
+                                            keyboardOptions = KeyboardOptions(
+                                                keyboardType = KeyboardType.Decimal,
+                                                imeAction = ImeAction.Done
+                                            ),
+                                            visualTransformation = CurrencyVisualTransformation(currencyCode),
+                                            modifier = Modifier
+                                                .padding(
+                                                    top = 4.dp
+                                                )
+                                        )
+                                    },
+                                    onPositiveClick = {
+                                        transactionFilterAction.onSetAmount(isFrom = true)
+                                    },
+                                    onNegativeClick = {
+                                        transactionFilterAction.onNavigateToFilter()
+                                    },
+                                    onBackButtonClick = {
+                                        transactionFilterAction.onNavigateToFilter()
+                                    },
+                                    currencyCode = currencyCode
+                                )
+                            }
+
+                            FilterBottomSheetType.AmountTo -> {
+                                BottomSheetInputAmount(
+                                    amountInputSlot = {
+                                        ViewTextField(
+                                            value = transactionFilterState.toAmountInput,
+                                            onValueChange = { amount ->
+                                                transactionFilterAction.onAmountChanged(amount = amount, isFrom = false)
+                                            },
+                                            label = stringResource(R.string.amount),
+                                            keyboardOptions = KeyboardOptions(
+                                                keyboardType = KeyboardType.Decimal,
+                                                imeAction = ImeAction.Done
+                                            ),
+                                            visualTransformation = CurrencyVisualTransformation(currencyCode),
+                                            modifier = Modifier
+                                                .padding(
+                                                    top = 4.dp
+                                                )
+                                        )
+                                    },
+                                    onPositiveClick = {
+                                        transactionFilterAction.onSetAmount(isFrom = false)
+                                    },
+                                    onNegativeClick = {
+                                        transactionFilterAction.onNavigateToFilter()
+                                    },
+                                    onBackButtonClick = {
+                                        transactionFilterAction.onNavigateToFilter()
+                                    },
+                                    currencyCode = currencyCode
                                 )
                             }
 
@@ -392,13 +504,23 @@ fun TransactionListContentPreview() {
         ),
     )
 
-    val pagingData = PagingData.from(sampleItems)
+    val loadStates = LoadStates(
+        refresh = LoadState.NotLoading(endOfPaginationReached = true),
+        prepend = LoadState.NotLoading(endOfPaginationReached = true),
+        append = LoadState.NotLoading(endOfPaginationReached = true)
+    )
+
+    val pagingData = PagingData.from(
+        data = sampleItems,
+        sourceLoadStates = loadStates
+    )
 
     // Turn into LazyPagingItems for preview
     val lazyPagingItems = flowOf(pagingData).collectAsLazyPagingItems()
 
     JetSpendingTheme {
         TransactionListContent(
+            currencyCode = AppCurrency.IDR,
             onBackClick = {},
             navigateToDetail = {},
             searchQuery = "",
@@ -426,9 +548,7 @@ fun TransactionListContentPreview() {
                 object : TransactionFilterAction {
                     override fun onFilterOptionClicked(option: TimeFilterOption) {}
 
-                    override fun onFromDateSelected(millis: Long?) {}
-
-                    override fun onToDateSelected(millis: Long?) {}
+                    override fun onDateSelected(millis: Long?, isFrom: Boolean) {}
 
                     override fun onSetSelectedDate() {}
 
@@ -436,17 +556,17 @@ fun TransactionListContentPreview() {
 
                     override fun onNavigateToFilter() {}
 
-                    override fun onFromAmountChanged(amount: String) {}
+                    override fun onNavigateToAmount(isFrom: Boolean) {}
 
-                    override fun onToAmountChanged(amount: String) {}
+                    override fun onAmountCardClicked(isFrom: Boolean) {}
+
+                    override fun onAmountChanged(amount: String, isFrom: Boolean) {}
 
                     override fun onTypeChange(type: TransactionType) {}
 
                     override fun onCategorySelected(categoryId: String) {}
 
-                    override fun onFromPositiveBtnClicked() {}
-
-                    override fun onToPositiveBtnClicked() {}
+                    override fun onSetAmount(isFrom: Boolean) {}
 
                     override fun onApplyFilter() {}
 

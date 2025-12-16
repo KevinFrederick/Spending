@@ -137,7 +137,9 @@ fun BottomSheetDateRange(
                         return !dayToCheck.isBefore(startYear) && !dayToCheck.isAfter(currentDate)
                     }
                 },
-                onDateSelected = transactionFilterAction::onFromDateSelected,
+                onDateSelected = { millis ->
+                    transactionFilterAction.onDateSelected(millis = millis, isFrom = true)
+                },
                 modifier = Modifier
                     .weight(1f)
             )
@@ -173,7 +175,9 @@ fun BottomSheetDateRange(
                 isEnable = transactionFilterState.fromDateRaw?.let { startInstant ->
                     startInstant.atZone(ZoneOffset.UTC).toLocalDate() != currentDate
                 } ?: false,
-                onDateSelected = transactionFilterAction::onToDateSelected,
+                onDateSelected = { millis ->
+                    transactionFilterAction.onDateSelected(millis = millis, isFrom = false)
+                },
                 modifier = Modifier
                     .weight(1f)
             )
@@ -217,9 +221,7 @@ fun BottomSheetDateRangePreview() {
                 object : TransactionFilterAction {
                     override fun onFilterOptionClicked(option: TimeFilterOption) {}
 
-                    override fun onFromDateSelected(millis: Long?) {}
-
-                    override fun onToDateSelected(millis: Long?) {}
+                    override fun onDateSelected(millis: Long?, isFrom: Boolean) {}
 
                     override fun onSetSelectedDate() {}
 
@@ -227,17 +229,17 @@ fun BottomSheetDateRangePreview() {
 
                     override fun onNavigateToFilter() {}
 
-                    override fun onFromAmountChanged(amount: String) {}
+                    override fun onNavigateToAmount(isFrom: Boolean) {}
 
-                    override fun onToAmountChanged(amount: String) {}
+                    override fun onAmountCardClicked(isFrom: Boolean) {}
+
+                    override fun onAmountChanged(amount: String, isFrom: Boolean) {}
 
                     override fun onTypeChange(type: TransactionType) {}
 
                     override fun onCategorySelected(categoryId: String) {}
 
-                    override fun onFromPositiveBtnClicked() {}
-
-                    override fun onToPositiveBtnClicked() {}
+                    override fun onSetAmount(isFrom: Boolean) {}
 
                     override fun onApplyFilter() {}
 

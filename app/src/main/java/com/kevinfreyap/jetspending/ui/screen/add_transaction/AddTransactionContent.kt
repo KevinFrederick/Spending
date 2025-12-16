@@ -20,9 +20,12 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SelectableDates
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -30,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -37,6 +41,7 @@ import com.kevinfreyap.domain.error.Field
 import com.kevinfreyap.domain.model.AppCurrency
 import com.kevinfreyap.domain.model.TransactionType
 import com.kevinfreyap.jetspending.R
+import com.kevinfreyap.jetspending.ui.components.BottomSheetInputAmount
 import com.kevinfreyap.jetspending.ui.components.ViewAmountCard
 import com.kevinfreyap.jetspending.ui.components.ViewCategoryItem
 import com.kevinfreyap.jetspending.ui.components.ViewCustomDialog
@@ -50,12 +55,14 @@ import com.kevinfreyap.jetspending.ui.state.UiState
 import com.kevinfreyap.jetspending.ui.theme.Green500
 import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
 import com.kevinfreyap.jetspending.ui.theme.Theme
+import com.kevinfreyap.jetspending.utils.CurrencyVisualTransformation
 import kotlinx.coroutines.delay
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
 import kotlin.collections.forEach
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddTransactionContent(
     onBackClick: () -> Unit,
@@ -79,6 +86,10 @@ fun AddTransactionContent(
     showSuccessDialog: Boolean,
     onDismissDialog: () -> Unit,
     uiState: UiState<Unit>,
+    amountSheetState: SheetState,
+    showAmountSheet: Boolean,
+    onShowAmountSheet: () -> Unit,
+    onDismissAmountSheet: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val focusManager = LocalFocusManager.current
@@ -141,15 +152,12 @@ fun AddTransactionContent(
                 onTransactionAmountClick = {
                     focusManager.clearFocus()
                     onInitBottomSheet()
+                    onShowAmountSheet()
                 },
                 transactionAmount = transactionAmountFormatted,
                 isError = amountError != null,
                 errorMessage = amountError?.let { stringResource(it) } ?: "",
                 cardTitle = stringResource(R.string.amount),
-                transactionAmountInput = transactionAmountInput,
-                onTransactionAmountChange = onTransactionAmountChange,
-                currencyCode = currencyCode,
-                onPositiveBtnBottomSheet = onPositiveBtnBottomSheet,
             )
 
             Spacer(
@@ -285,6 +293,36 @@ fun AddTransactionContent(
             }
         }
 
+        if (showAmountSheet) {
+            ModalBottomSheet(
+                containerColor = MaterialTheme.colorScheme.background,
+                onDismissRequest = onDismissAmountSheet,
+                sheetState = amountSheetState
+            ) {
+                BottomSheetInputAmount(
+                    amountInputSlot = {
+                        ViewTextField(
+                            value = transactionAmountInput,
+                            onValueChange = onTransactionAmountChange,
+                            label = stringResource(R.string.amount),
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Decimal,
+                                imeAction = ImeAction.Done
+                            ),
+                            visualTransformation = CurrencyVisualTransformation(currencyCode),
+                            modifier = Modifier
+                                .padding(
+                                    top = 4.dp
+                                )
+                        )
+                    },
+                    onPositiveClick = onPositiveBtnBottomSheet,
+                    onNegativeClick = onDismissAmountSheet,
+                    currencyCode = currencyCode
+                )
+            }
+        }
+
         if (showSuccessDialog) {
             LaunchedEffect(Unit) {
                 delay(2000)
@@ -364,7 +402,11 @@ fun AddTransactionContentPreview() {
             onSaveBtnClicked = {},
             showSuccessDialog = false,
             onDismissDialog = {},
-            uiState = UiState.Idle
+            uiState = UiState.Idle,
+            amountSheetState = rememberModalBottomSheetState(),
+            showAmountSheet = false,
+            onShowAmountSheet = {},
+            onDismissAmountSheet = {},
         )
     }
 }

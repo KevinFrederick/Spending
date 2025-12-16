@@ -8,7 +8,7 @@ object CategoryUiFormatter {
     fun mapCategoryDomainToUi(domain: Category): CategoryUI {
         return CategoryUI(
             id = domain.id,
-            name = mapIconNameToString(domain.id),
+            name = mapCategoryNameToString(domain.id),
             sortOrder = domain.sortOrder,
             iconRes = mapIconIdToDrawable(domain.iconId)
         )
@@ -34,7 +34,7 @@ object CategoryUiFormatter {
         }
     }
 
-    fun mapIconNameToString(catId: String): Int {
+    fun mapCategoryNameToString(catId: String): Int {
         return when(catId) {
             "CAT_GIFT" -> R.string.category_gift
             "CAT_INCOMING" -> R.string.category_incoming

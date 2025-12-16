@@ -5,17 +5,16 @@ import com.kevinfreyap.domain.model.TransactionType
 
 interface TransactionFilterAction {
     fun onFilterOptionClicked(option: TimeFilterOption)
-    fun onFromDateSelected(millis: Long?)
-    fun onToDateSelected(millis: Long?)
+    fun onDateSelected(millis: Long?, isFrom: Boolean)
     fun onSetSelectedDate()
     fun onResetSelectedDate()
     fun onNavigateToFilter()
-    fun onFromAmountChanged(amount: String)
-    fun onToAmountChanged(amount: String)
+    fun onNavigateToAmount(isFrom: Boolean)
+    fun onAmountCardClicked(isFrom: Boolean)
+    fun onAmountChanged(amount: String, isFrom: Boolean)
+    fun onSetAmount(isFrom: Boolean)
     fun onTypeChange(type: TransactionType)
     fun onCategorySelected(categoryId: String)
-    fun onFromPositiveBtnClicked()
-    fun onToPositiveBtnClicked()
     fun onApplyFilter()
     fun onResetFilter()
 }

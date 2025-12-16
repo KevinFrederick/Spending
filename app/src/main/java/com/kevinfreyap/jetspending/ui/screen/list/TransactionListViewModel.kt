@@ -1,5 +1,6 @@
 package com.kevinfreyap.jetspending.ui.screen.list
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
@@ -15,11 +16,11 @@ import com.kevinfreyap.domain.model.TransactionType
 import com.kevinfreyap.domain.usecase.category.CategoryUseCase
 import com.kevinfreyap.domain.usecase.transaction.TransactionUseCase
 import com.kevinfreyap.jetspending.R
-import com.kevinfreyap.jetspending.ui.model.AmountData
-import com.kevinfreyap.jetspending.ui.model.CategorySelectionData
+import com.kevinfreyap.jetspending.ui.model.FilterBottomSheetType
 import com.kevinfreyap.jetspending.ui.model.FilterTimeOptionUI
-import com.kevinfreyap.jetspending.ui.model.TimeFilterData
 import com.kevinfreyap.jetspending.ui.model.TransactionsUi
+import com.kevinfreyap.jetspending.ui.state.AmountInputState
+import com.kevinfreyap.jetspending.ui.state.FilterDraftState
 import com.kevinfreyap.jetspending.ui.state.TransactionFilterState
 import com.kevinfreyap.jetspending.ui.state.UiState
 import com.kevinfreyap.jetspending.utils.ErrorHelper
@@ -37,10 +38,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.update
 import java.math.BigDecimal
 import java.time.Instant
 import javax.inject.Inject
@@ -59,6 +61,15 @@ class TransactionListViewModel @Inject constructor(
 
     private val _filter = MutableStateFlow(TransactionFilter())
     val filter: StateFlow<TransactionFilter> = _filter
+
+    private val _draftState = MutableStateFlow(FilterDraftState())
+    private val _amountInputState = MutableStateFlow(AmountInputState())
+
+    private val _activeSheetContent = MutableStateFlow<FilterBottomSheetType>(FilterBottomSheetType.None)
+    val activeSheetContent = _activeSheetContent.asStateFlow()
+
+    private val _uiState = MutableStateFlow<UiState<Unit>>(UiState.Idle)
+    val uiState = _uiState.asStateFlow()
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     val transactions: Flow<PagingData<TransactionsUi>> = combine(
@@ -110,117 +121,51 @@ class TransactionListViewModel @Inject constructor(
             )
         }
 
-
-    private val _timeFilter = MutableStateFlow(TimeFilterOption.ALL_TIME)
-    private val _fromRawAmount = MutableStateFlow(BigDecimal.ZERO)
-    private val _toRawAmount = MutableStateFlow(BigDecimal.ZERO)
-    private val _fromAmountInput = MutableStateFlow("")
-    private val _toAmountInput = MutableStateFlow("")
-    private val _selectedType = MutableStateFlow<TransactionType?>(null)
-
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val categories = _selectedType
-        .flatMapLatest { transactionType ->
-            val rawFlow = if (transactionType != null) {
-                categoryUseCase.getCategoryByType(transactionType)
+    private val _categoriesFlow = _draftState
+        .map { it.selectedType }
+        .distinctUntilChanged() // Prevent refetching if Type didn't change
+        .flatMapLatest { type ->
+            if (type != null) {
+                categoryUseCase.getCategoryByType(type)
             } else {
                 categoryUseCase.getAllCategories()
             }
-
-            rawFlow
-                .map { categories ->
-                    categories
-                        .map {
-                            CategoryUiFormatter.mapCategoryDomainToUi(it)
-                        }
-                        .sortedBy { it.sortOrder }
-                }
         }
 
-    private val _selectedCategoryId = MutableStateFlow<String?>(null)
+    val filterUiState: StateFlow<TransactionFilterState> = combine(
+        _draftState,
+        _categoriesFlow,
+        _amountInputState
+    ) { draft, categories, amount ->
 
-    // On Change Date
-    private val _selectedFromDateRaw = MutableStateFlow<Instant?>(null)
-    private val _selectedToDateRaw = MutableStateFlow<Instant?>(null)
+        val categoriesUiList = categories
+            .map { CategoryUiFormatter.mapCategoryDomainToUi(it) }
+            .sortedBy { it.sortOrder }
 
-    // On Set Date
-    private val _selectedFromDate = MutableStateFlow<Instant?>(null)
-    private val _selectedToDate = MutableStateFlow<Instant?>(null)
-
-    val timeState = combine(
-        _timeFilter,
-        _selectedFromDateRaw,
-        _selectedToDateRaw
-    ) { timeType, fromDate, toDate ->
-        TimeFilterData(
-            earliestTransactionYear = transactionUseCase.earliestTransactionYear,
-            filterType = timeType,
-            fromDate = fromDate,
-            toDate = toDate,
-            displayFromText = if (timeType == TimeFilterOption.PICK_DATE) fromDate?.let { DateFormatter.formatToDate(it) } else null,
-            displayToText = if (timeType == TimeFilterOption.PICK_DATE) toDate?.let { DateFormatter.formatToDate(it) } else null
-        )
-    }
-
-    val amountState = combine(
-        _fromAmountInput,
-        _toAmountInput,
-        _fromRawAmount,
-        _toRawAmount
-    ) { fromInput, toInput, fromRaw, toRaw ->
-        AmountData(
-            fromInput = fromInput,
-            toInput = toInput,
-            fromRaw = fromRaw,
-            toRaw = toRaw
-        )
-    }
-
-    val categoryState = combine(
-        categories,
-        _selectedCategoryId
-    ) { categoryList, categoryId ->
-        val validCategory = categoryList.find { it.id == categoryId }
-
-        val categoryDisplay = if (validCategory != null){
-            CategoryUiFormatter.mapIconNameToString(validCategory.id)
-        } else {
-            null
-        }
-
-        CategorySelectionData(
-            list = categoryList,
-            validId = validCategory?.id,
-            displayText = categoryDisplay
-        )
-    }
-
-    val filterState = combine(
-        timeState,
-        amountState,
-        _selectedType,
-        categoryState
-    ) { timeState, amountState, type, categoryState ->
-
-        val formattedFrom = CurrencyUiFormatter.formatWithCode(amountState.fromRaw.toPlainString(), _currencyCode)
-        val formattedTo = CurrencyUiFormatter.formatWithCode(amountState.toRaw.toPlainString(), _currencyCode)
+        val validCategory = categoriesUiList.find { it.id == draft.selectedCategoryId }
 
         TransactionFilterState(
-            earliestTransactionYear = timeState.earliestTransactionYear,
-            timeFilter = timeState.filterType,
-            fromDateRaw = timeState.fromDate,
-            toDateRaw = timeState.toDate,
-            fromDateDisplay = timeState.displayFromText,
-            toDateDisplay = timeState.displayToText,
+            // Time
+            earliestTransactionYear = transactionUseCase.earliestTransactionYear,
+            timeFilter = draft.timeFilter,
             timeFilterOptions = dateFilterOptions,
-            displayFromAmount = formattedFrom,
-            displayToAmount = formattedTo,
-            fromAmountInput = amountState.fromInput,
-            toAmountInput = amountState.toInput,
-            selectedType = type,
-            categories = categoryState.list,
-            selectedCategoryId = categoryState.validId,
-            selectedCategoryDisplay = categoryState.displayText
+            fromDateRaw = draft.tempStartDate,
+            toDateRaw = draft.tempEndDate,
+            fromDateDisplay = draft.tempStartDate?.let { DateFormatter.formatToDate(it) },
+            toDateDisplay = draft.tempEndDate?.let { DateFormatter.formatToDate(it) },
+
+            // Amount
+            fromAmountInput = amount.fromAmountInput,
+            toAmountInput = amount.toAmountInput,
+            displayFromAmount = CurrencyUiFormatter.formatWithCode(draft.fromAmount.toPlainString(), _currencyCode),
+            displayToAmount = CurrencyUiFormatter.formatWithCode(draft.toAmount.toPlainString(), _currencyCode),
+
+            // Type & Category
+            selectedType = draft.selectedType,
+            categories = categoriesUiList,
+            selectedCategoryId = validCategory?.id,
+            selectedCategoryDisplay = validCategory?.let { CategoryUiFormatter.mapCategoryNameToString(it.id) }
         )
     }.stateIn(
         scope = viewModelScope,
@@ -230,164 +175,183 @@ class TransactionListViewModel @Inject constructor(
         )
     )
 
-    private val _uiState = MutableStateFlow<UiState<Unit>>(UiState.Idle)
-    val uiState = _uiState.asStateFlow()
-
-
-    init {
-        // Keeps Running
-        viewModelScope.launch {
-            _selectedType.collect {
-                _selectedCategoryId.value = null
-            }
-        }
+    // Query
+    fun onQueryChange(query: String) {
+        _query.value = query
     }
 
-
+    // Time Logic
     fun onTimeFilterOptionClicked(option: TimeFilterOption) {
-        _timeFilter.value = option
+        _draftState.update { it.copy(timeFilter = option) }
     }
 
-    fun onFromDateSelected(millis: Long?) {
-        if (millis != null) {
-            _selectedFromDateRaw.value = Instant.ofEpochMilli(millis)
-        }
-    }
-
-    fun onToDateSelected(millis: Long?) {
-        if (millis != null) {
-            _selectedToDateRaw.value = Instant.ofEpochMilli(millis)
+    // Date Logic
+    fun onDateSelected(millis: Long?, isFrom: Boolean) {
+        val date = millis?.let { Instant.ofEpochMilli(millis) }
+        _draftState.update {
+            if (isFrom) it.copy(tempStartDate = date) else it.copy(tempEndDate = date)
         }
     }
 
     fun initializeDateRange() {
-        _selectedFromDateRaw.value = _selectedFromDate.value
-        _selectedToDateRaw.value = _selectedToDate.value
+        _draftState.update {
+            it.copy(tempStartDate = it.startDate, tempEndDate = it.endDate)
+        }
     }
 
-    fun onSetDateRange() {
-        _selectedFromDate.value = _selectedFromDateRaw.value
-        _selectedToDate.value = _selectedToDateRaw.value
+    fun onSetDate() {
+        _draftState.update {
+            it.copy(startDate = it.tempStartDate, endDate = it.tempEndDate)
+        }
         checkSelectedDate()
     }
 
-    fun onResetDateRange() {
-        _selectedFromDateRaw.value = null
-        _selectedToDateRaw.value = null
+    fun onResetDate() {
+        _draftState.update {
+            it.copy(tempStartDate = null, tempEndDate = null)
+        }
     }
 
-    fun onFromRawAmountChange(amount: String) {
-        val cleanAmount = CurrencyUiFormatter.cleanAmount(amount, _currencyCode)
-        if (cleanAmount == null) return
+    // Amount Logic
+    fun prepareAmountInput(isFrom: Boolean) {
+        val confirmedAmount = if (isFrom) {
+            _draftState.value.fromAmount
+        } else {
+            _draftState.value.toAmount
+        }
 
-        _fromAmountInput.value = cleanAmount
+        val amountInput = if (confirmedAmount > BigDecimal.ZERO) {
+            confirmedAmount.toPlainString()
+        } else {
+            ""
+        }
+
+        _amountInputState.update { currencyInputs ->
+            if (isFrom) {
+                currencyInputs.copy(fromAmountInput = amountInput)
+            } else {
+                currencyInputs.copy(toAmountInput = amountInput)
+            }
+        }
+    }
+
+    fun onAmountChange(input: String, isFrom: Boolean) {
+        val cleanInput = CurrencyUiFormatter.cleanAmount(input, _currencyCode) ?: return
+        Log.d("TransactionListViewModel", cleanInput)
+
+        _amountInputState.update {
+            if (isFrom) it.copy(fromAmountInput = cleanInput)
+            else  it.copy(toAmountInput = cleanInput)
+        }
+
         _uiState.value = ErrorHelper.removeError(_uiState.value, Field.TRANSACTION_AMOUNT)
     }
 
-    fun onToRawAmountChange(amount: String) {
-        val cleanAmount = CurrencyUiFormatter.cleanAmount(amount, _currencyCode)
-        if (cleanAmount == null) return
+    fun onSetAmount(isFrom: Boolean) {
+        val currentAmountInputs = _amountInputState.value
 
-        _toAmountInput.value = cleanAmount
-        _uiState.value = ErrorHelper.removeError(_uiState.value, Field.TRANSACTION_AMOUNT)
-    }
-
-    fun onFromAmountPositiveBtnClicked() {
-        val trimmedZeroFraction = CurrencyUiFormatter.trimFractionZero(_fromAmountInput.value)
-        _fromRawAmount.value = trimmedZeroFraction.toBigDecimalOrNull() ?: BigDecimal.ZERO
-        checkSelectedAmount()
-    }
-
-    fun onToAmountPositiveBtnClicked() {
-        val trimmedZeroFraction = CurrencyUiFormatter.trimFractionZero(_toAmountInput.value)
-        _toRawAmount.value = trimmedZeroFraction.toBigDecimalOrNull() ?: BigDecimal.ZERO
-        checkSelectedAmount()
-    }
-
-    fun onTypeChange(type: TransactionType) {
-        if (_selectedType.value == type){
-            _selectedType.value = null
-        } else {
-            _selectedType.value = type
-        }
-    }
-
-    fun onCategorySelected(categoryId: String) {
-        _selectedCategoryId.value = categoryId
-    }
-
-    fun initializeFilter() {
-        // Time Option
-        _timeFilter.value = _filter.value.timeFilter
-        _selectedFromDate.value = _filter.value.customStartDate
-        _selectedToDate.value = _filter.value.customEndDate
-        // Amount Input Field
-        if (_filter.value.fromAmount > BigDecimal.ZERO) {
-            onToRawAmountChange(_filter.value.toAmount.toPlainString())
-            onFromRawAmountChange(_filter.value.fromAmount.toPlainString())
-        } else {
-            _fromAmountInput.value = ""
-            _toAmountInput.value = ""
-        }
-        // Amount Input Raw
-        _fromRawAmount.value = _filter.value.fromAmount
-        _toRawAmount.value = _filter.value.toAmount
-        // Type
-        _selectedType.value = _filter.value.type
-        // Category
-        _selectedCategoryId.value = _filter.value.category
-    }
-
-    fun applyFilter() {
-        val transactionFilter = TransactionFilter(
-            timeFilter = _timeFilter.value,
-            customStartDate = _selectedFromDate.value,
-            customEndDate = _selectedToDate.value,
-            fromAmount = _fromRawAmount.value,
-            toAmount = _toRawAmount.value,
-            type = _selectedType.value,
-            category = _selectedCategoryId.value
-        )
-
-        _filter.value = transactionFilter
-    }
-
-    fun resetFilter() {
-        // Time Option
-        _timeFilter.value = TimeFilterOption.ALL_TIME
-        _selectedFromDateRaw.value = null
-        _selectedToDateRaw.value = null
-        _selectedFromDate.value = null
-        _selectedToDate.value = null
-        // Amount Input Field
-        _fromAmountInput.value = ""
-        _toAmountInput.value = ""
-        // Amount Input Raw
-        _fromRawAmount.value = BigDecimal.ZERO
-        _toRawAmount.value = BigDecimal.ZERO
-        // Type
-        _selectedType.value = null
-        // Category
-        _selectedCategoryId.value = null
-    }
-
-    fun checkSelectedDate() {
-        if ((_timeFilter.value == TimeFilterOption.PICK_DATE) && (_selectedFromDate.value == null && _selectedToDate.value == null)) {
-            _timeFilter.value = TimeFilterOption.ALL_TIME
-        }
-    }
-
-    fun checkSelectedAmount() {
-        val fromAmount = _fromRawAmount.value
-        val toAmount = _toRawAmount.value
-        if (fromAmount > BigDecimal.ZERO && toAmount > BigDecimal.ZERO) {
-            if (fromAmount > toAmount) {
-                _uiState.value = UiState.ValidationErrors(
-                    ErrorHelper.validationErrorsToUiError(
-                        listOf(ValidationError.TransactionAmountFromGreaterThanTo)
-                    )
+        _draftState.update { draftState ->
+            if (isFrom) {
+                val validAmount = currentAmountInputs.fromAmountInput.toBigDecimalOrNull() ?: BigDecimal.ZERO
+                draftState.copy(
+                    fromAmount = validAmount
+                )
+            } else {
+                val validAmount = currentAmountInputs.toAmountInput.toBigDecimalOrNull() ?: BigDecimal.ZERO
+                draftState.copy(
+                    toAmount = validAmount
                 )
             }
         }
+        validateAmounts(draft = null)
+    }
+
+    // Type Logic
+    fun onTypeChange(type: TransactionType) {
+        _draftState.update {
+            val newType = if (it.selectedType == type) null else type
+            it.copy(selectedType = newType, selectedCategoryId = null)
+        }
+    }
+
+    // Category Logic
+    fun onCategoryChange(categoryId: String) {
+        _draftState.update {
+            it.copy(selectedCategoryId = categoryId)
+        }
+    }
+
+    // Core
+    fun initializeFilter() {
+        val currentFilter = _filter.value
+
+        _draftState.value = FilterDraftState(
+            timeFilter = currentFilter.timeFilter,
+            startDate = currentFilter.customStartDate,
+            endDate = currentFilter.customEndDate,
+            fromAmount = currentFilter.fromAmount,
+            toAmount = currentFilter.toAmount,
+            selectedType = currentFilter.type,
+            selectedCategoryId = currentFilter.category
+        )
+
+        _amountInputState.value = AmountInputState(
+            fromAmountInput = if (currentFilter.fromAmount > BigDecimal.ZERO) currentFilter.fromAmount.toPlainString() else "",
+            toAmountInput = if (currentFilter.toAmount > BigDecimal.ZERO) currentFilter.toAmount.toPlainString() else "",
+        )
+    }
+
+    fun resetFilter() {
+        _draftState.value = FilterDraftState()
+    }
+
+    fun applyFilter() {
+        val draft = _draftState.value
+
+        if (!validateAmounts(draft)) return
+
+        val newFilter = TransactionFilter(
+            timeFilter = draft.timeFilter,
+            customStartDate = draft.startDate,
+            customEndDate = draft.endDate,
+            fromAmount = draft.fromAmount,
+            toAmount = draft.toAmount,
+            type = draft.selectedType,
+            category = draft.selectedCategoryId
+        )
+
+        _filter.value = newFilter
+    }
+
+    // Validation
+    fun checkSelectedDate() {
+        val draft = _draftState.value
+        if (draft.timeFilter == TimeFilterOption.PICK_DATE &&
+            draft.startDate == null && draft.endDate == null){
+            onTimeFilterOptionClicked(TimeFilterOption.ALL_TIME)
+        }
+    }
+
+    private fun validateAmounts(draft: FilterDraftState?): Boolean {
+        val from = draft?.fromAmount ?: _draftState.value.fromAmount
+        val to = draft?.toAmount ?: _draftState.value.toAmount
+        if ((from > BigDecimal.ZERO) && (to > BigDecimal.ZERO) && (from > to)) {
+            _uiState.value = UiState.ValidationErrors(
+                ErrorHelper.validationErrorsToUiError(
+                    listOf(ValidationError.TransactionAmountFromGreaterThanTo)
+                )
+            )
+            return false
+        }
+        return true
+    }
+
+    // Navigate
+    fun navigateTo(content: FilterBottomSheetType) {
+        if (content == FilterBottomSheetType.DateFilter) initializeDateRange()
+        if (content == FilterBottomSheetType.AmountFrom) prepareAmountInput(isFrom = true)
+        if (content == FilterBottomSheetType.AmountTo) prepareAmountInput(isFrom = false)
+
+        _activeSheetContent.value = content
     }
 }

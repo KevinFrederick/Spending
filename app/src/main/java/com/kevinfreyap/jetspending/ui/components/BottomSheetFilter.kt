@@ -23,7 +23,6 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kevinfreyap.domain.error.Field
-import com.kevinfreyap.domain.model.AppCurrency
 import com.kevinfreyap.domain.model.TimeFilterOption
 import com.kevinfreyap.domain.model.TransactionType
 import com.kevinfreyap.jetspending.R
@@ -124,15 +123,13 @@ fun BottomSheetFilter(
         Row {
             // From 
             ViewAmountCard(
-                onTransactionAmountClick = {},
+                onTransactionAmountClick = {
+                    transactionFilterAction.onNavigateToAmount(isFrom = true)
+                },
                 cardTitle = stringResource(R.string.from),
                 transactionAmount = transactionFilterState.displayFromAmount,
-                transactionAmountInput = transactionFilterState.fromAmountInput,
-                onTransactionAmountChange = transactionFilterAction::onFromAmountChanged,
                 isError = amountError != null,
                 errorMessage = amountError?.let { stringResource(it) } ?: "",
-                currencyCode = AppCurrency.IDR,
-                onPositiveBtnBottomSheet = transactionFilterAction::onFromPositiveBtnClicked,
                 modifier = Modifier
                     .weight(1f)
             )
@@ -144,15 +141,13 @@ fun BottomSheetFilter(
 
             // To
             ViewAmountCard(
-                onTransactionAmountClick = {},
+                onTransactionAmountClick = {
+                    transactionFilterAction.onNavigateToAmount(isFrom = false)
+                },
                 cardTitle = stringResource(R.string.to),
                 transactionAmount = transactionFilterState.displayToAmount,
-                transactionAmountInput = transactionFilterState.toAmountInput,
-                onTransactionAmountChange = transactionFilterAction::onToAmountChanged,
                 isError = amountError != null,
                 errorMessage = amountError?.let { stringResource(it) } ?: "",
-                currencyCode = AppCurrency.IDR,
-                onPositiveBtnBottomSheet = transactionFilterAction::onToPositiveBtnClicked,
                 modifier = Modifier
                     .weight(1f)
             )
@@ -251,9 +246,7 @@ fun BottomSheetFilterPreview() {
                 object : TransactionFilterAction {
                     override fun onFilterOptionClicked(option: TimeFilterOption) {}
 
-                    override fun onFromDateSelected(millis: Long?) {}
-
-                    override fun onToDateSelected(millis: Long?) {}
+                    override fun onDateSelected(millis: Long?, isFrom: Boolean) {}
 
                     override fun onSetSelectedDate() {}
 
@@ -261,17 +254,17 @@ fun BottomSheetFilterPreview() {
 
                     override fun onNavigateToFilter() {}
 
-                    override fun onFromAmountChanged(amount: String) {}
+                    override fun onNavigateToAmount(isFrom: Boolean) {}
 
-                    override fun onToAmountChanged(amount: String) {}
+                    override fun onAmountCardClicked(isFrom: Boolean) {}
+
+                    override fun onAmountChanged(amount: String, isFrom: Boolean) {}
 
                     override fun onTypeChange(type: TransactionType) {}
 
                     override fun onCategorySelected(categoryId: String) {}
 
-                    override fun onFromPositiveBtnClicked() {}
-
-                    override fun onToPositiveBtnClicked() {}
+                    override fun onSetAmount(isFrom: Boolean) {}
 
                     override fun onApplyFilter() {}
 

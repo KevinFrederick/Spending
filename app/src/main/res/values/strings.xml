@@ -118,7 +118,7 @@
     <string name="success_message_welcome_back">Welcome back!</string>
 
     <!-- Error Message -->
-    <string name="error_required_transaction_name">Please enter a name for this transaction.</string>
+    <string name="error_required_transaction_name">Please enter a name for this transaction</string>
     <string name="error_required_transaction_amount">Please enter a valid amount.</string>
     <string name="error_transaction_from_greater_than_to">Please enter a valid amount range</string>
     <string name="error_required_transaction_category">Please select a category.</string>
@@ -126,10 +126,13 @@
     <string name="error_authentication_email_wrong_format">Please enter a valid email address</string>
     <string name="error_authentication_email_used">This email is already associated with an account</string>
     <string name="error_authentication_password_blank">Password is required</string>
-    <string name="error_authentication_password_too_short">Password must be at least 8 characters</string>"
+    <string name="error_authentication_password_too_short">Password must be at least 8 characters</string>
     <string name="error_authentication_password_wrong">Incorrect password</string>
-    <string name="error_authentication_confirm_password_blank">Please confirm your password</string>"
+    <string name="error_authentication_confirm_password_blank">Please confirm your password</string>
     <string name="error_authentication_confirm_password_not_match">Passwords do not match</string>
+    <string name="error_loading_data">Error Loading Data</string>
+    <string name="error_no_transaction">No transaction yet</string>
+    <string name="error_transaction_not_found">No transactions found</string>
 
     <!-- Description -->
     <string name="description_sign_up">Let\'s get started with a free account</string>
