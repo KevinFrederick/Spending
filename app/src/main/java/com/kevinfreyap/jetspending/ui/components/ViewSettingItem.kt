@@ -30,7 +30,7 @@ import com.kevinfreyap.jetspending.ui.theme.Theme
 fun ViewSettingItem(
     title: Int,
     modifier: Modifier = Modifier,
-    subtitle: Int? = null,
+    subtitle: String? = null,
     icon: Int? = null,
     chevronIcon: Boolean = true,
     contentColor: Color? = null
@@ -71,7 +71,7 @@ fun ViewSettingItem(
 
             subtitle?.let {
                 Text(
-                    text = stringResource(it),
+                    text = it,
                     fontWeight = FontWeight.SemiBold,
                     style = MaterialTheme.typography.labelMedium,
                     color = Grey500
@@ -99,7 +99,7 @@ fun ViewSettingItemPreview() {
         ViewSettingItem(
             title = R.string.edit_profile,
             icon = R.drawable.ic_mode_edit_24,
-            subtitle = R.string.description_sign_in
+            subtitle = "Subtitle"
         )
     }
 }

@@ -4,39 +4,47 @@ import com.kevinfreyap.domain.model.AppCurrency
 import java.lang.Exception
 import java.text.DecimalFormat
 import java.text.NumberFormat
-import java.util.Currency
 import java.util.Locale
+import java.util.Locale.*
 import kotlin.text.split
 
 object CurrencyUiFormatter {
     fun getLocale(currencyCode: AppCurrency): Locale {
         return when(currencyCode) {
             AppCurrency.USD -> {
-                Locale.US
+                US
             }
             AppCurrency.IDR -> {
-                Locale.Builder()
+                Builder()
                     .setLanguage("id")
                     .setRegion("ID")
                     .build()
             }
             AppCurrency.TWD -> {
-                Locale.Builder()
+                Builder()
                     .setLanguage("zh")
                     .setRegion("TW")
                     .build()
             }
             AppCurrency.MYR -> {
-                Locale.Builder()
+                Builder()
                     .setLanguage("ms")
                     .setRegion("MY")
                     .build()
             }
+            AppCurrency.SGD -> {
+                Builder()
+                    .setLanguage("en")
+                    .setRegion("SG")
+                    .build()
+            }
+            AppCurrency.JPY -> {
+                Builder()
+                    .setLanguage("ja")
+                    .setRegion("JP")
+                    .build()
+            }
         }
-    }
-
-    fun getCurrency(currencyCode: AppCurrency): Currency {
-        return Currency.getInstance(currencyCode.name)
     }
 
     fun getNumberFormatter(currencyCode: AppCurrency): NumberFormat {

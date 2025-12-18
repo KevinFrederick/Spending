@@ -16,6 +16,8 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
+
+        buildConfigField("String", "CURRENCY_URL", "\"https://%s.currency-api.pages.dev/v1/\"")
     }
 
     buildTypes {
@@ -31,6 +33,10 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
         isCoreLibraryDesugaringEnabled = true
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 }
 
@@ -62,10 +68,15 @@ dependencies {
     ksp(libs.androidx.room.compiler)
 
     implementation(libs.androidx.paging.runtime)
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+    implementation(libs.logging.interceptor)
 
     coreLibraryDesugaring(libs.android.desugarJdkLibs)
 
     testImplementation(libs.junit)
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlin.coroutine.test)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 }

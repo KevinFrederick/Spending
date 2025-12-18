@@ -6,9 +6,10 @@ import com.kevinfreyap.domain.model.TransactionType
 import com.kevinfreyap.jetspending.ui.theme.Green500
 import com.kevinfreyap.jetspending.ui.theme.Orange700
 import java.math.BigDecimal
+import java.math.RoundingMode
 
-object TransactionItemUiFormatter {
-    fun formatTransactionAmount(
+object TransactionUiFormatter {
+    fun formatAmountType(
         transactionAmount: BigDecimal,
         transactionType: TransactionType,
         selectedCurrency: AppCurrency
@@ -17,8 +18,21 @@ object TransactionItemUiFormatter {
             TransactionType.INCOME -> "+"
             TransactionType.SPENDING -> "-"
         }
-        val amountWithCode = CurrencyUiFormatter.formatWithCode(transactionAmount.toPlainString(), selectedCurrency)
+
+        val amountWithCode = formatAmount(transactionAmount, selectedCurrency)
         return "$symbol $amountWithCode"
+    }
+
+    fun formatAmount(
+        transactionAmount: BigDecimal,
+        selectedCurrency: AppCurrency
+    ): String {
+        val fraction = if (selectedCurrency.isFraction) 2 else 0
+
+        return CurrencyUiFormatter.formatWithCode(
+            transactionAmount.setScale(fraction, RoundingMode.HALF_UP).toPlainString(),
+            selectedCurrency
+        )
     }
 
     fun getBackgroundColor(transactionType: TransactionType): Color {

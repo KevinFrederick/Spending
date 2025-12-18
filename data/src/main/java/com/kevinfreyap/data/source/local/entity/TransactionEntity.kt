@@ -30,5 +30,6 @@ data class TransactionEntity(
     val type: TransactionType,
     val categoryId: String,
     val date: Instant,
+    val stringDate: String,
     val lastUpdated: Long
 )

@@ -126,6 +126,7 @@ fun SignInContent(
             ViewTopBar(
                 title = "",
                 onBackClick = onBackClick,
+                onSelectCurrency = {},
                 isLoading = uiState is UiState.Loading
             )
         }
@@ -322,7 +323,7 @@ fun SignInContent(
                 icon = R.drawable.ic_check_circle_outline_24,
                 iconColor = Green500,
                 title = stringResource(R.string.success),
-                message = stringResource(R.string.success_message_register_success)
+                message = stringResource(R.string.success_message_welcome_back)
             )
         }
     }

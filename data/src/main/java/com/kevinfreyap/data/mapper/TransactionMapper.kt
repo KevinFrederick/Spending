@@ -1,14 +1,17 @@
 package com.kevinfreyap.data.mapper
 
+import com.kevinfreyap.data.source.local.entity.PopulatedTransaction
 import com.kevinfreyap.data.source.local.entity.TransactionEntity
-import com.kevinfreyap.data.source.local.entity.TransactionWithCategory
+import com.kevinfreyap.domain.model.ExchangeRates
 import com.kevinfreyap.domain.model.Transaction
+import com.kevinfreyap.domain.model.TransactionWithRates
 import javax.inject.Inject
 
 class TransactionMapper @Inject constructor(
-    private val categoryMapper: TransactionCategoryMapper
+    private val categoryMapper: TransactionCategoryMapper,
+    private val exchangeRatesMapper: ExchangeRatesMapper,
 ) {
-    fun mapTransactionEntityToDomain(entity: TransactionWithCategory): Transaction {
+    fun mapTransactionEntityToDomain(entity: PopulatedTransaction): Transaction {
         return Transaction(
             id = entity.transaction.id,
             name = entity.transaction.name,
@@ -16,7 +19,8 @@ class TransactionMapper @Inject constructor(
             currency = entity.transaction.currency,
             type = entity.transaction.type,
             category = categoryMapper.mapCategoryEntityToDomain(entity.category),
-            date = entity.transaction.date
+            date = entity.transaction.date,
+            stringDate = entity.transaction.stringDate
         )
     }
 
@@ -29,7 +33,15 @@ class TransactionMapper @Inject constructor(
             type = domain.type,
             categoryId = domain.category.id,
             date = domain.date,
-            lastUpdated = System.currentTimeMillis()
+            stringDate = domain.stringDate,
+            lastUpdated = System.currentTimeMillis(),
+        )
+    }
+
+    fun mapTransactionEntityToDomainWithRates(entity: PopulatedTransaction): TransactionWithRates {
+        return TransactionWithRates(
+            transaction = mapTransactionEntityToDomain(entity),
+            rates = entity.rate?.let { exchangeRatesMapper.mapRatesEntityToDomain(it) }
         )
     }
 }

@@ -11,8 +11,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.kevinfreyap.domain.model.AppCurrency
 import com.kevinfreyap.domain.model.TransactionType
+import com.kevinfreyap.jetspending.ui.main.MainViewModel
 import com.kevinfreyap.jetspending.ui.state.TransactionAction
 import kotlinx.coroutines.launch
 
@@ -21,9 +21,10 @@ import kotlinx.coroutines.launch
 fun AddTransactionScreen(
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
+    mainViewModel: MainViewModel = hiltViewModel(),
     viewModel: AddTransactionViewModel = hiltViewModel(),
 ) {
-    val currencyCode = AppCurrency.IDR
+    val currencyCode by mainViewModel.selectedCurrency.collectAsState()
 
     val transactionState by viewModel.transactionState.collectAsState()
     val uiState by viewModel.uiState.collectAsState()
@@ -87,7 +88,6 @@ fun AddTransactionScreen(
     }
 
     AddTransactionContent(
-        onBackClick = onBackClick,
         currencyCode = currencyCode,
         transactionState = transactionState,
         transactionAction = transactionAction,
@@ -95,6 +95,10 @@ fun AddTransactionScreen(
         uiState = uiState,
         amountSheetState = sheetState,
         showAmountSheet = showAmountSheet,
+        onBackClick = onBackClick,
+        onSelectCurrency = {
+            mainViewModel.onSelectCurrency(it)
+        },
         onShowAmountSheet = {
             showAmountSheet = true
         },

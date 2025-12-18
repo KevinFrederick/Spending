@@ -3,7 +3,7 @@ package com.kevinfreyap.data.source.local.entity
 import androidx.room.Embedded
 import androidx.room.Relation
 
-data class TransactionWithCategory(
+data class PopulatedTransaction(
     // Embeds the main Transaction data (amount, date, note, etc.)
     @Embedded
     val transaction: TransactionEntity,
@@ -14,5 +14,11 @@ data class TransactionWithCategory(
         parentColumn = "categoryId",
         entityColumn = "id"
     )
-    val category: TransactionCategoryEntity
+    val category: TransactionCategoryEntity,
+
+    @Relation(
+        parentColumn = "stringDate",
+        entityColumn = "dateKey",
+    )
+    val rate: DailyRatesEntity?
 )

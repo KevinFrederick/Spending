@@ -36,6 +36,7 @@ fun RecentTransactions(
     transactions: List<TransactionItemUi>,
     navigateToTransactionList: () -> Unit,
     navigateToDetail: (String) -> Unit,
+    onCheckRate: (Instant) -> Unit,
     modifier: Modifier = Modifier
 ){
     Card(
@@ -88,7 +89,8 @@ fun RecentTransactions(
                             transaction = transaction,
                             navigateToDetail = {
                                 navigateToDetail(transaction.transactionId)
-                            }
+                            },
+                            onCheckRate = onCheckRate
                         )
                     }
                 }
@@ -115,6 +117,7 @@ fun RecentTransactionsPreview() {
                     transactionDateRaw = Instant.now(),
                     transactionTypeBackground = Green500,
                     transactionCategoryIcon = R.drawable.ic_salary_icon,
+                    isConversionPending = false
                 ),
                 TransactionItemUi(
                     transactionId = "2",
@@ -124,6 +127,7 @@ fun RecentTransactionsPreview() {
                     transactionDateRaw = Instant.now(),
                     transactionTypeBackground = Green500,
                     transactionCategoryIcon = R.drawable.ic_salary_icon,
+                    isConversionPending = false
                 ),
                 TransactionItemUi(
                     transactionId = "3",
@@ -133,54 +137,12 @@ fun RecentTransactionsPreview() {
                     transactionDateRaw = Instant.now(),
                     transactionTypeBackground = Green500,
                     transactionCategoryIcon = R.drawable.ic_salary_icon,
+                    isConversionPending = false
                 )
             ),
             navigateToDetail = {},
-            navigateToTransactionList = {}
-        )
-    }
-}
-
-@Preview(
-    showBackground = true,
-    device = Devices.PIXEL_9_PRO,
-    uiMode = Configuration.UI_MODE_NIGHT_YES
-)
-@Composable
-fun RecentTransactionsDarkPreview() {
-    JetSpendingTheme {
-        RecentTransactions(
-            transactions = listOf(
-                TransactionItemUi(
-                    transactionId = "1",
-                    transactionName = "Salary",
-                    transactionAmount = "+ Rp 1.000.000",
-                    transactionDate = "24 November 2025",
-                    transactionDateRaw = Instant.now(),
-                    transactionTypeBackground = Green500,
-                    transactionCategoryIcon = R.drawable.ic_salary_icon,
-                ),
-                TransactionItemUi(
-                    transactionId = "2",
-                    transactionName = "Salary",
-                    transactionAmount = "+ Rp 1.000.000",
-                    transactionDate = "24 November 2025",
-                    transactionDateRaw = Instant.now(),
-                    transactionTypeBackground = Green500,
-                    transactionCategoryIcon = R.drawable.ic_salary_icon,
-                ),
-                TransactionItemUi(
-                    transactionId = "3",
-                    transactionName = "Salary",
-                    transactionAmount = "+ Rp 1.000.000",
-                    transactionDate = "24 November 2025",
-                    transactionDateRaw = Instant.now(),
-                    transactionTypeBackground = Green500,
-                    transactionCategoryIcon = R.drawable.ic_salary_icon,
-                )
-            ),
-            navigateToDetail = {},
-            navigateToTransactionList = {}
+            navigateToTransactionList = {},
+            onCheckRate = {}
         )
     }
 }

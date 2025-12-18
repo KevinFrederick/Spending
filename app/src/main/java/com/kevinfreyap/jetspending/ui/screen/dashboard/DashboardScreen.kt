@@ -21,11 +21,13 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.kevinfreyap.domain.model.AppCurrency
 import com.kevinfreyap.jetspending.R
 import com.kevinfreyap.jetspending.ui.components.RecentTransactions
 import com.kevinfreyap.jetspending.ui.components.SummaryCard
 import com.kevinfreyap.jetspending.ui.components.ViewDateSelector
 import com.kevinfreyap.jetspending.ui.components.ViewTopBar
+import com.kevinfreyap.jetspending.ui.main.MainViewModel
 import com.kevinfreyap.jetspending.ui.model.TransactionItemUi
 import com.kevinfreyap.jetspending.ui.theme.Blue500
 import com.kevinfreyap.jetspending.ui.theme.Green500
@@ -38,32 +40,46 @@ fun DashboardScreen(
     navigateToTransactionList: () -> Unit,
     navigateToDetail: (String) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: DashboardViewModel = hiltViewModel()
+    viewModel: DashboardViewModel = hiltViewModel(),
+    mainViewModel: MainViewModel = hiltViewModel()
 ) {
+    val currencyCode by mainViewModel.selectedCurrency.collectAsState()
     val latestTransactions by viewModel.latestTransactions.collectAsState()
 
     DashboardContent(
+        currencyCode = currencyCode,
+        latestTransactions = latestTransactions,
+        onSelectCurrency = {
+            mainViewModel.onSelectCurrency(it)
+        },
         navigateToAddTransaction = navigateToAddTransaction,
         navigateToTransactionList = navigateToTransactionList,
         navigateToDetail = navigateToDetail,
-        latestTransactions = latestTransactions,
+        onCheckRate = {
+            mainViewModel.onRateMissing(it)
+        },
         modifier = modifier
     )
 }
 
 @Composable
 fun DashboardContent(
+    currencyCode: AppCurrency,
+    latestTransactions: List<TransactionItemUi>,
+    onSelectCurrency: (AppCurrency) -> Unit,
     navigateToAddTransaction: () -> Unit,
     navigateToTransactionList: () -> Unit,
     navigateToDetail: (String) -> Unit,
-    latestTransactions: List<TransactionItemUi>,
+    onCheckRate: (Instant) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
         topBar = {
             ViewTopBar(
                 title = stringResource(R.string.dashboard),
-                onCurrencyIconClick = {}
+                selectedCurrency = currencyCode,
+                onSelectCurrency = onSelectCurrency,
+                showActionButton = true
             )
         },
         floatingActionButton = {
@@ -112,6 +128,7 @@ fun DashboardContent(
                 transactions = latestTransactions,
                 navigateToTransactionList = navigateToTransactionList,
                 navigateToDetail = navigateToDetail,
+                onCheckRate = onCheckRate
             )
 
             Spacer(
@@ -129,6 +146,8 @@ fun DashboardContent(
 fun DashboardContentPreview(){
     JetSpendingTheme {
         DashboardContent(
+            currencyCode = AppCurrency.IDR,
+            onSelectCurrency = {},
             navigateToAddTransaction = {},
             navigateToTransactionList = {},
             navigateToDetail = {},
@@ -141,6 +160,7 @@ fun DashboardContentPreview(){
                     transactionDateRaw = Instant.now(),
                     transactionTypeBackground = Green500,
                     transactionCategoryIcon = R.drawable.ic_salary_icon,
+                    isConversionPending = false
                 ),
                 TransactionItemUi(
                     transactionId = "2",
@@ -150,6 +170,7 @@ fun DashboardContentPreview(){
                     transactionDateRaw = Instant.now(),
                     transactionTypeBackground = Green500,
                     transactionCategoryIcon = R.drawable.ic_salary_icon,
+                    isConversionPending = false
                 ),
                 TransactionItemUi(
                     transactionId = "3",
@@ -159,8 +180,10 @@ fun DashboardContentPreview(){
                     transactionDateRaw = Instant.now(),
                     transactionTypeBackground = Green500,
                     transactionCategoryIcon = R.drawable.ic_salary_icon,
+                    isConversionPending = false
                 )
-            )
+            ),
+            onCheckRate = {}
         )
     }
 }

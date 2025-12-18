@@ -3,8 +3,10 @@ package com.kevinfreyap.jetspending.ui.screen.settings
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kevinfreyap.domain.model.AppCurrency
 import com.kevinfreyap.domain.resource.DomainResult
 import com.kevinfreyap.domain.usecase.authentication.AuthenticationUseCase
+import com.kevinfreyap.domain.usecase.currency.CurrencyUseCase
 import com.kevinfreyap.domain.usecase.user.UserUseCase
 import com.kevinfreyap.jetspending.R
 import com.kevinfreyap.jetspending.ui.model.SettingsGroup
@@ -26,7 +28,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-    private val userUseCase: UserUseCase,
+    userUseCase: UserUseCase,
+    currencyUseCase: CurrencyUseCase,
     private val authenticationUseCase: AuthenticationUseCase,
     private val userProfileUiMapper: UserProfileUiMapper
 ): ViewModel() {
@@ -52,7 +55,12 @@ class SettingsViewModel @Inject constructor(
             )
         )
 
-    private val _selectedCurrency = MutableStateFlow(R.string.currency_idr)
+    private val _selectedCurrency = currencyUseCase.getCurrency()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = AppCurrency.IDR
+        )
     private val _selectedTheme = MutableStateFlow(R.string.light_mode)
 
     val settingsState = combine(
@@ -82,13 +90,13 @@ class SettingsViewModel @Inject constructor(
                 id = SettingsOption.CURRENCY,
                 title = R.string.currency,
                 icon = R.drawable.ic_currency_exchange_24,
-                subtitle = currency
+                subtitle = currency.displayLongName
             ),
             SettingsItem(
                 id = SettingsOption.THEME,
                 title = R.string.theme,
                 icon = R.drawable.ic_light_mode_24,
-                subtitle = theme
+                subtitle = "Light Mode"
             ),
         )
 

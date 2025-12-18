@@ -11,6 +11,7 @@ import com.kevinfreyap.data.utils.DataConstants.TRANSACTION_COLLECTION
 import com.kevinfreyap.data.utils.TransactionQuery
 import com.kevinfreyap.domain.model.Transaction
 import com.kevinfreyap.domain.model.TransactionFilter
+import com.kevinfreyap.domain.model.TransactionWithRates
 import com.kevinfreyap.domain.repository.ITransactionRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -27,7 +28,7 @@ class TransactionRepository @Inject constructor(
     override fun getTransactions(
         query: String,
         filter: TransactionFilter
-    ): Flow<PagingData<Transaction>> {
+    ): Flow<PagingData<TransactionWithRates>> {
         val filterQuery = transactionQuery.searchTransactionQuery(query, filter)
 
         val pager = Pager(
@@ -41,19 +42,23 @@ class TransactionRepository @Inject constructor(
         )
         return pager.flow
             .map { pagingData ->
-                pagingData.map { transactionWithCategory ->
-                    transactionMapper.mapTransactionEntityToDomain(transactionWithCategory)
+                pagingData.map { populatedTransaction ->
+                    transactionMapper.mapTransactionEntityToDomainWithRates(populatedTransaction)
                 }
             }
     }
 
-    override fun getLatestTransactions(limit: Int): Flow<List<Transaction>> {
+    override fun getLatestTransactions(limit: Int): Flow<List<TransactionWithRates>> {
         return transactionDao.getLatestTransactions(limit)
             .map { transactionWithCategories ->
-                transactionWithCategories.map { transactionWithCategory ->
-                    transactionMapper.mapTransactionEntityToDomain(transactionWithCategory)
+                transactionWithCategories.map { populatedTransaction ->
+                    transactionMapper.mapTransactionEntityToDomainWithRates(populatedTransaction)
                 }
             }
+    }
+
+    override fun getDatesOfMissingRates(): Flow<List<String>> {
+        return transactionDao.getDatesOfMissingRates()
     }
 
     override suspend fun insertTransaction(transaction: Transaction) {

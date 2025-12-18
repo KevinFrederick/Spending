@@ -67,14 +67,15 @@ import kotlin.collections.forEach
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddTransactionContent(
-    onBackClick: () -> Unit,
+    currencyCode: AppCurrency,
     transactionState: TransactionState,
     transactionAction: TransactionAction,
-    currencyCode: AppCurrency,
     showSuccessDialog: Boolean,
     uiState: UiState<Unit>,
     amountSheetState: SheetState,
     showAmountSheet: Boolean,
+    onBackClick: () -> Unit,
+    onSelectCurrency: (AppCurrency) -> Unit,
     onShowAmountSheet: () -> Unit,
     onDismissAmountSheet: () -> Unit,
     modifier: Modifier = Modifier
@@ -97,8 +98,10 @@ fun AddTransactionContent(
         topBar = {
             ViewTopBar(
                 title = stringResource(R.string.add_transaction),
-                onCurrencyIconClick = {},
+                showActionButton = true,
                 onBackClick = { onBackClick() },
+                selectedCurrency = currencyCode,
+                onSelectCurrency = onSelectCurrency,
                 isLoading = uiState is UiState.Loading
             )
         }
@@ -377,6 +380,7 @@ fun AddTransactionContentPreview() {
             showAmountSheet = false,
             onShowAmountSheet = {},
             onDismissAmountSheet = {},
+            onSelectCurrency = {},
             transactionState = TransactionState(
                 transactionAmountDisplay = "Rp 0",
                 transactionCategories = listCategory,

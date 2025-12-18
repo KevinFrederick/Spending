@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.kevinfreyap.domain.model.AppCurrency
 import com.kevinfreyap.jetspending.R
 import com.kevinfreyap.jetspending.ui.theme.Theme
 
@@ -23,8 +24,10 @@ import com.kevinfreyap.jetspending.ui.theme.Theme
 fun ViewTopBar(
     title: String,
     isLoading: Boolean? = null,
-    onCurrencyIconClick: (() -> Unit)? = null,
-    onBackClick: (() -> Unit)? = null
+    showActionButton: Boolean = false,
+    onBackClick: (() -> Unit)? = null,
+    selectedCurrency: AppCurrency? = null,
+    onSelectCurrency: (AppCurrency) -> Unit,
 ) {
     Column(
         modifier = Modifier.fillMaxWidth()
@@ -38,16 +41,13 @@ fun ViewTopBar(
                 )
             },
             actions = {
-                if (onCurrencyIconClick != null) {
-                    IconButton(
-                        onClick = onCurrencyIconClick,
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_currency_exchange_24),
-                            tint = Theme.custom.iconColor,
-                            contentDescription = "Currency Exchange"
-                        )
-                    }
+                if (showActionButton) {
+                    ViewCurrencyActionMenu(
+                        currentCurrency = selectedCurrency,
+                        onCurrencySelected = { newCurrency ->
+                            onSelectCurrency(newCurrency)
+                        }
+                    )
                 }
             },
             navigationIcon = {

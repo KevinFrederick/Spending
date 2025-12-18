@@ -1,27 +1,45 @@
 package com.kevinfreyap.jetspending.utils.mapper
 
 import com.kevinfreyap.domain.model.AppCurrency
-import com.kevinfreyap.domain.model.Transaction
+import com.kevinfreyap.domain.model.TransactionWithRates
+import com.kevinfreyap.domain.usecase.currency.CurrencyUseCase
 import com.kevinfreyap.jetspending.ui.model.TransactionItemUi
 import com.kevinfreyap.jetspending.utils.formatter.CategoryUiFormatter
 import com.kevinfreyap.jetspending.utils.formatter.DateFormatter
-import com.kevinfreyap.jetspending.utils.formatter.TransactionItemUiFormatter
+import com.kevinfreyap.jetspending.utils.formatter.TransactionUiFormatter
 import javax.inject.Inject
 
-class TransactionItemUiMapper @Inject constructor() {
-    fun mapTransactionDomainToUi(transaction: Transaction): TransactionItemUi {
+class TransactionItemUiMapper @Inject constructor(
+    private val currencyUseCase: CurrencyUseCase
+) {
+    fun mapTransactionDomainToUi(
+        populatedTransaction: TransactionWithRates,
+        selectedCurrency: AppCurrency
+    ): TransactionItemUi {
+        val transaction = populatedTransaction.transaction
+        val rates = populatedTransaction.rates
+
+        val calculateRatesValue = currencyUseCase.calculateAmount(
+            amount = transaction.amount,
+            sourceCurrency = transaction.currency,
+            targetCurrency = selectedCurrency,
+            rates = rates
+        )
+
         return TransactionItemUi(
             transactionId = transaction.id,
             transactionName = transaction.name,
-            transactionTypeBackground = TransactionItemUiFormatter.getBackgroundColor(transaction.type),
+            transactionTypeBackground = TransactionUiFormatter.getBackgroundColor(transaction.type),
             transactionCategoryIcon = CategoryUiFormatter.mapCategoryDomainToUi(transaction.category).iconRes,
-            transactionAmount = TransactionItemUiFormatter.formatTransactionAmount(
-                transaction.amount,
-                transaction.type,
-                AppCurrency.IDR
-            ),
+            transactionAmount =
+                TransactionUiFormatter.formatAmountType(
+                    calculateRatesValue ?: transaction.amount,
+                    transaction.type,
+                    if (calculateRatesValue != null) selectedCurrency else transaction.currency
+                ),
             transactionDate = DateFormatter.formatToDate(transaction.date),
-            transactionDateRaw = transaction.date
+            transactionDateRaw = transaction.date,
+            isConversionPending = calculateRatesValue == null
         )
     }
 }

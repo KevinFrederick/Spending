@@ -112,7 +112,7 @@ fun ViewSettingsGroupPreview() {
                     id = SettingsOption.THEME,
                     title = R.string.theme,
                     icon = R.drawable.ic_nightlight_24,
-                    subtitle = R.string.dark_mode
+                    subtitle = "Dark Mode"
                 ),
             ),
             onSettingsClicked = {},

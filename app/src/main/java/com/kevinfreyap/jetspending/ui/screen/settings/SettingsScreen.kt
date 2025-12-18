@@ -1,6 +1,7 @@
 package com.kevinfreyap.jetspending.ui.screen.settings
 
 import android.content.res.Configuration
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -8,6 +9,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -24,29 +26,39 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.kevinfreyap.domain.model.AppCurrency
 import com.kevinfreyap.jetspending.R
 import com.kevinfreyap.jetspending.ui.components.ProfileCard
 import com.kevinfreyap.jetspending.ui.components.ViewCustomDialog
+import com.kevinfreyap.jetspending.ui.components.ViewSelectionDialog
+import com.kevinfreyap.jetspending.ui.components.ViewSelectionItem
 import com.kevinfreyap.jetspending.ui.components.ViewSettingsGroup
 import com.kevinfreyap.jetspending.ui.components.ViewTopBar
+import com.kevinfreyap.jetspending.ui.main.MainViewModel
 import com.kevinfreyap.jetspending.ui.model.SettingsGroup
+import com.kevinfreyap.jetspending.ui.model.SettingsItem
 import com.kevinfreyap.jetspending.ui.model.SettingsOption
 import com.kevinfreyap.jetspending.ui.model.UserProfileUi
 import com.kevinfreyap.jetspending.ui.theme.Grey500
 import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
 import com.kevinfreyap.jetspending.ui.theme.Orange700
 import com.kevinfreyap.jetspending.ui.theme.Red500
+import com.kevinfreyap.jetspending.ui.theme.Theme
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun SettingsScreen(
     navigateToOnBoarding: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: SettingsViewModel = hiltViewModel()
+    mainViewModel: MainViewModel = hiltViewModel(),
+    viewModel: SettingsViewModel = hiltViewModel(),
 ) {
+    val currencyCode by mainViewModel.selectedCurrency.collectAsState()
+
     val settingsGroup by viewModel.settingsState.collectAsState()
     val userProfile by viewModel.userProfile.collectAsState()
 
+    var showCurrencyDialog by remember { mutableStateOf(false) }
     var showLogoutDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
@@ -56,14 +68,39 @@ fun SettingsScreen(
     }
 
     SettingsContent(
+        currencyCode = currencyCode,
         user = userProfile,
         settingsGroup = settingsGroup,
         onSettingsClicked = { settingsOption ->
-            if (settingsOption == SettingsOption.LOG_OUT) {
-                showLogoutDialog = true
+            when(settingsOption) {
+                SettingsOption.EDIT_PROFILE -> {
+
+                }
+                SettingsOption.NOTIFICATION -> {
+
+                }
+                SettingsOption.PRIVACY_SECURITY -> {
+
+                }
+                SettingsOption.CURRENCY -> {
+                    showCurrencyDialog = true
+                }
+                SettingsOption.THEME -> {
+
+                }
+                SettingsOption.LOG_OUT -> {
+                    showLogoutDialog = true
+                }
             }
         },
+        showCurrencyDialog = showCurrencyDialog,
         showLogoutDialog = showLogoutDialog,
+        onSelectCurrency = {
+            mainViewModel.onSelectCurrency(it)
+        },
+        onDismissCurrencyDialog = {
+            showCurrencyDialog = false
+        },
         onLogoutDialogPositiveBtn = {
             showLogoutDialog = false
             viewModel.logout()
@@ -77,10 +114,14 @@ fun SettingsScreen(
 
 @Composable
 fun SettingsContent(
+    currencyCode: AppCurrency,
     user: UserProfileUi,
     settingsGroup: List<SettingsGroup>,
-    onSettingsClicked: (SettingsOption) -> Unit,
+    showCurrencyDialog: Boolean,
     showLogoutDialog: Boolean,
+    onSettingsClicked: (SettingsOption) -> Unit,
+    onSelectCurrency: (AppCurrency) -> Unit,
+    onDismissCurrencyDialog: () -> Unit,
     onLogoutDialogPositiveBtn: () -> Unit,
     onLogoutDialogNegativeBtn: () -> Unit,
     modifier: Modifier = Modifier
@@ -88,7 +129,8 @@ fun SettingsContent(
     Scaffold(
         topBar = {
             ViewTopBar(
-                title = stringResource(R.string.settings)
+                title = stringResource(R.string.settings),
+                onSelectCurrency = {}
             )
         }
     ) { innerPadding ->
@@ -117,6 +159,36 @@ fun SettingsContent(
                     settings = group.settings
                 )
             }
+        }
+
+        if (showCurrencyDialog) {
+            ViewSelectionDialog(
+                title = stringResource(R.string.select_currency),
+                subtitle = stringResource(R.string.description_select_currency),
+                onDismissRequest = onDismissCurrencyDialog,
+                options = {
+                    AppCurrency.entries.forEachIndexed { index, currency ->
+                        ViewSelectionItem(
+                            title = currency.countryName,
+                            subtitle = currency.displayCurrencyName,
+                            selected = currency == currencyCode,
+                            modifier = Modifier
+                                .clickable(
+                                    onClick = { onSelectCurrency(currency) }
+                                )
+                        )
+
+                        if (index < AppCurrency.entries.lastIndex) {
+                            HorizontalDivider(
+                                thickness = 1.dp,
+                                color = Theme.custom.hintColor,
+                                modifier = Modifier
+                                    .padding(horizontal = 16.dp)
+                            )
+                        }
+                    }
+                }
+            )
         }
 
         if (showLogoutDialog) {
@@ -164,8 +236,54 @@ fun SettingsContent(
 )
 @Composable
 fun SettingsContentPreview() {
-    val viewModel: SettingsViewModel = hiltViewModel()
-    val settingsGroup by viewModel.settingsState.collectAsState()
+    val generalList = listOf(
+        SettingsItem(
+            id = SettingsOption.EDIT_PROFILE,
+            title = R.string.edit_profile,
+            icon = R.drawable.ic_mode_edit_24,
+        ),
+        SettingsItem(
+            id = SettingsOption.NOTIFICATION,
+            title = R.string.notifications,
+            icon = R.drawable.ic_notifications_24,
+        ),
+        SettingsItem(
+            id = SettingsOption.PRIVACY_SECURITY,
+            title = R.string.security,
+            icon = R.drawable.ic_lock_24,
+        ),
+    )
+
+    val preferencesList = listOf(
+        SettingsItem(
+            id = SettingsOption.CURRENCY,
+            title = R.string.currency,
+            icon = R.drawable.ic_currency_exchange_24,
+            subtitle = "Indonesia (Rupiah | Rp)"
+        ),
+        SettingsItem(
+            id = SettingsOption.THEME,
+            title = R.string.theme,
+            icon = R.drawable.ic_light_mode_24,
+            subtitle = "Dark Mode"
+        ),
+    )
+
+    val supportList = listOf(
+        SettingsItem(
+            id = SettingsOption.LOG_OUT,
+            title = R.string.logout,
+            icon = R.drawable.ic_logout_24,
+            contentColor = Red500,
+            showChevron = false
+        ),
+    )
+
+    val settingsGroup = listOf(
+        SettingsGroup(R.string.general, generalList),
+        SettingsGroup(R.string.preference, preferencesList),
+        SettingsGroup(R.string.support, supportList),
+    )
 
     JetSpendingTheme {
         SettingsContent(
@@ -176,9 +294,13 @@ fun SettingsContentPreview() {
             ),
             settingsGroup = settingsGroup,
             onSettingsClicked = {},
+            showCurrencyDialog = false,
             showLogoutDialog = false,
             onLogoutDialogPositiveBtn = {},
             onLogoutDialogNegativeBtn = {},
+            currencyCode = AppCurrency.IDR,
+            onDismissCurrencyDialog = {},
+            onSelectCurrency = {},
         )
     }
 }

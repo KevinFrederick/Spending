@@ -13,6 +13,7 @@ import com.kevinfreyap.domain.model.TimeFilterOption
 import com.kevinfreyap.domain.model.TransactionFilter
 import com.kevinfreyap.domain.model.TransactionType
 import com.kevinfreyap.domain.usecase.category.CategoryUseCase
+import com.kevinfreyap.domain.usecase.currency.CurrencyUseCase
 import com.kevinfreyap.domain.usecase.transaction.TransactionUseCase
 import com.kevinfreyap.jetspending.R
 import com.kevinfreyap.jetspending.ui.model.FilterBottomSheetType
@@ -49,11 +50,17 @@ import kotlin.collections.find
 
 @HiltViewModel
 class TransactionListViewModel @Inject constructor(
+    currencyUseCase: CurrencyUseCase,
     private val transactionUseCase: TransactionUseCase,
     private val categoryUseCase: CategoryUseCase,
     private val transactionItemUiMapper: TransactionItemUiMapper
 ): ViewModel() {
-    private val _currencyCode = AppCurrency.IDR
+    val currencyCode = currencyUseCase.getCurrency()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = AppCurrency.IDR
+        )
 
     private val _query = MutableStateFlow("")
     val query: StateFlow<String> = _query
@@ -82,7 +89,14 @@ class TransactionListViewModel @Inject constructor(
         }
         .map { pagingData ->
             pagingData
-                .map { transaction -> TransactionsUi.Item (transactionItemUiMapper.mapTransactionDomainToUi(transaction)) }
+                .map { transaction ->
+                    TransactionsUi.Item (
+                        transactionItemUiMapper.mapTransactionDomainToUi(
+                            transaction,
+                            currencyCode.value
+                        )
+                    )
+                }
                 .insertSeparators { before: TransactionsUi.Item?, after: TransactionsUi.Item? ->
                     if (after == null) return@insertSeparators null
 
@@ -135,8 +149,9 @@ class TransactionListViewModel @Inject constructor(
     val filterUiState: StateFlow<TransactionFilterState> = combine(
         _draftState,
         _categoriesFlow,
-        _amountInputState
-    ) { draft, categories, amount ->
+        _amountInputState,
+        currencyCode
+    ) { draft, categories, amount, currency ->
 
         val categoriesUiList = categories
             .map { CategoryUiFormatter.mapCategoryDomainToUi(it) }
@@ -157,8 +172,8 @@ class TransactionListViewModel @Inject constructor(
             // Amount
             fromAmountInput = amount.fromAmountInput,
             toAmountInput = amount.toAmountInput,
-            displayFromAmount = CurrencyUiFormatter.formatWithCode(draft.fromAmount.toPlainString(), _currencyCode),
-            displayToAmount = CurrencyUiFormatter.formatWithCode(draft.toAmount.toPlainString(), _currencyCode),
+            displayFromAmount = CurrencyUiFormatter.formatWithCode(draft.fromAmount.toPlainString(), currency),
+            displayToAmount = CurrencyUiFormatter.formatWithCode(draft.toAmount.toPlainString(), currency),
 
             // Type & Category
             selectedType = draft.selectedType,
@@ -235,7 +250,7 @@ class TransactionListViewModel @Inject constructor(
     }
 
     fun onAmountChange(input: String, isFrom: Boolean) {
-        val cleanInput = CurrencyUiFormatter.cleanAmount(input, _currencyCode) ?: return
+        val cleanInput = CurrencyUiFormatter.cleanAmount(input, currencyCode.value) ?: return
 
         _amountInputState.update {
             if (isFrom) it.copy(fromAmountInput = cleanInput)

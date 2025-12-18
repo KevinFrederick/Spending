@@ -138,6 +138,7 @@ fun SignUpContent(
             ViewTopBar(
                 title = "",
                 onBackClick = onBackClick,
+                onSelectCurrency = {},
                 isLoading = uiState is UiState.Loading
             )
         }

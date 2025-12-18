@@ -9,6 +9,7 @@ import com.kevinfreyap.domain.model.AppCurrency
 import com.kevinfreyap.domain.model.TransactionType
 import com.kevinfreyap.domain.resource.DomainResult
 import com.kevinfreyap.domain.usecase.category.CategoryUseCase
+import com.kevinfreyap.domain.usecase.currency.CurrencyUseCase
 import com.kevinfreyap.domain.usecase.transaction.TransactionUseCase
 import com.kevinfreyap.jetspending.ui.state.TransactionDraft
 import com.kevinfreyap.jetspending.ui.state.TransactionState
@@ -38,10 +39,16 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AddTransactionViewModel @Inject constructor(
+    currencyUseCase: CurrencyUseCase,
     private val transactionUseCase: TransactionUseCase,
     private val categoryUseCase: CategoryUseCase,
 ): ViewModel(){
-    private val _currencyCode = AppCurrency.IDR
+    val currencyCode = currencyUseCase.getCurrency()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = AppCurrency.IDR
+        )
 
     // Draft
     private val _draftState = MutableStateFlow(TransactionDraft())
@@ -73,8 +80,9 @@ class AddTransactionViewModel @Inject constructor(
         _draftState,
         _transactionName,
         _transactionAmountInput,
-        _categories
-    ) { draft, name, amount, categories ->
+        _categories,
+        currencyCode
+    ) { draft, name, amount, categories, currency ->
 
         val validCategory = categories.find { it.id == draft.transactionCategoryId }
         val dateDisplay = DateFormatter.formatToDateWithDay(draft.transactionDate)
@@ -82,7 +90,7 @@ class AddTransactionViewModel @Inject constructor(
         TransactionState(
             transactionName = name,
             transactionAmountInput = amount,
-            transactionAmountDisplay = CurrencyUiFormatter.formatWithCode(draft.transactionAmountRaw.toPlainString(), _currencyCode),
+            transactionAmountDisplay = CurrencyUiFormatter.formatWithCode(draft.transactionAmountRaw.toPlainString(), currency),
             transactionType = draft.transactionType,
             transactionCategories = categories,
             transactionCategoryId = validCategory?.id,
@@ -118,7 +126,7 @@ class AddTransactionViewModel @Inject constructor(
     }
 
     fun onAmountChange(amount: String) {
-        val cleanAmount = CurrencyUiFormatter.cleanAmount(amount, _currencyCode)
+        val cleanAmount = CurrencyUiFormatter.cleanAmount(amount, currencyCode.value)
 
         if (cleanAmount == null) return
 
@@ -180,9 +188,11 @@ class AddTransactionViewModel @Inject constructor(
             val result = transactionUseCase.insertTransaction(
                 name = _transactionName.value,
                 amount = draft.transactionAmountRaw,
+                currency = currencyCode.value,
                 type = draft.transactionType,
                 categoryId = draft.transactionCategoryId ?: "",
-                date = draft.transactionDate
+                date = draft.transactionDate,
+                stringDate = DateFormatter.formatToDailyRatesString(draft.transactionDate)
             )
 
             when(result) {

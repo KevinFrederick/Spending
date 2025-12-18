@@ -1,7 +1,7 @@
 [versions]
 agp = "8.12.3"
-ksp = "2.2.21-2.0.4"
-kotlin = "2.2.21"
+ksp = "2.3.4"
+kotlin = "2.3.0"
 coreKtx = "1.17.0"
 junit = "4.13.2"
 junitVersion = "1.3.0"
@@ -25,6 +25,12 @@ datastore = "1.2.0"
 splashScreen = "1.2.0"
 coil = "3.3.0"
 paging = "3.3.6"
+retrofit = "3.0.0"
+converterGson = "3.0.0"
+loggingInterceptor = "5.3.2"
+mockk = "1.14.7"
+coroutineTest = "1.10.2"
+metadata = "2.3.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -73,6 +79,16 @@ androidx-splash-screen = { group = "androidx.core", name = "core-splashscreen", 
 # Coil (Load Image)
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
 coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coil" }
+# API Call
+retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
+converter-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "converterGson" }
+# Log API Response
+logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "loggingInterceptor" }
+# Testing
+mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
+kotlin-coroutine-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutineTest" }
+# Metadata
+kotlinx-metadata-jvm = { module = "org.jetbrains.kotlin:kotlin-metadata-jvm", version.ref = "metadata" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

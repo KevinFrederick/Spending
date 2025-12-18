@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.kevinfreyap.data.source.local.AppDatabase
 import com.kevinfreyap.data.source.local.dao.CategoryDao
+import com.kevinfreyap.data.source.local.dao.ExchangeRatesDao
 import com.kevinfreyap.data.source.local.dao.TransactionDao
 import dagger.Module
 import dagger.Provides
@@ -30,4 +31,7 @@ class DatabaseModule {
 
     @Provides
     fun provideCategoryDao(database: AppDatabase): CategoryDao = database.categoryDao()
+
+    @Provides
+    fun provideExchangeRateDao(database: AppDatabase): ExchangeRatesDao = database.exchangeRateDao()
 }

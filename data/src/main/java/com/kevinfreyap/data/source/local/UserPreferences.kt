@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.kevinfreyap.domain.model.AppCurrency
 import com.kevinfreyap.domain.model.User
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -34,6 +35,13 @@ class UserPreferences @Inject constructor(
         }
     }
 
+    fun getCurrency(): Flow<AppCurrency> {
+        return dataStore.data.map { preferences ->
+            val currency = preferences[CURRENCY_KEY] ?: "IDR"
+            AppCurrency.valueOf(currency)
+        }
+    }
+
     suspend fun saveUser(user: User) {
         dataStore.edit { preferences ->
             with(user){
@@ -43,6 +51,12 @@ class UserPreferences @Inject constructor(
                 preferences[PHOTO_URL_KEY] = photoUrl ?: ""
                 preferences[IS_GOOGLE_KEY] = isGoogleAccount
             }
+        }
+    }
+
+    suspend fun saveCurrency(appCurrency: AppCurrency) {
+        dataStore.edit { preferences ->
+            preferences[CURRENCY_KEY] = appCurrency.name
         }
     }
 
@@ -64,5 +78,6 @@ class UserPreferences @Inject constructor(
         private val PHOTO_URL_KEY = stringPreferencesKey("photo_url")
         private val IS_GOOGLE_KEY = booleanPreferencesKey("is_google")
         private val THEME_KEY = intPreferencesKey("theme_mode")
+        private val CURRENCY_KEY = stringPreferencesKey("currency")
     }
 }

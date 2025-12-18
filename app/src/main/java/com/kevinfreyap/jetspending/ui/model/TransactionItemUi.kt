@@ -10,5 +10,6 @@ data class TransactionItemUi(
     val transactionCategoryIcon: Int,
     val transactionAmount: String,
     val transactionDate: String,
-    val transactionDateRaw: Instant
+    val transactionDateRaw: Instant,
+    val isConversionPending: Boolean
 )

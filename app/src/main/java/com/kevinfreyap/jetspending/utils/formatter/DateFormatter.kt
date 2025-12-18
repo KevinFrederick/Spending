@@ -34,4 +34,10 @@ object DateFormatter {
             .withZone(zoneId)
         return monthYearFormatter.format(instant)
     }
+
+    fun formatToDailyRatesString(instant: Instant): String {
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+            .withZone(ZoneId.of("UTC"))
+        return formatter.format(instant)
+    }
 }

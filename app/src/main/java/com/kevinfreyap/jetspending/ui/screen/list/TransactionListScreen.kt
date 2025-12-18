@@ -56,6 +56,7 @@ import com.kevinfreyap.jetspending.ui.components.ViewTextField
 import com.kevinfreyap.jetspending.ui.components.ViewTopBar
 import com.kevinfreyap.jetspending.ui.components.ViewTransactionItem
 import com.kevinfreyap.jetspending.ui.components.ViewTransactionItemPlaceholder
+import com.kevinfreyap.jetspending.ui.main.MainViewModel
 import com.kevinfreyap.jetspending.ui.model.FilterBottomSheetType
 import com.kevinfreyap.jetspending.ui.model.FilterTimeOptionUI
 import com.kevinfreyap.jetspending.ui.model.TransactionItemUi
@@ -78,11 +79,12 @@ fun TransactionListScreen(
     onBackClick: () -> Unit,
     navigateToDetail: (String) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: TransactionListViewModel = hiltViewModel()
+    viewModel: TransactionListViewModel = hiltViewModel(),
+    mainViewModel: MainViewModel = hiltViewModel()
 ) {
-    val currencyCode = AppCurrency.IDR
     val transactions = viewModel.transactions.collectAsLazyPagingItems()
 
+    val currencyCode by viewModel.currencyCode.collectAsState()
     val query by viewModel.query.collectAsState()
     val filter by viewModel.filter.collectAsState()
     val filterState by viewModel.filterUiState.collectAsState()
@@ -176,10 +178,15 @@ fun TransactionListScreen(
 
     TransactionListContent(
         currencyCode = currencyCode,
+        transactionFilterState = filterState,
+        transactionFilterAction = filterActions,
         transactions = transactions,
         searchQuery = query,
         sheetState = sheetState,
         activeSheet = activeSheet,
+        onSelectCurrency = {
+            mainViewModel.onSelectCurrency(it)
+        },
         onQueryChange = {
             viewModel.onQueryChange(it)
         },
@@ -190,10 +197,11 @@ fun TransactionListScreen(
         onSelectSheet = { sheet ->
             viewModel.navigateTo(sheet)
         },
+        onCheckRate = {
+            mainViewModel.onRateMissing(it)
+        },
         navigateToDetail = navigateToDetail,
         onBackClick = onBackClick,
-        transactionFilterState = filterState,
-        transactionFilterAction = filterActions,
         uiState = uiState,
         hasActiveFilters = filter.hasActiveFilters,
         modifier = modifier,
@@ -204,17 +212,19 @@ fun TransactionListScreen(
 @Composable
 fun TransactionListContent(
     currencyCode: AppCurrency,
+    transactionFilterState: TransactionFilterState,
+    transactionFilterAction: TransactionFilterAction,
     transactions: LazyPagingItems<TransactionsUi>,
     searchQuery: String,
     sheetState: SheetState,
     activeSheet: FilterBottomSheetType,
+    onSelectCurrency: (AppCurrency) -> Unit,
     onQueryChange: (String) -> Unit,
     onFilterBtnClicked: () -> Unit,
     onSelectSheet: (FilterBottomSheetType) -> Unit,
     navigateToDetail: (String) -> Unit,
     onBackClick: () -> Unit,
-    transactionFilterState: TransactionFilterState,
-    transactionFilterAction: TransactionFilterAction,
+    onCheckRate: (Instant) -> Unit,
     uiState: UiState<Unit>,
     hasActiveFilters: Boolean,
     modifier: Modifier = Modifier
@@ -224,6 +234,9 @@ fun TransactionListContent(
             ViewTopBar(
                 title = stringResource(R.string.transactions),
                 onBackClick = onBackClick,
+                showActionButton = true,
+                selectedCurrency = currencyCode,
+                onSelectCurrency = onSelectCurrency,
                 isLoading = transactions.loadState.refresh is LoadState.Loading
             )
         }
@@ -319,6 +332,7 @@ fun TransactionListContent(
                                                     navigateToDetail(item.transaction.transactionId)
                                                 },
                                                 isNestedCard = false,
+                                                onCheckRate = onCheckRate
                                             )
                                         }
 
@@ -465,7 +479,8 @@ fun TransactionListContentPreview() {
                 transactionCategoryIcon = R.drawable.ic_salary_icon,
                 transactionAmount = "+ Rp 1.000.000",
                 transactionDate = "24 Oct 2025",
-                transactionDateRaw = Instant.now()
+                transactionDateRaw = Instant.now(),
+                isConversionPending = false
             ),
         ),
         TransactionsUi.Item(
@@ -476,7 +491,8 @@ fun TransactionListContentPreview() {
                 transactionCategoryIcon = R.drawable.ic_salary_icon,
                 transactionAmount = "+ Rp 1.000.000",
                 transactionDate = "24 Oct 2025",
-                transactionDateRaw = Instant.now()
+                transactionDateRaw = Instant.now(),
+                isConversionPending = true
             ),
         ),
         TransactionsUi.Header("November 2025"),
@@ -488,7 +504,8 @@ fun TransactionListContentPreview() {
                 transactionCategoryIcon = R.drawable.ic_salary_icon,
                 transactionAmount = "+ Rp 1.000.000",
                 transactionDate = "24 Oct 2025",
-                transactionDateRaw = Instant.now()
+                transactionDateRaw = Instant.now(),
+                isConversionPending = false
             ),
         ),
         TransactionsUi.Item(
@@ -499,7 +516,8 @@ fun TransactionListContentPreview() {
                 transactionCategoryIcon = R.drawable.ic_salary_icon,
                 transactionAmount = "+ Rp 1.000.000",
                 transactionDate = "24 Oct 2025",
-                transactionDateRaw = Instant.now()
+                transactionDateRaw = Instant.now(),
+                isConversionPending = true
             ),
         ),
     )
@@ -521,12 +539,14 @@ fun TransactionListContentPreview() {
     JetSpendingTheme {
         TransactionListContent(
             currencyCode = AppCurrency.IDR,
+            onSelectCurrency = {},
             onBackClick = {},
             navigateToDetail = {},
             searchQuery = "",
             onFilterBtnClicked = {},
             onQueryChange = {},
             onSelectSheet = {},
+            onCheckRate = {},
             transactions = lazyPagingItems,
             sheetState = rememberModalBottomSheetState(),
             activeSheet = FilterBottomSheetType.None,
