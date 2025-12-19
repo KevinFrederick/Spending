@@ -9,10 +9,12 @@ import androidx.room.RawQuery
 import androidx.room.Transaction
 import androidx.sqlite.db.SimpleSQLiteQuery
 import com.kevinfreyap.data.source.local.entity.DailyRatesEntity
-import com.kevinfreyap.data.source.local.entity.PopulatedTransaction
+import com.kevinfreyap.data.source.local.model.PopulatedTransaction
 import com.kevinfreyap.data.source.local.entity.TransactionCategoryEntity
 import com.kevinfreyap.data.source.local.entity.TransactionEntity
+import com.kevinfreyap.data.source.local.model.TransactionMath
 import kotlinx.coroutines.flow.Flow
+import java.time.Instant
 
 @Dao
 interface TransactionDao {
@@ -40,4 +42,11 @@ interface TransactionDao {
         WHERE t.date NOT IN (SELECT date FROM daily_rates)
     """)
     fun getDatesOfMissingRates(): Flow<List<String>>
+
+    // Summary
+    @Query("SELECT amount, currency, type, date, stringDate FROM transactions")
+    fun getAllTransactionsForBalance(): Flow<List<TransactionMath>>
+
+    @Query("SELECT amount, currency, type, date, stringDate FROM transactions WHERE date >= :start AND date <= :end")
+    fun getTransactionsByTimeFrame(start: Instant, end: Instant): Flow<List<TransactionMath>>
 }

@@ -25,17 +25,21 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kevinfreyap.jetspending.R
+import com.kevinfreyap.jetspending.ui.model.MonthlyBalanceUi
 import com.kevinfreyap.jetspending.ui.theme.Green500
 import com.kevinfreyap.jetspending.ui.theme.Grey400
 import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
 import com.kevinfreyap.jetspending.ui.theme.Orange700
+import com.kevinfreyap.jetspending.ui.theme.Red500
 import com.kevinfreyap.jetspending.ui.theme.Theme
 
 @Composable
 fun SummaryCard(
     totalBalance: String,
+    monthlyBalanceUi: MonthlyBalanceUi,
     dateSelectorSlot: @Composable () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isIncomplete: Boolean? = null,
 ) {
     Card(
         colors = CardDefaults.cardColors(
@@ -54,7 +58,23 @@ fun SummaryCard(
                 style = MaterialTheme.typography.titleLarge
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            if (isIncomplete == true){
+                Spacer(modifier = Modifier.height(8.dp))
+            } else {
+                Spacer(modifier = Modifier.height(24.dp))
+            }
+
+            if (isIncomplete == true) {
+                Text(
+                    text = stringResource(R.string.error_some_transaction_rate_unavailable),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Red500,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 4.dp)
+                )
+            }
 
             Text(
                 text = stringResource(R.string.total_balance),
@@ -106,7 +126,7 @@ fun SummaryCard(
                         fontWeight = FontWeight.SemiBold
                     )
                     Text(
-                        text = "Rp 100.000",
+                        text = monthlyBalanceUi.monthlyIncome,
                         fontWeight = FontWeight.SemiBold,
                         color = Green500
                     )
@@ -128,7 +148,7 @@ fun SummaryCard(
                         fontWeight = FontWeight.SemiBold
                     )
                     Text(
-                        text = "Rp 100.000",
+                        text = monthlyBalanceUi.monthlySpending,
                         fontWeight = FontWeight.SemiBold,
                         color = Orange700
                     )
@@ -157,7 +177,9 @@ fun SummaryCardLightPreview() {
                     onNextClick = {  },
                     onNextBtnEnabled = true,
                 )
-            }
+            },
+            isIncomplete = true,
+            monthlyBalanceUi = MonthlyBalanceUi()
         )
     }
 }
@@ -181,7 +203,11 @@ fun SummaryCardDarkPreview() {
                     onNextClick = {  },
                     onNextBtnEnabled = true,
                 )
-            }
+            },
+            monthlyBalanceUi = MonthlyBalanceUi(
+                monthlyIncome = "Rp 100.000",
+                monthlySpending = "Rp 120.000"
+            )
         )
     }
 }

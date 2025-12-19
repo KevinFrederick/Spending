@@ -11,10 +11,12 @@ import com.kevinfreyap.data.utils.DataConstants.TRANSACTION_COLLECTION
 import com.kevinfreyap.data.utils.TransactionQuery
 import com.kevinfreyap.domain.model.Transaction
 import com.kevinfreyap.domain.model.TransactionFilter
+import com.kevinfreyap.domain.model.TransactionMathWithRates
 import com.kevinfreyap.domain.model.TransactionWithRates
 import com.kevinfreyap.domain.repository.ITransactionRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -59,6 +61,25 @@ class TransactionRepository @Inject constructor(
 
     override fun getDatesOfMissingRates(): Flow<List<String>> {
         return transactionDao.getDatesOfMissingRates()
+    }
+
+    override fun getAllTimeTransactions(): Flow<List<TransactionMathWithRates>> {
+        return transactionDao.getAllTransactionsForBalance().map { transactionMaths ->
+            transactionMaths.map { transactionMath ->
+                transactionMapper.mapTransactionMathEntityToDomainWithRates(transactionMath)
+            }
+        }
+    }
+
+    override fun getTransactionsByTimeFrame(
+        start: Instant,
+        end: Instant
+    ): Flow<List<TransactionMathWithRates>> {
+        return transactionDao.getTransactionsByTimeFrame(start, end).map { transactionMaths ->
+            transactionMaths.map { transactionMath ->
+                transactionMapper.mapTransactionMathEntityToDomainWithRates(transactionMath)
+            }
+        }
     }
 
     override suspend fun insertTransaction(transaction: Transaction) {

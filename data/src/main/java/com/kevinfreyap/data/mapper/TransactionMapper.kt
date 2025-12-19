@@ -1,9 +1,10 @@
 package com.kevinfreyap.data.mapper
 
-import com.kevinfreyap.data.source.local.entity.PopulatedTransaction
+import com.kevinfreyap.data.source.local.model.PopulatedTransaction
 import com.kevinfreyap.data.source.local.entity.TransactionEntity
-import com.kevinfreyap.domain.model.ExchangeRates
+import com.kevinfreyap.data.source.local.model.TransactionMath
 import com.kevinfreyap.domain.model.Transaction
+import com.kevinfreyap.domain.model.TransactionMathWithRates
 import com.kevinfreyap.domain.model.TransactionWithRates
 import javax.inject.Inject
 
@@ -41,6 +42,17 @@ class TransactionMapper @Inject constructor(
     fun mapTransactionEntityToDomainWithRates(entity: PopulatedTransaction): TransactionWithRates {
         return TransactionWithRates(
             transaction = mapTransactionEntityToDomain(entity),
+            rates = entity.rate?.let { exchangeRatesMapper.mapRatesEntityToDomain(it) }
+        )
+    }
+
+    fun mapTransactionMathEntityToDomainWithRates(entity: TransactionMath): TransactionMathWithRates {
+        return TransactionMathWithRates(
+            amount = entity.amount,
+            currency = entity.currency,
+            type = entity.type,
+            date = entity.date,
+            stringDate = entity.stringDate,
             rates = entity.rate?.let { exchangeRatesMapper.mapRatesEntityToDomain(it) }
         )
     }

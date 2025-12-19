@@ -5,6 +5,7 @@ import java.time.format.DateTimeFormatter
 import kotlin.time.ExperimentalTime
 import java.time.Instant
 import java.time.LocalDate
+import java.time.YearMonth
 
 @OptIn(ExperimentalTime::class)
 object DateFormatter {
@@ -39,5 +40,10 @@ object DateFormatter {
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
             .withZone(ZoneId.of("UTC"))
         return formatter.format(instant)
+    }
+
+    fun formatYearMonthToString(yearMonth: YearMonth): String {
+        val formatter = DateTimeFormatter.ofPattern("MMMM yyyy")
+        return formatter.format(yearMonth)
     }
 }

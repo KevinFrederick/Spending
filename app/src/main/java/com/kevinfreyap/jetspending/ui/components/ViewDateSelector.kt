@@ -33,7 +33,7 @@ fun ViewDateSelector(
     ) {
         Icon(
             painter = painterResource(R.drawable.ic_chevron_left),
-            tint = Theme.custom.iconColor,
+            tint = if (onPreviousBtnEnabled) Theme.custom.iconColor else Theme.custom.hintColor,
             contentDescription = null,
             modifier = Modifier
                 .weight(1f)
@@ -50,7 +50,7 @@ fun ViewDateSelector(
         )
         Icon(
             painter = painterResource(R.drawable.ic_chevron_right),
-            tint = Theme.custom.iconColor,
+            tint = if (onNextBtnEnabled) Theme.custom.iconColor else Theme.custom.hintColor,
             contentDescription = null,
             modifier = Modifier
                 .weight(1f)
@@ -75,7 +75,7 @@ fun ViewDateSelectorPreview(){
             centerText = "December",
             onPreviousClick = {},
             onNextClick = {},
-            onPreviousBtnEnabled = true,
+            onPreviousBtnEnabled = false,
             onNextBtnEnabled = true,
         )
     }

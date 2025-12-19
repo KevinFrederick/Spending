@@ -94,6 +94,23 @@ fun RecentTransactions(
                         )
                     }
                 }
+
+                if (transactions.isEmpty()) {
+                    Text(
+                        text = stringResource(R.string.error_no_transaction),
+                        style = MaterialTheme.typography.headlineSmall,
+                        textAlign = TextAlign.Center,
+                        color = Theme.custom.textColor,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                top = 8.dp,
+                                start = 16.dp,
+                                bottom = 16.dp,
+                                end = 16.dp
+                            )
+                    )
+                }
             }
         }
     }

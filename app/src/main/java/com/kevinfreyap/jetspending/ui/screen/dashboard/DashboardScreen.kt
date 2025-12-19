@@ -1,5 +1,6 @@
 package com.kevinfreyap.jetspending.ui.screen.dashboard
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -28,6 +29,8 @@ import com.kevinfreyap.jetspending.ui.components.SummaryCard
 import com.kevinfreyap.jetspending.ui.components.ViewDateSelector
 import com.kevinfreyap.jetspending.ui.components.ViewTopBar
 import com.kevinfreyap.jetspending.ui.main.MainViewModel
+import com.kevinfreyap.jetspending.ui.model.MonthlyBalanceUi
+import com.kevinfreyap.jetspending.ui.model.TotalBalanceUi
 import com.kevinfreyap.jetspending.ui.model.TransactionItemUi
 import com.kevinfreyap.jetspending.ui.theme.Blue500
 import com.kevinfreyap.jetspending.ui.theme.Green500
@@ -44,13 +47,30 @@ fun DashboardScreen(
     mainViewModel: MainViewModel = hiltViewModel()
 ) {
     val currencyCode by mainViewModel.selectedCurrency.collectAsState()
+    val totalBalance by viewModel.totalBalance.collectAsState()
+    val monthDisplay by viewModel.monthDisplay.collectAsState()
+    val monthlyBalance by viewModel.monthlyBalance.collectAsState()
     val latestTransactions by viewModel.latestTransactions.collectAsState()
+
+    val nextBtnEnabled by viewModel.nextBtnEnabled.collectAsState()
+    val previousBtnEnabled by viewModel.previousBtnEnabled.collectAsState()
 
     DashboardContent(
         currencyCode = currencyCode,
+        balanceUi = totalBalance,
+        monthDisplay = monthDisplay,
+        monthlyBalance = monthlyBalance,
+        nextBtnEnabled = nextBtnEnabled,
+        previousBtnEnabled = previousBtnEnabled,
         latestTransactions = latestTransactions,
         onSelectCurrency = {
             mainViewModel.onSelectCurrency(it)
+        },
+        onNextBtnClicked = {
+            viewModel.onNextMonth()
+        },
+        onPreviousBtnClicked = {
+            viewModel.onPreviousMonth()
         },
         navigateToAddTransaction = navigateToAddTransaction,
         navigateToTransactionList = navigateToTransactionList,
@@ -65,8 +85,15 @@ fun DashboardScreen(
 @Composable
 fun DashboardContent(
     currencyCode: AppCurrency,
+    balanceUi: TotalBalanceUi,
+    monthDisplay: String,
+    monthlyBalance: MonthlyBalanceUi,
+    nextBtnEnabled: Boolean,
+    previousBtnEnabled: Boolean,
     latestTransactions: List<TransactionItemUi>,
     onSelectCurrency: (AppCurrency) -> Unit,
+    onNextBtnClicked: () -> Unit,
+    onPreviousBtnClicked: () -> Unit,
     navigateToAddTransaction: () -> Unit,
     navigateToTransactionList: () -> Unit,
     navigateToDetail: (String) -> Unit,
@@ -108,16 +135,18 @@ fun DashboardContent(
                 .verticalScroll(rememberScrollState())
         ) {
             SummaryCard(
-                totalBalance = "Rp 100.000",
+                totalBalance = balanceUi.balance,
                 dateSelectorSlot = {
                     ViewDateSelector(
-                        centerText = "December",
-                        onPreviousClick = {  },
-                        onPreviousBtnEnabled = true,
-                        onNextClick = {  },
-                        onNextBtnEnabled = true,
+                        centerText = monthDisplay,
+                        onPreviousClick = onPreviousBtnClicked,
+                        onPreviousBtnEnabled = previousBtnEnabled,
+                        onNextClick = onNextBtnClicked,
+                        onNextBtnEnabled = nextBtnEnabled,
                     )
-                }
+                },
+                isIncomplete = balanceUi.isIncomplete,
+                monthlyBalanceUi = monthlyBalance
             )
 
             Spacer(
@@ -140,13 +169,23 @@ fun DashboardContent(
 
 @Preview(
     showBackground = true,
-    device = Devices.PIXEL_9_PRO
+    device = Devices.PIXEL_9_PRO,
+    uiMode = Configuration.UI_MODE_NIGHT_NO
 )
 @Composable
 fun DashboardContentPreview(){
     JetSpendingTheme {
         DashboardContent(
             currencyCode = AppCurrency.IDR,
+            balanceUi = TotalBalanceUi(
+                balance = "Rp 100.000",
+                isIncomplete = false
+            ),
+            monthDisplay = "December 2025",
+            monthlyBalance = MonthlyBalanceUi(
+                monthlyIncome = "Rp 1.000.000",
+                monthlySpending = "Rp 500.000"
+            ),
             onSelectCurrency = {},
             navigateToAddTransaction = {},
             navigateToTransactionList = {},
@@ -183,7 +222,11 @@ fun DashboardContentPreview(){
                     isConversionPending = false
                 )
             ),
-            onCheckRate = {}
+            onCheckRate = {},
+            nextBtnEnabled = false,
+            previousBtnEnabled = true,
+            onNextBtnClicked = {  },
+            onPreviousBtnClicked = {},
         )
     }
 }
