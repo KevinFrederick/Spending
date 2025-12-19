@@ -13,7 +13,7 @@ class CurrencyInteractor @Inject constructor(
 ): CurrencyUseCase {
     override fun getCurrency(): Flow<AppCurrency> = userRepository.getSelectedCurrency()
 
-    override fun calculateAmount(
+    override fun calculateAmountBasedOnRates(
         amount: BigDecimal,
         sourceCurrency: AppCurrency,
         targetCurrency: AppCurrency,

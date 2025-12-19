@@ -7,7 +7,7 @@ import java.math.BigDecimal
 
 interface CurrencyUseCase {
     fun getCurrency(): Flow<AppCurrency>
-    fun calculateAmount(
+    fun calculateAmountBasedOnRates(
         amount: BigDecimal,
         sourceCurrency: AppCurrency,
         targetCurrency: AppCurrency,

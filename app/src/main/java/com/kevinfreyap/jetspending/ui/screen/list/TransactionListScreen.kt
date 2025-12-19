@@ -415,7 +415,8 @@ fun TransactionListContent(
                                     onBackButtonClick = {
                                         transactionFilterAction.onNavigateToFilter()
                                     },
-                                    currencyCode = currencyCode
+                                    currencyCode = currencyCode,
+                                    onSelectCurrency = onSelectCurrency
                                 )
                             }
 
@@ -448,7 +449,8 @@ fun TransactionListContent(
                                     onBackButtonClick = {
                                         transactionFilterAction.onNavigateToFilter()
                                     },
-                                    currencyCode = currencyCode
+                                    currencyCode = currencyCode,
+                                    onSelectCurrency = onSelectCurrency
                                 )
                             }
 

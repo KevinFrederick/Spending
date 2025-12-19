@@ -90,7 +90,7 @@ class AddTransactionViewModel @Inject constructor(
         TransactionState(
             transactionName = name,
             transactionAmountInput = amount,
-            transactionAmountDisplay = CurrencyUiFormatter.formatWithCode(draft.transactionAmountRaw.toPlainString(), currency),
+            transactionAmountDisplay = CurrencyUiFormatter.formatWithCode(draft.transactionAmountRaw, currency),
             transactionType = draft.transactionType,
             transactionCategories = categories,
             transactionCategoryId = validCategory?.id,

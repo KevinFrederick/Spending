@@ -172,8 +172,8 @@ class TransactionListViewModel @Inject constructor(
             // Amount
             fromAmountInput = amount.fromAmountInput,
             toAmountInput = amount.toAmountInput,
-            displayFromAmount = CurrencyUiFormatter.formatWithCode(draft.fromAmount.toPlainString(), currency),
-            displayToAmount = CurrencyUiFormatter.formatWithCode(draft.toAmount.toPlainString(), currency),
+            displayFromAmount = CurrencyUiFormatter.formatWithCode(draft.fromAmount, currency),
+            displayToAmount = CurrencyUiFormatter.formatWithCode(draft.toAmount, currency),
 
             // Type & Category
             selectedType = draft.selectedType,

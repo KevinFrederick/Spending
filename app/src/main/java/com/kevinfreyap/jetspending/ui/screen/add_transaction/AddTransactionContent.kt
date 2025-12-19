@@ -308,7 +308,8 @@ fun AddTransactionContent(
                     },
                     onPositiveClick = transactionAction::onSetAmount,
                     onNegativeClick = onDismissAmountSheet,
-                    currencyCode = currencyCode
+                    currencyCode = currencyCode,
+                    onSelectCurrency = onSelectCurrency
                 )
             }
         }

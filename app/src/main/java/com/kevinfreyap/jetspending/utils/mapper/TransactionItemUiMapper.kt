@@ -19,7 +19,7 @@ class TransactionItemUiMapper @Inject constructor(
         val transaction = populatedTransaction.transaction
         val rates = populatedTransaction.rates
 
-        val calculateRatesValue = currencyUseCase.calculateAmount(
+        val calculateRatesValue = currencyUseCase.calculateAmountBasedOnRates(
             amount = transaction.amount,
             sourceCurrency = transaction.currency,
             targetCurrency = selectedCurrency,

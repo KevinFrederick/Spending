@@ -2,6 +2,8 @@ package com.kevinfreyap.jetspending.utils.formatter
 
 import com.kevinfreyap.domain.model.AppCurrency
 import java.lang.Exception
+import java.math.BigDecimal
+import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.util.Locale
@@ -93,10 +95,16 @@ object CurrencyUiFormatter {
         }
     }
 
-    fun formatWithCode(amount: String, currencyCode: AppCurrency): String {
-        val currencySymbol = currencyCode.symbol
+    fun formatWithCode(amount: BigDecimal, currencyCode: AppCurrency): String {
+        val fraction = if (currencyCode.isFraction) 2 else 0
 
-        val formattedAmount = formatNumber(amount, currencyCode)
+        val currencySymbol = currencyCode.symbol
+        val stringAmount = amount.setScale(fraction, RoundingMode.HALF_UP).toPlainString()
+
+        val formattedAmount = formatNumber(
+            stringAmount,
+            currencyCode
+        )
 
         return "$currencySymbol $formattedAmount"
     }
