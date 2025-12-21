@@ -1,8 +1,10 @@
 package com.kevinfreyap.data.source.remote.firebase
 
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.DocumentId
 
 data class TransactionFirestore(
+    @DocumentId
     val id: String = "",
     val name: String = "",
     val amount: String = "0",
