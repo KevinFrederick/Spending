@@ -11,5 +11,6 @@ data class Transaction(
     val type: TransactionType,
     val category: Category,
     val date: Instant,
-    val stringDate: String
+    val stringDate: String,
+    val lastUpdated: Long
 )

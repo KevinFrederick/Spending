@@ -95,6 +95,26 @@ class ExchangeRatesRepository @Inject constructor(
         }
     }
 
+    override suspend fun syncDailyRates() {
+        firestore.collection(EXCHANGE_RATES_COLLECTION)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null || snapshot == null) {
+                    Log.e(TAG, error?.message ?: "Sync Rates Error")
+                    return@addSnapshotListener
+                }
+
+                val rates = snapshot.documents.mapNotNull { documentSnapshot ->
+                    documentSnapshot.toObject(ExchangeRatesFirestore::class.java)
+                }.map { ratesFirestore ->
+                    exchangeRatesMapper.mapRatesFirestoreToEntity(ratesFirestore)
+                }
+
+                CoroutineScope(Dispatchers.IO).launch {
+                    exchangeRatesDao.upsertRates(rates)
+                }
+            }
+    }
+
     companion object {
         private const val TAG = "ExchangeRatesRepository"
     }

@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Upsert
 import com.kevinfreyap.data.source.local.entity.DailyRatesEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -18,4 +19,7 @@ interface ExchangeRatesDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertRates(rate: DailyRatesEntity)
+
+    @Upsert
+    suspend fun upsertRates(rates: List<DailyRatesEntity>)
 }

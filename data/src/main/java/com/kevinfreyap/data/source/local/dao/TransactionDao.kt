@@ -22,6 +22,9 @@ interface TransactionDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTransaction(transaction: TransactionEntity)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAllTransaction(transactions: List<TransactionEntity>)
+
     // Read
     @Transaction
     @RawQuery(observedEntities = [
@@ -49,4 +52,11 @@ interface TransactionDao {
 
     @Query("SELECT amount, currency, type, date, stringDate FROM transactions WHERE date >= :start AND date <= :end")
     fun getTransactionsByTimeFrame(start: Instant, end: Instant): Flow<List<TransactionMath>>
+
+    // Delete
+    @Query("DELETE FROM transactions")
+    suspend fun deleteAllTransactions()
+
+    @Query("DELETE FROM transactions WHERE id IN (:ids)")
+    suspend fun deleteTransactionByIds(ids: List<String>)
 }

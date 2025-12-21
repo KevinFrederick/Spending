@@ -33,4 +33,8 @@ class ExchangeRatesInteractor @Inject constructor(
             }
         }
     }
+
+    override suspend fun syncDailyRates() {
+        exchangeRatesRepository.syncDailyRates()
+    }
 }

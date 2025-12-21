@@ -19,7 +19,7 @@ interface TransactionUseCase {
     fun getLatestTransactions(): Flow<List<TransactionWithRates>>
     fun getTotalBalance(selectedCurrency: AppCurrency): Flow<TotalBalanceStatus>
     fun getMonthlyStats(month: YearMonth, selectedCurrency: AppCurrency): Flow<MonthlyStatus>
-
+    fun syncTransactionsFromFirestore(): Flow<Boolean>
     suspend fun insertTransaction(
         name: String,
         amount: BigDecimal,
@@ -29,5 +29,4 @@ interface TransactionUseCase {
         date: Instant,
         stringDate: String,
     ): DomainResult<Unit>
-    suspend fun syncTransactionsFromFirestore()
 }

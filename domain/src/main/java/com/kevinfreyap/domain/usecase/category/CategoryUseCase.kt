@@ -8,6 +8,5 @@ interface CategoryUseCase {
     fun getAllCategories(): Flow<List<Category>>
     fun getCategoryByType(type: TransactionType): Flow<List<Category>>
     suspend fun getCategoryById(categoryId: String): Category?
-
     suspend fun syncCategoriesFromFirestore()
 }

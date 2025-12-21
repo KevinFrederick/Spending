@@ -5,11 +5,16 @@ import com.kevinfreyap.domain.error.ValidationError
 import com.kevinfreyap.domain.model.AuthenticationRequest
 import com.kevinfreyap.domain.repository.IAuthenticationRepository
 import com.kevinfreyap.domain.resource.DomainResult
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class AuthenticationInteractor @Inject constructor(
     private val authenticationRepository: IAuthenticationRepository
 ): AuthenticationUseCase {
+    override fun getAuthState(): Flow<Boolean> {
+        return authenticationRepository.getAuthState()
+    }
+
     override suspend fun isUserLoggedIn(): Boolean {
         return authenticationRepository.isUserLoggedIn()
     }

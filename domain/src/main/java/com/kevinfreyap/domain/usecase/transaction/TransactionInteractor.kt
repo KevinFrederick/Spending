@@ -120,6 +120,10 @@ class TransactionInteractor @Inject constructor(
             .flowOn(Dispatchers.Default)
     }
 
+    override fun syncTransactionsFromFirestore(): Flow<Boolean> {
+        return transactionRepository.syncTransactionsFromFirestore()
+    }
+
     override suspend fun insertTransaction(
         name: String,
         amount: BigDecimal,
@@ -149,7 +153,8 @@ class TransactionInteractor @Inject constructor(
             type = type,
             category = category!!,
             date = date,
-            stringDate
+            stringDate = stringDate,
+            lastUpdated = System.currentTimeMillis()
         )
 
         try {
@@ -164,10 +169,6 @@ class TransactionInteractor @Inject constructor(
         } catch (e: Exception){
             DomainResult.Failure(e)
         }
-    }
-
-    override suspend fun syncTransactionsFromFirestore() {
-
     }
 
     private fun validateTransaction(

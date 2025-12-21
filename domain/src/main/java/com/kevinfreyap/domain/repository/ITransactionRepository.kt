@@ -22,7 +22,7 @@ interface ITransactionRepository {
 
     fun getTransactionsByTimeFrame(start: Instant, end: Instant): Flow<List<TransactionMathWithRates>>
 
-    suspend fun insertTransaction(transaction: Transaction)
+    fun syncTransactionsFromFirestore(): Flow<Boolean>
 
-    suspend fun syncTransactionsFromFirestore()
+    suspend fun insertTransaction(transaction: Transaction)
 }

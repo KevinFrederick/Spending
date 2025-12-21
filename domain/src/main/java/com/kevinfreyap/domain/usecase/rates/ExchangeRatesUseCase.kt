@@ -7,4 +7,5 @@ interface ExchangeRatesUseCase {
     fun getRatesFlow(dateKey: String): Flow<ExchangeRates?>
     suspend fun ensureRatesExist(dateKey: String)
     suspend fun startRatesHealer()
+    suspend fun syncDailyRates()
 }
