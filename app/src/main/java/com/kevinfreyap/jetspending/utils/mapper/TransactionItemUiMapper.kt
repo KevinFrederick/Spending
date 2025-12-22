@@ -1,12 +1,17 @@
 package com.kevinfreyap.jetspending.utils.mapper
 
+import androidx.compose.ui.graphics.Color
 import com.kevinfreyap.domain.model.AppCurrency
+import com.kevinfreyap.domain.model.TransactionType
 import com.kevinfreyap.domain.model.TransactionWithRates
 import com.kevinfreyap.domain.usecase.currency.CurrencyUseCase
 import com.kevinfreyap.jetspending.ui.model.TransactionItemUi
+import com.kevinfreyap.jetspending.ui.theme.Green500
+import com.kevinfreyap.jetspending.ui.theme.Orange700
 import com.kevinfreyap.jetspending.utils.formatter.CategoryUiFormatter
+import com.kevinfreyap.jetspending.utils.formatter.CurrencyUiFormatter
 import com.kevinfreyap.jetspending.utils.formatter.DateFormatter
-import com.kevinfreyap.jetspending.utils.formatter.TransactionUiFormatter
+import java.math.BigDecimal
 import javax.inject.Inject
 
 class TransactionItemUiMapper @Inject constructor(
@@ -29,10 +34,10 @@ class TransactionItemUiMapper @Inject constructor(
         return TransactionItemUi(
             transactionId = transaction.id,
             transactionName = transaction.name,
-            transactionTypeBackground = TransactionUiFormatter.getBackgroundColor(transaction.type),
+            transactionTypeBackground = getBackgroundColor(transaction.type),
             transactionCategoryIcon = CategoryUiFormatter.mapCategoryDomainToUi(transaction.category).iconRes,
             transactionAmount =
-                TransactionUiFormatter.formatAmountType(
+                formatAmountType(
                     calculateRatesValue ?: transaction.amount,
                     transaction.type,
                     if (calculateRatesValue != null) selectedCurrency else transaction.currency
@@ -41,5 +46,26 @@ class TransactionItemUiMapper @Inject constructor(
             transactionDateRaw = transaction.date,
             isConversionPending = calculateRatesValue == null
         )
+    }
+
+    fun formatAmountType(
+        transactionAmount: BigDecimal,
+        transactionType: TransactionType,
+        selectedCurrency: AppCurrency
+    ): String {
+        val symbol = when(transactionType) {
+            TransactionType.INCOME -> "+"
+            TransactionType.SPENDING -> "-"
+        }
+
+        val amountWithCode = CurrencyUiFormatter.formatWithCode(transactionAmount, selectedCurrency)
+        return "$symbol $amountWithCode"
+    }
+
+    fun getBackgroundColor(transactionType: TransactionType): Color {
+        return when (transactionType) {
+            TransactionType.INCOME -> Green500
+            TransactionType.SPENDING -> Orange700
+        }
     }
 }

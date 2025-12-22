@@ -7,6 +7,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.RawQuery
 import androidx.room.Transaction
+import androidx.room.Update
 import androidx.sqlite.db.SimpleSQLiteQuery
 import com.kevinfreyap.data.source.local.entity.DailyRatesEntity
 import com.kevinfreyap.data.source.local.model.PopulatedTransaction
@@ -38,6 +39,24 @@ interface TransactionDao {
     @Query("SELECT * FROM transactions ORDER BY date DESC LIMIT :limit")
     fun getLatestTransactions(limit: Int): Flow<List<PopulatedTransaction>>
 
+    @Transaction
+    @Query("SELECT * FROM transactions WHERE id = :transactionId")
+    fun getTransactionById(transactionId: String): Flow<PopulatedTransaction?>
+
+    // Update
+    @Update
+    fun updateTransaction(transaction: TransactionEntity)
+
+    // Delete
+    @Query("DELETE FROM transactions")
+    suspend fun deleteAllTransactions()
+
+    @Query("DELETE FROM transactions WHERE id IN (:ids)")
+    suspend fun deleteTransactionByIds(ids: List<String>)
+
+    @Query("DELETE FROM transactions WHERE id = :transactionId")
+    suspend fun deleteTransactionById(transactionId: String)
+
     // Check Rates
     @Query("""
         SELECT DISTINCT t.stringDate
@@ -52,11 +71,4 @@ interface TransactionDao {
 
     @Query("SELECT amount, currency, type, date, stringDate FROM transactions WHERE date >= :start AND date <= :end")
     fun getTransactionsByTimeFrame(start: Instant, end: Instant): Flow<List<TransactionMath>>
-
-    // Delete
-    @Query("DELETE FROM transactions")
-    suspend fun deleteAllTransactions()
-
-    @Query("DELETE FROM transactions WHERE id IN (:ids)")
-    suspend fun deleteTransactionByIds(ids: List<String>)
 }

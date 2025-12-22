@@ -96,6 +96,7 @@ fun ViewCustomDialog(
                         textAlign = TextAlign.Center,
                         modifier = Modifier
                             .fillMaxWidth()
+                            .padding(top = 4.dp)
                     )
                 }
 

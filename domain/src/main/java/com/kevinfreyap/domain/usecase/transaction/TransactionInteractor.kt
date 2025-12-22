@@ -48,6 +48,10 @@ class TransactionInteractor @Inject constructor(
         return transactionRepository.getLatestTransactions(3)
     }
 
+    override fun getTransactionById(transactionId: String): Flow<TransactionWithRates?> {
+        return transactionRepository.getTransactionById(transactionId)
+    }
+
     override fun getTotalBalance(selectedCurrency: AppCurrency): Flow<TotalBalanceStatus> {
         return transactionRepository.getAllTimeTransactions().map { transactions ->
             var total = BigDecimal.ZERO
@@ -169,6 +173,10 @@ class TransactionInteractor @Inject constructor(
         } catch (e: Exception){
             DomainResult.Failure(e)
         }
+    }
+
+    override suspend fun deleteTransaction(transactionId: String) {
+        transactionRepository.deleteTransaction(transactionId)
     }
 
     private fun validateTransaction(

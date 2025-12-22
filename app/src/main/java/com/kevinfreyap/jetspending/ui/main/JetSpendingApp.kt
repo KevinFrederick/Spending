@@ -16,15 +16,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.kevinfreyap.jetspending.R
 import com.kevinfreyap.jetspending.ui.navigation.NavigationItem
 import com.kevinfreyap.jetspending.ui.navigation.Screen
 import com.kevinfreyap.jetspending.ui.screen.add_transaction.AddTransactionScreen
 import com.kevinfreyap.jetspending.ui.screen.dashboard.DashboardScreen
+import com.kevinfreyap.jetspending.ui.screen.detail.DetailTransactionScreen
 import com.kevinfreyap.jetspending.ui.screen.list.TransactionListScreen
 import com.kevinfreyap.jetspending.ui.screen.onboarding.OnboardingScreen
 import com.kevinfreyap.jetspending.ui.screen.settings.SettingsScreen
@@ -127,8 +130,8 @@ fun JetSpendingApp(
                     navigateToTransactionList = {
                         navController.navigate(Screen.TransactionList.route)
                     },
-                    navigateToDetail = {
-
+                    navigateToDetail = { transactionId ->
+                        navController.navigate(Screen.TransactionDetail.createRoute(transactionId))
                     }
                 )
             }
@@ -155,8 +158,21 @@ fun JetSpendingApp(
                     onBackClick = {
                         navController.popBackStack()
                     },
-                    navigateToDetail = {
+                    navigateToDetail = { transactionId ->
+                        navController.navigate(Screen.TransactionDetail.createRoute(transactionId))
+                    }
+                )
+            }
+            composable(
+                route = Screen.TransactionDetail.route,
+                arguments = listOf(navArgument("transactionId") {type = NavType.StringType})
+            ) { backStackEntry ->
+                val transactionId = backStackEntry.arguments?.getString("transactionId")
 
+                DetailTransactionScreen(
+                    transactionId = transactionId,
+                    onBackClick = {
+                        navController.popBackStack()
                     }
                 )
             }

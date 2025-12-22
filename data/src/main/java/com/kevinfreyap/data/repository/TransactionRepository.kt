@@ -62,9 +62,18 @@ class TransactionRepository @Inject constructor(
 
     override fun getLatestTransactions(limit: Int): Flow<List<TransactionWithRates>> {
         return transactionDao.getLatestTransactions(limit)
-            .map { transactionWithCategories ->
-                transactionWithCategories.map { populatedTransaction ->
+            .map { populatedTransactions ->
+                populatedTransactions.map { populatedTransaction ->
                     transactionMapper.mapTransactionEntityToDomainWithRates(populatedTransaction)
+                }
+            }
+    }
+
+    override fun getTransactionById(transactionId: String): Flow<TransactionWithRates?> {
+        return transactionDao.getTransactionById(transactionId)
+            .map { transaction ->
+                transaction?.let {
+                    transactionMapper.mapTransactionEntityToDomainWithRates(it)
                 }
             }
     }
@@ -157,6 +166,12 @@ class TransactionRepository @Inject constructor(
         insertTransactionToFirestore(transaction, currentTimeStamp)
     }
 
+    override suspend fun deleteTransaction(transactionId: String) {
+        transactionDao.deleteTransactionById(transactionId)
+
+        deleteTransactionFromFirestore(transactionId)
+    }
+
     private fun insertTransactionToFirestore(transaction: Transaction, timeStamp: Long) {
         val currentUserId = fireAuth.currentUser?.uid ?: return
 
@@ -170,6 +185,19 @@ class TransactionRepository @Inject constructor(
             .set(transactionFirestore)
             .addOnFailureListener { e ->
                 Log.e(TAG + "Insert Firestore", e.message ?: "Something Wrong")
+            }
+    }
+
+    private fun deleteTransactionFromFirestore(transactionId: String) {
+        val currentUserId = fireAuth.currentUser?.uid ?: return
+
+        firestore.collection(USER_COLLECTION)
+            .document(currentUserId)
+            .collection(TRANSACTION_COLLECTION)
+            .document(transactionId)
+            .delete()
+            .addOnFailureListener { e ->
+                Log.e(TAG + "Delete Firestore", e.message ?: "Something Wrong")
             }
     }
 

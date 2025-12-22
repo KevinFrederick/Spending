@@ -16,6 +16,8 @@ interface ITransactionRepository {
 
     fun getLatestTransactions(limit: Int): Flow<List<TransactionWithRates>>
 
+    fun getTransactionById(transactionId: String): Flow<TransactionWithRates?>
+
     fun getDatesOfMissingRates(): Flow<List<String>>
 
     fun getAllTimeTransactions(): Flow<List<TransactionMathWithRates>>
@@ -25,4 +27,5 @@ interface ITransactionRepository {
     fun syncTransactionsFromFirestore(): Flow<Boolean>
 
     suspend fun insertTransaction(transaction: Transaction)
+    suspend fun deleteTransaction(transactionId: String)
 }

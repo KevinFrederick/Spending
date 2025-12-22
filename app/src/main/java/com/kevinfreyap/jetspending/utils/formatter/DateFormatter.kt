@@ -46,4 +46,10 @@ object DateFormatter {
         val formatter = DateTimeFormatter.ofPattern("MMMM yyyy")
         return formatter.format(yearMonth)
     }
+
+    fun formatInstantToDateHour(instant: Instant): String {
+        val formatter = DateTimeFormatter.ofPattern("EEEE, dd MMMM yyyy | HH:mm")
+
+        return formatter.format(instant.atZone(zoneId))
+    }
 }

@@ -7,6 +7,7 @@
     <string name="report">Report</string>
     <string name="settings">Settings</string>
     <string name="transactions">Transactions</string>
+    <string name="transaction_detail">Transaction Detail</string>
 
     <!-- Card Title -->
     <string name="balance_info">Balance Information</string>
@@ -14,7 +15,6 @@
     <string name="spending_report">Spending Report</string>
     <string name="categories_percentage">Categories Percentage</string>
     <string name="category_detail">Category Detail</string>
-    <string name="transaction_detail">Transaction Detail</string>
 
     <!-- Categories -->
     <string name="category_gift">Gifts</string>
@@ -66,6 +66,10 @@
     <string name="from">From</string>
     <string name="to">To</string>
     <string name="select_currency">Select Currency</string>
+    <string name="transaction_type">Transaction Type</string>
+    <string name="transaction_notes">Transaction Notes</string>
+    <string name="notes">Notes</string>
+    <string name="transaction_deleted">Transaction Deleted</string>
 
     <!-- Button -->
     <string name="cancel">Cancel</string>
@@ -88,6 +92,8 @@
     <string name="reset">Reset</string>
     <string name="see_result">See Result</string>
     <string name="set_date">Set Date</string>
+    <string name="edit">Edit</string>
+    <string name="delete_transaction">Delete Transaction</string>
 
     <!-- Theme -->
     <string name="theme">Theme</string>
@@ -132,6 +138,7 @@
     <string name="error_transaction_not_found">No transactions found</string>
     <string name="error_rate_unavailable">Rate Unavailable</string>
     <string name="error_some_transaction_rate_unavailable">Some transaction rate unavailable</string>
+    <string name="error_transaction_missing">Transaction Not Found</string>
 
     <!-- Description -->
     <string name="description_sign_up">Let\'s get started with a free account</string>
@@ -139,4 +146,7 @@
     <string name="description_log_out">Are you sure you want to log out?</string>
     <string name="description_date_range">Select a date or range of date</string>
     <string name="description_select_currency">Choose currency for your transactions</string>
+    <string name="description_delete_transaction">This action cannot be undone. Do you want to delete this transaction?</string>
+    <string name="description_transaction_missing">This transaction may have been deleted or is unavailable</string>
+    <string name="description_delete_transaction_success">Transaction deleted successfully</string>
 </resources>

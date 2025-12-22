@@ -17,6 +17,7 @@ interface TransactionUseCase {
     val earliestTransactionYear: Int
     fun getTransactions(query: String, filter: TransactionFilter): Flow<PagingData<TransactionWithRates>>
     fun getLatestTransactions(): Flow<List<TransactionWithRates>>
+    fun getTransactionById(transactionId: String): Flow<TransactionWithRates?>
     fun getTotalBalance(selectedCurrency: AppCurrency): Flow<TotalBalanceStatus>
     fun getMonthlyStats(month: YearMonth, selectedCurrency: AppCurrency): Flow<MonthlyStatus>
     fun syncTransactionsFromFirestore(): Flow<Boolean>
@@ -29,4 +30,5 @@ interface TransactionUseCase {
         date: Instant,
         stringDate: String,
     ): DomainResult<Unit>
+    suspend fun deleteTransaction(transactionId: String)
 }
