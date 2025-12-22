@@ -6,11 +6,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -18,11 +17,14 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -32,6 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -44,11 +47,11 @@ import com.kevinfreyap.domain.model.TransactionType
 import com.kevinfreyap.jetspending.R
 import com.kevinfreyap.jetspending.ui.components.ViewCategoryPill
 import com.kevinfreyap.jetspending.ui.components.ViewCustomDialog
+import com.kevinfreyap.jetspending.ui.components.ViewDropdownCurrency
 import com.kevinfreyap.jetspending.ui.components.ViewNotesInput
-import com.kevinfreyap.jetspending.ui.components.ViewTopBar
-import com.kevinfreyap.jetspending.ui.main.MainViewModel
 import com.kevinfreyap.jetspending.ui.model.CategoryUI
 import com.kevinfreyap.jetspending.ui.state.TransactionDetailState
+import com.kevinfreyap.jetspending.ui.theme.Blue500
 import com.kevinfreyap.jetspending.ui.theme.Green500
 import com.kevinfreyap.jetspending.ui.theme.Grey500
 import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
@@ -62,12 +65,10 @@ fun DetailTransactionScreen(
     transactionId: String?,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
-    mainViewModel: MainViewModel = hiltViewModel(),
     viewModel: DetailTransactionViewModel = hiltViewModel()
 ) {
     transactionId?.let { viewModel.onSetTransactionId(it) }
 
-    val selectedCurrency by mainViewModel.selectedCurrency.collectAsState()
     val transactionState by viewModel.transactionState.collectAsState()
 
     val showDeleteSuccessDialog by viewModel.showDeleteSuccessDialog.collectAsState()
@@ -76,7 +77,6 @@ fun DetailTransactionScreen(
 
     DetailTransactionContent(
         transactionState = transactionState,
-        selectedCurrency = selectedCurrency,
         showDeleteDialog = showDeleteDialog,
         showDeleteSuccessDialog = showDeleteSuccessDialog,
         isDeleting = isDelete,
@@ -88,17 +88,17 @@ fun DetailTransactionScreen(
             viewModel.onDeleteTransaction()
         },
         onSelectCurrency = {
-            mainViewModel.onSelectCurrency(it)
+            viewModel.onSelectCurrency(it)
         },
         onBackClick = onBackClick,
         modifier = modifier
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailTransactionContent(
     transactionState: TransactionDetailState?,
-    selectedCurrency: AppCurrency,
     showDeleteDialog: Boolean,
     showDeleteSuccessDialog: Boolean,
     isDeleting: Boolean,
@@ -110,13 +110,53 @@ fun DetailTransactionContent(
 ) {
     Scaffold(
         topBar = {
-            ViewTopBar(
-                title = stringResource(R.string.transaction_detail),
-                showActionButton = true,
-                onBackClick = onBackClick,
-                selectedCurrency = selectedCurrency,
-                onSelectCurrency = onSelectCurrency,
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        text = stringResource(R.string.transaction_detail),
+                        color = Theme.custom.textColor,
+                        style = MaterialTheme.typography.headlineSmall
+                    )
+                },
+                actions = {
+                    IconButton(
+                        onClick = {
+                            onShowDeleteDialog(true)
+                        }
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_delete_24),
+                            contentDescription = stringResource(R.string.delete_transaction),
+                            tint = Theme.custom.iconColor
+                        )
+                    }
+                },
+                navigationIcon = {
+                    IconButton(
+                        onClick = onBackClick
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_arrow_back_24),
+                            tint = Theme.custom.iconColor,
+                            contentDescription = stringResource(R.string.back)
+                        )
+                    }
+                },
+                windowInsets = WindowInsets(top = 0.dp)
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {},
+                containerColor = Blue500,
+                contentColor = Color.White,
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_mode_edit_24),
+                    contentDescription = stringResource(R.string.edit_transaction),
+                )
+            }
         }
     ) { innerPadding ->
         if (transactionState == null && !isDeleting) {
@@ -153,31 +193,6 @@ fun DetailTransactionContent(
                     modifier = Modifier
                         .fillMaxWidth()
                 ) {
-                    TextButton(
-                        onClick = {},
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_mode_edit_24),
-                                contentDescription = "Edit",
-                                modifier = Modifier
-                                    .size(20.dp)
-                            )
-                            Spacer(
-                                modifier = Modifier
-                                    .width(4.dp)
-                            )
-                            Text(
-                                text = stringResource(R.string.edit),
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                        }
-                    }
-
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier
@@ -217,6 +232,44 @@ fun DetailTransactionContent(
                             style = MaterialTheme.typography.titleMedium,
                             color = Theme.custom.textColor,
                         )
+                    }
+                }
+
+                Spacer(
+                    modifier = Modifier
+                        .height(16.dp)
+                )
+
+                Card (
+                    colors = CardDefaults.cardColors(
+                        containerColor = Theme.custom.cardColor
+                    ),
+                    shape = RoundedCornerShape(16.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    Row (
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                vertical = 8.dp,
+                                horizontal = 16.dp
+                            )
+                    ) {
+                        Text(
+                            text = stringResource(R.string.currency),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = Theme.custom.textColor,
+                        )
+
+                        transactionState.transactionCurrency?.let { currency ->
+                            ViewDropdownCurrency(
+                                selectedCurrency = currency,
+                                onSelectCurrency = onSelectCurrency
+                            )
+                        }
                     }
                 }
 
@@ -306,7 +359,12 @@ fun DetailTransactionContent(
                     colors = CardDefaults.cardColors(
                         containerColor = Theme.custom.cardColor
                     ),
-                    shape = RoundedCornerShape(16.dp),
+                    shape = RoundedCornerShape(
+                        topStart = 16.dp,
+                        topEnd = 16.dp,
+                        bottomStart = 32.dp,
+                        bottomEnd = 32.dp
+                    ),
                     modifier = modifier
                         .fillMaxWidth()
                 ) {
@@ -328,44 +386,6 @@ fun DetailTransactionContent(
                             value = transactionState.transactionNotes,
                             onValueChange = {},
                             readOnly = true,
-                        )
-                    }
-                }
-
-
-                Spacer(
-                    modifier = Modifier
-                        .height(32.dp)
-                )
-
-                Button(
-                    onClick = {
-                        onShowDeleteDialog(true)
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Red500
-                    ),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                ) {
-                    Row (
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .padding(vertical = 4.dp)
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_delete_24),
-                            contentDescription = stringResource(R.string.delete_transaction)
-                        )
-
-                        Spacer(
-                            modifier = Modifier
-                                .width(8.dp)
-                        )
-
-                        Text(
-                            text = stringResource(R.string.delete_transaction),
-                            style = MaterialTheme.typography.titleMedium
                         )
                     }
                 }
@@ -448,9 +468,9 @@ fun DetailTransactionPreview() {
                     name = R.string.category_salary,
                     iconRes = R.drawable.ic_salary_icon
                 ),
-                transactionColor = Green500
+                transactionColor = Green500,
+                transactionCurrency = AppCurrency.IDR
             ),
-            selectedCurrency = AppCurrency.IDR,
             isDeleting = false,
             showDeleteSuccessDialog = false,
             showDeleteDialog = false,

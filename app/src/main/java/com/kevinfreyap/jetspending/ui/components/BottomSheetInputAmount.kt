@@ -122,6 +122,7 @@ fun BottomSheetInputAmount(
                         Text(
                             text = currencyCode.symbol,
                             style = MaterialTheme.typography.bodyLarge,
+                            color = Theme.custom.textColor,
                             modifier = Modifier
                                 .padding(end = 4.dp)
                         )
@@ -157,7 +158,8 @@ fun BottomSheetInputAmount(
                                 ){
                                     Text(
                                         text = option.symbol,
-                                        fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
+                                        fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
+                                        color = Theme.custom.textColor
                                     )
 
                                     if (selected) {

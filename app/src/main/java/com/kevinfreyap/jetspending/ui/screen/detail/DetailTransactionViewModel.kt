@@ -21,7 +21,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -35,54 +34,52 @@ class DetailTransactionViewModel @Inject constructor(
     private val transactionItemUiMapper: TransactionItemUiMapper
 ): ViewModel(){
     private val _transactionId = MutableStateFlow("")
-    private val currencyCode = currencyUseCase.getCurrency()
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = AppCurrency.IDR
-        )
-    
+
+    private val _currencyCode = MutableStateFlow<AppCurrency?>(null)
     @OptIn(ExperimentalCoroutinesApi::class)
+    private val _transactionFlow = _transactionId
+        .flatMapLatest { id ->
+            transactionUseCase.getTransactionById(id)
+        }
+
     val transactionState: StateFlow<TransactionDetailState?> = combine(
-        _transactionId,
-        currencyCode
-    ) { transactionId, currency ->
-        Pair(transactionId, currency)
-    }
-        .flatMapLatest { (transactionId, currency) ->
-            transactionUseCase.getTransactionById(transactionId)
-                .map { transactionWithRates ->
+        _transactionFlow,
+        _currencyCode
+    ) { transaction, userSelectedCurrency ->
+        val currency = userSelectedCurrency ?: transaction?.transaction?.currency
 
-                    transactionWithRates?.let {
-                        val calculatedRates = currencyUseCase.calculateAmountBasedOnRates(
-                            amount = transactionWithRates.transaction.amount,
-                            sourceCurrency = transactionWithRates.transaction.currency,
-                            targetCurrency = currency,
-                            rates = transactionWithRates.rates
-                        ) ?: BigDecimal.ZERO
+        if (transaction == null || currency == null) {
+            return@combine TransactionDetailState()
+        }
 
-                        TransactionDetailState(
-                            transactionName = it.transaction.name,
-                            transactionAmountDisplay = transactionItemUiMapper.formatAmountType(
-                                transactionAmount = calculatedRates,
-                                transactionType = it.transaction.type,
-                                selectedCurrency = currency
-                            ),
-                            transactionDateDisplay = DateFormatter.formatInstantToDateHour(it.transaction.date),
-                            transactionType = it.transaction.type,
-                            transactionCategory = CategoryUiFormatter.mapCategoryDomainToUi(it.transaction.category),
-                            transactionAmountRaw = calculatedRates,
-                            transactionDateRaw = it.transaction.date,
-                            transactionNotes = it.transaction.notes,
-                            transactionColor = if (it.transaction.type == TransactionType.INCOME) Green500 else Orange700
-                        )
-                    }
-                }
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = TransactionDetailState()
+        val calculatedRates = currencyUseCase.calculateAmountBasedOnRates(
+            amount = transaction.transaction.amount,
+            sourceCurrency = transaction.transaction.currency,
+            targetCurrency = currency,
+            rates = transaction.rates
+        ) ?: BigDecimal.ZERO
+
+        TransactionDetailState(
+            transactionName = transaction.transaction.name,
+            transactionAmountDisplay = transactionItemUiMapper.formatAmountType(
+                transactionAmount = calculatedRates,
+                transactionType = transaction.transaction.type,
+                selectedCurrency = currency
+            ),
+            transactionCurrency = currency,
+            transactionDateDisplay = DateFormatter.formatInstantToDateHour(transaction.transaction.date),
+            transactionType = transaction.transaction.type,
+            transactionCategory = CategoryUiFormatter.mapCategoryDomainToUi(transaction.transaction.category),
+            transactionAmountRaw = calculatedRates,
+            transactionDateRaw = transaction.transaction.date,
+            transactionNotes = transaction.transaction.notes,
+            transactionColor = if (transaction.transaction.type == TransactionType.INCOME) Green500 else Orange700
         )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = TransactionDetailState()
+    )
 
     private val _isDelete = MutableStateFlow(false)
     val isDelete = _isDelete.asStateFlow()
@@ -92,6 +89,10 @@ class DetailTransactionViewModel @Inject constructor(
 
     fun onSetTransactionId(id: String) {
         _transactionId.value = id
+    }
+
+    fun onSelectCurrency(currency: AppCurrency) {
+        _currencyCode.value = currency
     }
 
     fun onDeleteTransaction() {
