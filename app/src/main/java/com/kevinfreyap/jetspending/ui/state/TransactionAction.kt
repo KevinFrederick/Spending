@@ -10,6 +10,7 @@ interface TransactionAction {
     fun onSelectType(type: TransactionType)
     fun onSelectCategory(categoryId: String)
     fun onDateSelected(millis: Long?)
+    fun onNotesChange(notes: String)
     fun onSaveTransaction()
     fun onDismissSuccessDialog()
 }

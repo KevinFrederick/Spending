@@ -136,6 +136,7 @@ class TransactionInteractor @Inject constructor(
         categoryId: String,
         date: Instant,
         stringDate: String,
+        notes: String
     ): DomainResult<Unit> {
         val category = categoryRepository.getCategoryById(categoryId)
 
@@ -143,6 +144,7 @@ class TransactionInteractor @Inject constructor(
             name = name,
             amount = amount,
             category = category,
+            notes = notes
         )
 
         if (errors.isNotEmpty()) {
@@ -158,6 +160,7 @@ class TransactionInteractor @Inject constructor(
             category = category!!,
             date = date,
             stringDate = stringDate,
+            notes = notes,
             lastUpdated = System.currentTimeMillis()
         )
 
@@ -182,13 +185,15 @@ class TransactionInteractor @Inject constructor(
     private fun validateTransaction(
         name: String,
         amount: BigDecimal,
-        category: Category?
+        category: Category?,
+        notes: String
     ): List<ValidationError> {
         val errors = mutableListOf<ValidationError>()
 
         if (name.isBlank()) errors.add(ValidationError.TransactionNameRequired)
         if (amount <= BigDecimal.ZERO) errors.add(ValidationError.TransactionAmountInvalid)
         if (category == null) errors.add(ValidationError.TransactionCategoryMissing)
+        if (notes.length > 1000) errors.add(ValidationError.TransactionNotesTooLong)
 
         return errors
     }

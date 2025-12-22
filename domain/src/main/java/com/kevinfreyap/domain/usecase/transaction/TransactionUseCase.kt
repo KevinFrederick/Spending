@@ -29,6 +29,7 @@ interface TransactionUseCase {
         categoryId: String,
         date: Instant,
         stringDate: String,
+        notes: String
     ): DomainResult<Unit>
     suspend fun deleteTransaction(transactionId: String)
 }

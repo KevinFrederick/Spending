@@ -20,6 +20,10 @@ sealed class ValidationError(
         Field.TRANSACTION_CATEGORY,
         ErrorMessage.TRANSACTION_CATEGORY_NOT_SELECTED
     )
+    object TransactionNotesTooLong: ValidationError(
+        Field.TRANSACTION_NOTES,
+        ErrorMessage.TRANSACTION_NOTES_TOO_LONG
+    )
 
     object AuthenticationEmailBlank: ValidationError(
         Field.AUTHENTICATION_EMAIL,

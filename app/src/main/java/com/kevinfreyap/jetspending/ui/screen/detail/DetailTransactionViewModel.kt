@@ -73,6 +73,7 @@ class DetailTransactionViewModel @Inject constructor(
                             transactionCategory = CategoryUiFormatter.mapCategoryDomainToUi(it.transaction.category),
                             transactionAmountRaw = calculatedRates,
                             transactionDateRaw = it.transaction.date,
+                            transactionNotes = it.transaction.notes,
                             transactionColor = if (it.transaction.type == TransactionType.INCOME) Green500 else Orange700
                         )
                     }

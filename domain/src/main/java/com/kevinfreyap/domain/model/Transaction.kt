@@ -12,5 +12,6 @@ data class Transaction(
     val category: Category,
     val date: Instant,
     val stringDate: String,
+    val notes: String,
     val lastUpdated: Long
 )

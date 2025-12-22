@@ -15,6 +15,7 @@ import com.kevinfreyap.jetspending.ui.state.TransactionDraft
 import com.kevinfreyap.jetspending.ui.state.TransactionState
 import com.kevinfreyap.jetspending.ui.state.UiState
 import com.kevinfreyap.jetspending.utils.ErrorHelper
+import com.kevinfreyap.jetspending.utils.combine
 import com.kevinfreyap.jetspending.utils.formatter.CategoryUiFormatter
 import com.kevinfreyap.jetspending.utils.formatter.CurrencyUiFormatter
 import com.kevinfreyap.jetspending.utils.formatter.DateFormatter
@@ -25,7 +26,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
@@ -75,14 +75,18 @@ class AddTransactionViewModel @Inject constructor(
                 .flowOn(Dispatchers.Default)
         }
 
+    // Notes
+    private val _transactionNotes = MutableStateFlow("")
+
     // Transaction State
     val transactionState: StateFlow<TransactionState> = combine(
         _draftState,
         _transactionName,
         _transactionAmountInput,
         _categories,
-        currencyCode
-    ) { draft, name, amount, categories, currency ->
+        currencyCode,
+        _transactionNotes
+    ) { draft, name, amount, categories, currency, notes ->
 
         val validCategory = categories.find { it.id == draft.transactionCategoryId }
         val dateDisplay = DateFormatter.formatToDateWithDay(draft.transactionDate)
@@ -95,7 +99,8 @@ class AddTransactionViewModel @Inject constructor(
             transactionCategories = categories,
             transactionCategoryId = validCategory?.id,
             transactionDate = draft.transactionDate,
-            transactionDateDisplay = dateDisplay
+            transactionDateDisplay = dateDisplay,
+            transactionNotes = notes
         )
     }.stateIn(
         scope = viewModelScope,
@@ -168,6 +173,20 @@ class AddTransactionViewModel @Inject constructor(
         }
     }
 
+    // Notes
+    fun onNotesChange(notes: String) {
+        _transactionNotes.value = notes
+        if (notes.length <= 1000) {
+            _uiState.value = ErrorHelper.removeError(_uiState.value, Field.TRANSACTION_NOTES)
+        } else {
+            _uiState.value = UiState.ValidationErrors(
+                ErrorHelper.validationErrorsToUiError(
+                    listOf(ValidationError.TransactionNotesTooLong)
+                )
+            )
+        }
+    }
+
     // Save Transaction
     fun onSaveTransaction() {
         _uiState.value = UiState.Loading
@@ -176,7 +195,8 @@ class AddTransactionViewModel @Inject constructor(
         val validationRes = validateTransaction(
             name = _transactionName.value,
             amount = draft.transactionAmountRaw,
-            category = draft.transactionCategoryId
+            category = draft.transactionCategoryId,
+            notes = _transactionNotes.value
         )
 
         if (validationRes.isNotEmpty()) {
@@ -192,7 +212,8 @@ class AddTransactionViewModel @Inject constructor(
                 type = draft.transactionType,
                 categoryId = draft.transactionCategoryId ?: "",
                 date = draft.transactionDate,
-                stringDate = DateFormatter.formatToDailyRatesString(draft.transactionDate)
+                stringDate = DateFormatter.formatToDailyRatesString(draft.transactionDate),
+                notes = _transactionNotes.value
             )
 
             when(result) {
@@ -214,13 +235,15 @@ class AddTransactionViewModel @Inject constructor(
     fun validateTransaction(
         name: String,
         amount: BigDecimal,
-        category: String?
+        category: String?,
+        notes: String
     ): List<ValidationError> {
         val currentErrors = mutableListOf<ValidationError>()
 
         if (name.isBlank()) currentErrors.add(ValidationError.TransactionNameRequired)
         if (amount <= BigDecimal.ZERO) currentErrors.add(ValidationError.TransactionAmountInvalid)
         if (category == null) currentErrors.add(ValidationError.TransactionCategoryMissing)
+        if (notes.length > 1000) currentErrors.add(ValidationError.TransactionNotesTooLong)
 
         return currentErrors
     }

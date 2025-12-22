@@ -13,5 +13,6 @@ data class TransactionFirestore(
     val categoryId: String = "",
     val date: Timestamp? = null,
     val stringDate: String = "",
+    val notes: String = "",
     val lastUpdated: Long = 0L
 )

@@ -75,6 +75,10 @@ fun AddTransactionScreen(
                 viewModel.onDateSelected(millis)
             }
 
+            override fun onNotesChange(notes: String) {
+                viewModel.onNotesChange(notes)
+            }
+
             override fun onSaveTransaction() {
                 viewModel.onSaveTransaction()
             }

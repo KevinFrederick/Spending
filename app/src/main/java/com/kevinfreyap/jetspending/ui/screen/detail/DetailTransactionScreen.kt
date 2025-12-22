@@ -1,5 +1,6 @@
 package com.kevinfreyap.jetspending.ui.screen.detail
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -301,11 +302,36 @@ fun DetailTransactionContent(
                         .height(16.dp)
                 )
 
-                ViewNotesInput(
-                    value = "",
-                    onValueChange = {},
-                    isEnabled = false
-                )
+                Card (
+                    colors = CardDefaults.cardColors(
+                        containerColor = Theme.custom.cardColor
+                    ),
+                    shape = RoundedCornerShape(16.dp),
+                    modifier = modifier
+                        .fillMaxWidth()
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .padding(
+                                top = 16.dp,
+                                start = 16.dp,
+                                end = 16.dp
+                            )
+                    ) {
+                        Text(
+                            text = stringResource(R.string.transaction_notes),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = Theme.custom.textColor
+                        )
+
+                        ViewNotesInput(
+                            value = transactionState.transactionNotes,
+                            onValueChange = {},
+                            readOnly = true,
+                        )
+                    }
+                }
+
 
                 Spacer(
                     modifier = Modifier
@@ -404,7 +430,8 @@ fun DetailTransactionContent(
 
 @Preview(
     showBackground = true,
-    device = Devices.PIXEL_9_PRO
+    device = Devices.PIXEL_9_PRO,
+    uiMode = Configuration.UI_MODE_NIGHT_NO
 )
 @Composable
 fun DetailTransactionPreview() {

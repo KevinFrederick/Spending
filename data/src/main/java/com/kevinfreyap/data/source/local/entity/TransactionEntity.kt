@@ -31,5 +31,6 @@ data class TransactionEntity(
     val categoryId: String,
     val date: Instant,
     val stringDate: String,
+    val notes: String = "",
     val lastUpdated: Long
 )

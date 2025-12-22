@@ -18,6 +18,7 @@ object ErrorFormatter {
             ErrorMessage.AUTHENTICATION_PASSWORD_WRONG -> R.string.error_authentication_password_wrong
             ErrorMessage.AUTHENTICATION_CONFIRM_PASSWORD_BLANK -> R.string.error_authentication_confirm_password_blank
             ErrorMessage.AUTHENTICATION_CONFIRM_PASSWORD_NOT_MATCH -> R.string.error_authentication_confirm_password_not_match
+            ErrorMessage.TRANSACTION_NOTES_TOO_LONG -> R.string.error_notes_too_long
         }
     }
 }

@@ -10,6 +10,7 @@ data class TransactionDetailState(
     val transactionName: String = "",
     val transactionAmountDisplay: String = "",
     val transactionDateDisplay: String = "",
+    val transactionNotes: String = "",
     val transactionType: TransactionType? = null,
     val transactionCategory: CategoryUI? = null,
     val transactionAmountRaw: BigDecimal? = null,

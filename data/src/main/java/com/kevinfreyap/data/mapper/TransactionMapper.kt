@@ -29,6 +29,7 @@ class TransactionMapper @Inject constructor(
             category = categoryMapper.mapCategoryEntityToDomain(entity.category),
             date = entity.transaction.date,
             stringDate = entity.transaction.stringDate,
+            notes = entity.transaction.notes,
             lastUpdated = entity.transaction.lastUpdated
         )
     }
@@ -43,6 +44,7 @@ class TransactionMapper @Inject constructor(
             categoryId = domain.category.id,
             date = domain.date,
             stringDate = domain.stringDate,
+            notes = domain.notes,
             lastUpdated = domain.lastUpdated,
         )
     }
@@ -76,6 +78,7 @@ class TransactionMapper @Inject constructor(
             categoryId = domain.category.id,
             date = Timestamp(domain.date.epochSecond, domain.date.nano),
             stringDate = domain.stringDate,
+            notes = domain.notes,
             lastUpdated = domain.lastUpdated
         )
     }
@@ -92,6 +95,7 @@ class TransactionMapper @Inject constructor(
                 Instant.ofEpochSecond(it.seconds, it.nanoseconds.toLong())
             } ?: Instant.now(),
             stringDate = firestore.stringDate,
+            notes = firestore.notes,
             lastUpdated = firestore.lastUpdated
         )
     }

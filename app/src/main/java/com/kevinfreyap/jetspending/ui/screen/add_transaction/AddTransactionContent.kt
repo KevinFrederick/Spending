@@ -47,6 +47,7 @@ import com.kevinfreyap.jetspending.ui.components.ViewCategoryItem
 import com.kevinfreyap.jetspending.ui.components.ViewCustomDialog
 import com.kevinfreyap.jetspending.ui.components.ViewDatePickerField
 import com.kevinfreyap.jetspending.ui.components.ViewErrorTooltip
+import com.kevinfreyap.jetspending.ui.components.ViewNotesInput
 import com.kevinfreyap.jetspending.ui.components.ViewTextField
 import com.kevinfreyap.jetspending.ui.components.ViewTopBar
 import com.kevinfreyap.jetspending.ui.components.ViewTypeSelector
@@ -92,6 +93,10 @@ fun AddTransactionContent(
 
     val categoryError = if (uiState is UiState.ValidationErrors){
         uiState.errors[Field.TRANSACTION_CATEGORY]
+    } else null
+
+    val notesError = if (uiState is UiState.ValidationErrors) {
+        uiState.errors[Field.TRANSACTION_NOTES]
     } else null
 
     Scaffold(
@@ -263,6 +268,36 @@ fun AddTransactionContent(
 
             Spacer(
                 modifier = Modifier
+                    .height(24.dp)
+            )
+
+            Box {
+                if (notesError != null) {
+                    ViewErrorTooltip(
+                        errorMessage = stringResource(notesError),
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .offset(y = (-12).dp)
+                    )
+                }
+
+                Column {
+                    Text(
+                        text = stringResource(R.string.transaction_notes_optional),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = Theme.custom.textColor
+                    )
+
+                    ViewNotesInput(
+                        value = transactionState.transactionNotes,
+                        onValueChange = transactionAction::onNotesChange,
+                        isError = notesError != null
+                    )
+                }
+            }
+
+            Spacer(
+                modifier = Modifier
                     .height(32.dp)
             )
 
@@ -335,7 +370,8 @@ fun AddTransactionContent(
 @Preview(
     showBackground = true,
     device = Devices.PIXEL_9_PRO,
-    uiMode = Configuration.UI_MODE_NIGHT_YES
+    uiMode = Configuration.UI_MODE_NIGHT_NO,
+    heightDp = 1500
 )
 @Composable
 fun AddTransactionContentPreview() {
@@ -401,6 +437,8 @@ fun AddTransactionContentPreview() {
                 override fun onSelectCategory(categoryId: String) {}
 
                 override fun onDateSelected(millis: Long?) {}
+
+                override fun onNotesChange(notes: String) {}
 
                 override fun onSaveTransaction() {}
 

@@ -12,5 +12,6 @@ data class TransactionState(
     val transactionCategories: List<CategoryUI> = emptyList(),
     val transactionCategoryId: String? = null,
     val transactionDate: Instant = Instant.now(),
+    val transactionNotes: String = "",
     val transactionDateDisplay: String = ""
 )
