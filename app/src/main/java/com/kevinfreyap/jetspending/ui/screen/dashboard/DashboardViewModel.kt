@@ -2,11 +2,12 @@ package com.kevinfreyap.jetspending.ui.screen.dashboard
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kevinfreyap.domain.model.AppCurrency
 import com.kevinfreyap.domain.usecase.currency.CurrencyUseCase
 import com.kevinfreyap.domain.usecase.transaction.TransactionUseCase
+import com.kevinfreyap.jetspending.ui.model.DashboardUi
 import com.kevinfreyap.jetspending.ui.model.MonthlyBalanceUi
 import com.kevinfreyap.jetspending.ui.model.TotalBalanceUi
+import com.kevinfreyap.jetspending.ui.state.UiState
 import com.kevinfreyap.jetspending.utils.formatter.CurrencyUiFormatter
 import com.kevinfreyap.jetspending.utils.formatter.DateFormatter
 import com.kevinfreyap.jetspending.utils.mapper.TransactionItemUiMapper
@@ -29,25 +30,16 @@ class DashboardViewModel @Inject constructor(
     currencyUseCase: CurrencyUseCase,
     private val transactionItemUiMapper: TransactionItemUiMapper
 ): ViewModel() {
-    val currencyCode = currencyUseCase.getCurrency()
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = AppCurrency.IDR
-        )
+    private val currencyCodeFlow = currencyUseCase.getCurrency()
 
-    val latestTransactions = combine(
+    private val latestTransactionsFlow = combine(
         transactionUseCase.getLatestTransactions(),
-        currencyCode
+        currencyCodeFlow
     ) { transactions, currency ->
         transactions.map { transaction ->
             transactionItemUiMapper.mapTransactionDomainToUi(transaction, currency)
         }
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = emptyList()
-    )
+    }
 
     private val _currentMonth = MutableStateFlow(YearMonth.now())
 
@@ -80,7 +72,7 @@ class DashboardViewModel @Inject constructor(
     )
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val totalBalance = currencyCode
+    private val totalBalanceFlow = currencyCodeFlow
         .flatMapLatest {
             transactionUseCase.getTotalBalance(it)
                 .map { balanceStatus ->
@@ -97,9 +89,9 @@ class DashboardViewModel @Inject constructor(
         )
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val monthlyBalance: StateFlow<MonthlyBalanceUi> = combine(
+    private val monthlyBalanceFlow = combine(
         _currentMonth,
-        currencyCode
+        currencyCodeFlow
     ) { month, currency ->
         Pair(month, currency)
     }.flatMapLatest {  (month, currency) ->
@@ -111,11 +103,24 @@ class DashboardViewModel @Inject constructor(
                 )
             }
     }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = MonthlyBalanceUi()
+
+    val uiState: StateFlow<UiState<DashboardUi>> = combine(
+        totalBalanceFlow,
+        monthlyBalanceFlow,
+        latestTransactionsFlow
+    ) { total, monthly, transactions ->
+        val data = DashboardUi(
+            totalBalance = total,
+            monthlyBalance = monthly,
+            latestTransactions = transactions
         )
+
+        UiState.Success(data)
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = UiState.Loading
+    )
 
     fun onNextMonth() {
         _currentMonth.update { it.plusMonths(1) }

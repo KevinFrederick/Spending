@@ -1,6 +1,7 @@
 package com.kevinfreyap.jetspending.ui.components
 
 import android.content.res.Configuration
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -18,6 +20,7 @@ import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -32,6 +35,7 @@ import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
 import com.kevinfreyap.jetspending.ui.theme.Orange700
 import com.kevinfreyap.jetspending.ui.theme.Red500
 import com.kevinfreyap.jetspending.ui.theme.Theme
+import com.kevinfreyap.jetspending.utils.rememberShimmerBrush
 
 @Composable
 fun SummaryCard(
@@ -40,6 +44,7 @@ fun SummaryCard(
     dateSelectorSlot: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     isIncomplete: Boolean? = null,
+    isLoading: Boolean = false
 ) {
     Card(
         colors = CardDefaults.cardColors(
@@ -91,9 +96,15 @@ fun SummaryCard(
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.headlineSmall,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(
-                        top = 4.dp
+                    .align(Alignment.CenterHorizontally)
+                    .then(
+                        if (isLoading) {
+                            Modifier
+                                .width(200.dp)
+                                .background(Theme.custom.nestedCardColor, RoundedCornerShape(8.dp))
+                                .background(rememberShimmerBrush())
+                        }
+                        else Modifier
                     )
             )
 
@@ -126,9 +137,19 @@ fun SummaryCard(
                         fontWeight = FontWeight.SemiBold
                     )
                     Text(
-                        text = monthlyBalanceUi.monthlyIncome,
+                        text = if (isLoading) "000.000" else monthlyBalanceUi.monthlyIncome,
                         fontWeight = FontWeight.SemiBold,
-                        color = Green500
+                        color = if (isLoading) Color.Transparent else Green500,
+                        modifier = Modifier
+                            .then(
+                                if (isLoading) {
+                                    Modifier
+                                        .width(128.dp)
+                                        .background(Theme.custom.nestedCardColor, RoundedCornerShape(8.dp))
+                                        .background(rememberShimmerBrush())
+                                }
+                                else Modifier
+                            )
                     )
                 }
 
@@ -148,9 +169,19 @@ fun SummaryCard(
                         fontWeight = FontWeight.SemiBold
                     )
                     Text(
-                        text = monthlyBalanceUi.monthlySpending,
+                        text = if (isLoading) "000.000" else monthlyBalanceUi.monthlySpending,
                         fontWeight = FontWeight.SemiBold,
-                        color = Orange700
+                        color = if (isLoading) Color.Transparent else Orange700,
+                        modifier = Modifier
+                            .then(
+                                if (isLoading) {
+                                    Modifier
+                                        .width(128.dp)
+                                        .background(Theme.custom.nestedCardColor, RoundedCornerShape(8.dp))
+                                        .background(rememberShimmerBrush())
+                                }
+                                else Modifier
+                            )
                     )
                 }
             }
@@ -168,7 +199,8 @@ fun SummaryCard(
 fun SummaryCardLightPreview() {
     JetSpendingTheme {
         SummaryCard(
-            totalBalance = "Rp 100.000",
+            totalBalance = "",
+            isLoading = true,
             dateSelectorSlot = {
                 ViewDateSelector(
                     centerText = "December",
@@ -179,7 +211,10 @@ fun SummaryCardLightPreview() {
                 )
             },
             isIncomplete = true,
-            monthlyBalanceUi = MonthlyBalanceUi()
+            monthlyBalanceUi = MonthlyBalanceUi(
+                monthlyIncome = "Rp 100.000",
+                monthlySpending = "Rp 120.000"
+            )
         )
     }
 }

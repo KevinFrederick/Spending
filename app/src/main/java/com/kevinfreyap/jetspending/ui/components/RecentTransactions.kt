@@ -37,7 +37,8 @@ fun RecentTransactions(
     navigateToTransactionList: () -> Unit,
     navigateToDetail: (String) -> Unit,
     onCheckRate: (Instant) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isLoading: Boolean = false
 ){
     Card(
         shape = RoundedCornerShape(16.dp),
@@ -82,34 +83,40 @@ fun RecentTransactions(
                 modifier = Modifier
                     .animateContentSize()
             ) {
-                transactions.forEach { transaction ->
-                    // Key -> transaction.id
-                    key(transaction.transactionId) {
-                        ViewTransactionItem(
-                            transaction = transaction,
-                            navigateToDetail = {
-                                navigateToDetail(transaction.transactionId)
-                            },
-                            onCheckRate = onCheckRate
+                if (isLoading) {
+                    repeat(3) {
+                        ViewTransactionItemPlaceholder(isNestedCard = true)
+                    }
+                } else {
+                    transactions.forEach { transaction ->
+                        // Key -> transaction.id
+                        key(transaction.transactionId) {
+                            ViewTransactionItem(
+                                transaction = transaction,
+                                navigateToDetail = {
+                                    navigateToDetail(transaction.transactionId)
+                                },
+                                onCheckRate = onCheckRate
+                            )
+                        }
+                    }
+
+                    if (transactions.isEmpty()) {
+                        Text(
+                            text = stringResource(R.string.error_no_transaction),
+                            style = MaterialTheme.typography.headlineSmall,
+                            textAlign = TextAlign.Center,
+                            color = Theme.custom.textColor,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(
+                                    top = 8.dp,
+                                    start = 16.dp,
+                                    bottom = 16.dp,
+                                    end = 16.dp
+                                )
                         )
                     }
-                }
-
-                if (transactions.isEmpty()) {
-                    Text(
-                        text = stringResource(R.string.error_no_transaction),
-                        style = MaterialTheme.typography.headlineSmall,
-                        textAlign = TextAlign.Center,
-                        color = Theme.custom.textColor,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(
-                                top = 8.dp,
-                                start = 16.dp,
-                                bottom = 16.dp,
-                                end = 16.dp
-                            )
-                    )
                 }
             }
         }
@@ -125,6 +132,7 @@ fun RecentTransactions(
 fun RecentTransactionsPreview() {
     JetSpendingTheme {
         RecentTransactions(
+            isLoading = false,
             transactions = listOf(
                 TransactionItemUi(
                     transactionId = "1",

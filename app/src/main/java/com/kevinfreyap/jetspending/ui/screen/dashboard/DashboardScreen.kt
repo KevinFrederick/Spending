@@ -22,6 +22,7 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kevinfreyap.domain.model.AppCurrency
 import com.kevinfreyap.jetspending.R
 import com.kevinfreyap.jetspending.ui.components.RecentTransactions
@@ -29,9 +30,11 @@ import com.kevinfreyap.jetspending.ui.components.SummaryCard
 import com.kevinfreyap.jetspending.ui.components.ViewDateSelector
 import com.kevinfreyap.jetspending.ui.components.ViewTopBar
 import com.kevinfreyap.jetspending.ui.main.MainViewModel
+import com.kevinfreyap.jetspending.ui.model.DashboardUi
 import com.kevinfreyap.jetspending.ui.model.MonthlyBalanceUi
 import com.kevinfreyap.jetspending.ui.model.TotalBalanceUi
 import com.kevinfreyap.jetspending.ui.model.TransactionItemUi
+import com.kevinfreyap.jetspending.ui.state.UiState
 import com.kevinfreyap.jetspending.ui.theme.Blue500
 import com.kevinfreyap.jetspending.ui.theme.Green500
 import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
@@ -47,22 +50,18 @@ fun DashboardScreen(
     mainViewModel: MainViewModel = hiltViewModel()
 ) {
     val currencyCode by mainViewModel.selectedCurrency.collectAsState()
-    val totalBalance by viewModel.totalBalance.collectAsState()
     val monthDisplay by viewModel.monthDisplay.collectAsState()
-    val monthlyBalance by viewModel.monthlyBalance.collectAsState()
-    val latestTransactions by viewModel.latestTransactions.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val nextBtnEnabled by viewModel.nextBtnEnabled.collectAsState()
     val previousBtnEnabled by viewModel.previousBtnEnabled.collectAsState()
 
     DashboardContent(
         currencyCode = currencyCode,
-        balanceUi = totalBalance,
+        dashboardState = uiState,
         monthDisplay = monthDisplay,
-        monthlyBalance = monthlyBalance,
         nextBtnEnabled = nextBtnEnabled,
         previousBtnEnabled = previousBtnEnabled,
-        latestTransactions = latestTransactions,
         onSelectCurrency = {
             mainViewModel.onSelectCurrency(it)
         },
@@ -85,12 +84,10 @@ fun DashboardScreen(
 @Composable
 fun DashboardContent(
     currencyCode: AppCurrency,
-    balanceUi: TotalBalanceUi,
+    dashboardState: UiState<DashboardUi>,
     monthDisplay: String,
-    monthlyBalance: MonthlyBalanceUi,
     nextBtnEnabled: Boolean,
     previousBtnEnabled: Boolean,
-    latestTransactions: List<TransactionItemUi>,
     onSelectCurrency: (AppCurrency) -> Unit,
     onNextBtnClicked: () -> Unit,
     onPreviousBtnClicked: () -> Unit,
@@ -100,13 +97,16 @@ fun DashboardContent(
     onCheckRate: (Instant) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val isLoading = dashboardState is UiState.Loading
+    val data = if (dashboardState is UiState.Success) dashboardState.data else DashboardUi()
+
     Scaffold(
         topBar = {
             ViewTopBar(
                 title = stringResource(R.string.dashboard),
                 selectedCurrency = currencyCode,
                 onSelectCurrency = onSelectCurrency,
-                showActionButton = true
+                showActionButton = true,
             )
         },
         floatingActionButton = {
@@ -135,7 +135,7 @@ fun DashboardContent(
                 .verticalScroll(rememberScrollState())
         ) {
             SummaryCard(
-                totalBalance = balanceUi.balance,
+                totalBalance = data.totalBalance.balance,
                 dateSelectorSlot = {
                     ViewDateSelector(
                         centerText = monthDisplay,
@@ -145,8 +145,9 @@ fun DashboardContent(
                         onNextBtnEnabled = nextBtnEnabled,
                     )
                 },
-                isIncomplete = balanceUi.isIncomplete,
-                monthlyBalanceUi = monthlyBalance
+                isIncomplete = data.totalBalance.isIncomplete,
+                monthlyBalanceUi = data.monthlyBalance,
+                isLoading = isLoading
             )
 
             Spacer(
@@ -154,10 +155,11 @@ fun DashboardContent(
             )
 
             RecentTransactions(
-                transactions = latestTransactions,
+                transactions = data.latestTransactions,
                 navigateToTransactionList = navigateToTransactionList,
                 navigateToDetail = navigateToDetail,
-                onCheckRate = onCheckRate
+                onCheckRate = onCheckRate,
+                isLoading = isLoading
             )
 
             Spacer(
@@ -177,51 +179,55 @@ fun DashboardContentPreview(){
     JetSpendingTheme {
         DashboardContent(
             currencyCode = AppCurrency.IDR,
-            balanceUi = TotalBalanceUi(
-                balance = "Rp 100.000",
-                isIncomplete = false
+            dashboardState = UiState.Success(
+                DashboardUi(
+                    totalBalance = TotalBalanceUi(
+                        balance = "Rp 100.000",
+                        isIncomplete = false
+                    ),
+                    monthlyBalance = MonthlyBalanceUi(
+                        monthlyIncome = "Rp 1.000.000",
+                        monthlySpending = "Rp 500.000"
+                    ),
+                    latestTransactions = listOf(
+                        TransactionItemUi(
+                            transactionId = "1",
+                            transactionName = "Salary",
+                            transactionAmount = "+ Rp 1.000.000",
+                            transactionDate = "24 November 2025",
+                            transactionDateRaw = Instant.now(),
+                            transactionTypeBackground = Green500,
+                            transactionCategoryIcon = R.drawable.ic_salary_icon,
+                            isConversionPending = false
+                        ),
+                        TransactionItemUi(
+                            transactionId = "2",
+                            transactionName = "Salary",
+                            transactionAmount = "+ Rp 1.000.000",
+                            transactionDate = "24 November 2025",
+                            transactionDateRaw = Instant.now(),
+                            transactionTypeBackground = Green500,
+                            transactionCategoryIcon = R.drawable.ic_salary_icon,
+                            isConversionPending = false
+                        ),
+                        TransactionItemUi(
+                            transactionId = "3",
+                            transactionName = "Salary",
+                            transactionAmount = "+ Rp 1.000.000",
+                            transactionDate = "24 November 2025",
+                            transactionDateRaw = Instant.now(),
+                            transactionTypeBackground = Green500,
+                            transactionCategoryIcon = R.drawable.ic_salary_icon,
+                            isConversionPending = false
+                        )
+                    )
+                )
             ),
             monthDisplay = "December 2025",
-            monthlyBalance = MonthlyBalanceUi(
-                monthlyIncome = "Rp 1.000.000",
-                monthlySpending = "Rp 500.000"
-            ),
             onSelectCurrency = {},
             navigateToAddTransaction = {},
             navigateToTransactionList = {},
             navigateToDetail = {},
-            latestTransactions = listOf(
-                TransactionItemUi(
-                    transactionId = "1",
-                    transactionName = "Salary",
-                    transactionAmount = "+ Rp 1.000.000",
-                    transactionDate = "24 November 2025",
-                    transactionDateRaw = Instant.now(),
-                    transactionTypeBackground = Green500,
-                    transactionCategoryIcon = R.drawable.ic_salary_icon,
-                    isConversionPending = false
-                ),
-                TransactionItemUi(
-                    transactionId = "2",
-                    transactionName = "Salary",
-                    transactionAmount = "+ Rp 1.000.000",
-                    transactionDate = "24 November 2025",
-                    transactionDateRaw = Instant.now(),
-                    transactionTypeBackground = Green500,
-                    transactionCategoryIcon = R.drawable.ic_salary_icon,
-                    isConversionPending = false
-                ),
-                TransactionItemUi(
-                    transactionId = "3",
-                    transactionName = "Salary",
-                    transactionAmount = "+ Rp 1.000.000",
-                    transactionDate = "24 November 2025",
-                    transactionDateRaw = Instant.now(),
-                    transactionTypeBackground = Green500,
-                    transactionCategoryIcon = R.drawable.ic_salary_icon,
-                    isConversionPending = false
-                )
-            ),
             onCheckRate = {},
             nextBtnEnabled = false,
             previousBtnEnabled = true,
