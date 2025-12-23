@@ -9,6 +9,7 @@ import com.kevinfreyap.domain.usecase.currency.CurrencyUseCase
 import com.kevinfreyap.domain.usecase.rates.ExchangeRatesUseCase
 import com.kevinfreyap.domain.usecase.transaction.TransactionUseCase
 import com.kevinfreyap.jetspending.ui.navigation.Screen
+import com.kevinfreyap.jetspending.utils.NetworkMonitor
 import com.kevinfreyap.jetspending.utils.formatter.DateFormatter
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -31,7 +32,8 @@ class MainViewModel @Inject constructor(
     private val authenticationUseCase: AuthenticationUseCase,
     private val exchangeRatesUseCase: ExchangeRatesUseCase,
     private val transactionUseCase: TransactionUseCase,
-    private val categoryUseCase: CategoryUseCase
+    private val categoryUseCase: CategoryUseCase,
+    networkMonitor: NetworkMonitor
 ): ViewModel(){
     private val _startDestination = MutableStateFlow<String?>(null)
     val startDestination = _startDestination.asStateFlow()
@@ -41,6 +43,13 @@ class MainViewModel @Inject constructor(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = AppCurrency.IDR
+        )
+
+    val isOnline = networkMonitor.isOnline
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = true
         )
 
     init {

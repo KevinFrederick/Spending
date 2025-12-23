@@ -144,6 +144,7 @@
     <string name="error_transaction_missing">Transaction Not Found</string>
     <string name="error_notes_too_long">Notes too long</string>
     <string name="error_transaction_currency">Currency data not loaded yet. Please wait.</string>
+    <string name="error_network_offline">You are offline. Data will sync when online</string>
 
     <!-- Description -->
     <string name="description_sign_up">Let\'s get started with a free account</string>

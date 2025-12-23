@@ -1,19 +1,33 @@
 package com.kevinfreyap.jetspending.ui.main
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.exclude
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -23,6 +37,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.kevinfreyap.jetspending.R
+import com.kevinfreyap.jetspending.ui.components.OfflineBanner
 import com.kevinfreyap.jetspending.ui.navigation.NavigationItem
 import com.kevinfreyap.jetspending.ui.navigation.Screen
 import com.kevinfreyap.jetspending.ui.screen.add_transaction.AddTransactionScreen
@@ -38,8 +53,11 @@ import com.kevinfreyap.jetspending.ui.screen.signup.SignUpScreen
 fun JetSpendingApp(
     modifier: Modifier = Modifier,
     startDestination: String,
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
+    mainViewModel: MainViewModel = hiltViewModel()
 ) {
+    val isOnline by mainViewModel.isOnline.collectAsState()
+
     val focusManager = LocalFocusManager.current
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -51,145 +69,169 @@ fun JetSpendingApp(
         Screen.Settings.route
     )
 
-    Scaffold(
-        bottomBar = {
-            if (currentRoute in bottomBarRoutes){
-                BottomBar(navController = navController)
-            }
-        },
-        modifier = modifier.pointerInput(Unit) {
-            detectTapGestures(onTap = {
-                focusManager.clearFocus()
-            })
-        }
-    ){ innerPadding ->
-        NavHost(
-            navController = navController,
-            startDestination = startDestination,
-            modifier = Modifier.padding(innerPadding)
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .statusBarsPadding()
+    ) {
+        AnimatedVisibility(
+            visible = !isOnline,
+            enter = expandVertically() + fadeIn(),
+            exit = shrinkVertically() + fadeOut()
         ) {
-            composable(Screen.OnBoarding.route) {
-                OnboardingScreen(
-                    onGetStartedClicked = {
-                        navController.navigate(Screen.SignUp.route)
-                    },
-                    onSignInClicked = {
-                        navController.navigate(Screen.SignIn.route)
-                    },
-                )
-            }
-            composable(Screen.SignUp.route) {
-                SignUpScreen(
-                    onBackClick = {
-                        navController.popBackStack()
-                    },
-                    onSignInClicked = {
-                        navController.navigate(Screen.SignIn.route) {
-                            popUpTo(Screen.OnBoarding.route) {
-                                inclusive = false
-                            }
-                        }
-                    },
-                    navigateToDashboard = {
-                        navController.navigate(Screen.Dashboard.route) {
-                            popUpTo(Screen.OnBoarding.route) {
-                                inclusive = true
-                            }
-                            launchSingleTop = true
-                        }
-                    }
-                )
-            }
-            composable(Screen.SignIn.route) {
-                SignInScreen(
-                    onBackClick = {
-                        navController.popBackStack()
-                    },
-                    onSignUpClicked = {
-                        navController.navigate(Screen.SignUp.route) {
-                            popUpTo(Screen.OnBoarding.route) {
-                                inclusive = false
-                            }
-                        }
-                    },
-                    navigateToDashboard = {
-                        navController.navigate(Screen.Dashboard.route) {
-                            popUpTo(Screen.OnBoarding.route) {
-                                inclusive = true
-                            }
-                            launchSingleTop = true
-                        }
-                    }
-                )
-            }
-            composable(Screen.Dashboard.route) {
-                DashboardScreen(
-                    navigateToAddTransaction = {
-                        navController.navigate(Screen.AddTransaction.route)
-                    },
-                    navigateToTransactionList = {
-                        navController.navigate(Screen.TransactionList.route)
-                    },
-                    navigateToDetail = { transactionId ->
-                        navController.navigate(Screen.TransactionDetail.createRoute(transactionId))
-                    }
-                )
-            }
-            composable(Screen.Settings.route) {
-                SettingsScreen(
-                    navigateToOnBoarding = {
-                        navController.navigate(Screen.OnBoarding.route) {
-                            popUpTo(0) {
-                                inclusive = true
-                            }
-                        }
-                    }
-                )
-            }
-            composable(
-                route = Screen.AddTransaction.routeWithArgs,
-                arguments = listOf(
-                    navArgument(
-                        "transactionId"
-                    ) {
-                        type = NavType.StringType
-                        nullable = true
-                        defaultValue = null
-                    }
-                )
-            ) { backStackEntry ->
-                AddTransactionScreen(
-                    onBackClick = {
-                        navController.popBackStack()
-                    }
-                )
-            }
-            composable(Screen.TransactionList.route) {
-                TransactionListScreen(
-                    onBackClick = {
-                        navController.popBackStack()
-                    },
-                    navigateToDetail = { transactionId ->
-                        navController.navigate(Screen.TransactionDetail.createRoute(transactionId))
-                    }
-                )
-            }
-            composable(
-                route = Screen.TransactionDetail.route,
-                arguments = listOf(navArgument("transactionId") {type = NavType.StringType})
-            ) { backStackEntry ->
-                val transactionId = backStackEntry.arguments?.getString("transactionId")
+            OfflineBanner()
+        }
 
-                DetailTransactionScreen(
-                    transactionId = transactionId,
-                    onBackClick = {
-                        navController.popBackStack()
-                    },
-                    navigateToUpdate = { transactionId ->
-                        val id = transactionId ?: return@DetailTransactionScreen
-                        navController.navigate(Screen.AddTransaction.createRoute(transactionId = id))
-                    }
-                )
+        Scaffold(
+            bottomBar = {
+                if (currentRoute in bottomBarRoutes) {
+                    BottomBar(navController = navController)
+                }
+            },
+            contentWindowInsets = ScaffoldDefaults.contentWindowInsets
+                .exclude(WindowInsets.statusBars),
+            modifier = modifier.pointerInput(Unit) {
+                detectTapGestures(onTap = {
+                    focusManager.clearFocus()
+                })
+            }
+        ) { innerPadding ->
+            NavHost(
+                navController = navController,
+                startDestination = startDestination,
+                modifier = Modifier.padding(innerPadding)
+            ) {
+                composable(Screen.OnBoarding.route) {
+                    OnboardingScreen(
+                        onGetStartedClicked = {
+                            navController.navigate(Screen.SignUp.route)
+                        },
+                        onSignInClicked = {
+                            navController.navigate(Screen.SignIn.route)
+                        },
+                    )
+                }
+                composable(Screen.SignUp.route) {
+                    SignUpScreen(
+                        onBackClick = {
+                            navController.popBackStack()
+                        },
+                        onSignInClicked = {
+                            navController.navigate(Screen.SignIn.route) {
+                                popUpTo(Screen.OnBoarding.route) {
+                                    inclusive = false
+                                }
+                            }
+                        },
+                        navigateToDashboard = {
+                            navController.navigate(Screen.Dashboard.route) {
+                                popUpTo(Screen.OnBoarding.route) {
+                                    inclusive = true
+                                }
+                                launchSingleTop = true
+                            }
+                        }
+                    )
+                }
+                composable(Screen.SignIn.route) {
+                    SignInScreen(
+                        onBackClick = {
+                            navController.popBackStack()
+                        },
+                        onSignUpClicked = {
+                            navController.navigate(Screen.SignUp.route) {
+                                popUpTo(Screen.OnBoarding.route) {
+                                    inclusive = false
+                                }
+                            }
+                        },
+                        navigateToDashboard = {
+                            navController.navigate(Screen.Dashboard.route) {
+                                popUpTo(Screen.OnBoarding.route) {
+                                    inclusive = true
+                                }
+                                launchSingleTop = true
+                            }
+                        }
+                    )
+                }
+                composable(Screen.Dashboard.route) {
+                    DashboardScreen(
+                        navigateToAddTransaction = {
+                            navController.navigate(Screen.AddTransaction.route)
+                        },
+                        navigateToTransactionList = {
+                            navController.navigate(Screen.TransactionList.route)
+                        },
+                        navigateToDetail = { transactionId ->
+                            navController.navigate(
+                                Screen.TransactionDetail.createRoute(
+                                    transactionId
+                                )
+                            )
+                        }
+                    )
+                }
+                composable(Screen.Settings.route) {
+                    SettingsScreen(
+                        navigateToOnBoarding = {
+                            navController.navigate(Screen.OnBoarding.route) {
+                                popUpTo(0) {
+                                    inclusive = true
+                                }
+                            }
+                        }
+                    )
+                }
+                composable(
+                    route = Screen.AddTransaction.routeWithArgs,
+                    arguments = listOf(
+                        navArgument(
+                            "transactionId"
+                        ) {
+                            type = NavType.StringType
+                            nullable = true
+                            defaultValue = null
+                        }
+                    )
+                ) { backStackEntry ->
+                    AddTransactionScreen(
+                        onBackClick = {
+                            navController.popBackStack()
+                        }
+                    )
+                }
+                composable(Screen.TransactionList.route) {
+                    TransactionListScreen(
+                        onBackClick = {
+                            navController.popBackStack()
+                        },
+                        navigateToDetail = { transactionId ->
+                            navController.navigate(
+                                Screen.TransactionDetail.createRoute(
+                                    transactionId
+                                )
+                            )
+                        }
+                    )
+                }
+                composable(
+                    route = Screen.TransactionDetail.route,
+                    arguments = listOf(navArgument("transactionId") { type = NavType.StringType })
+                ) { backStackEntry ->
+                    val transactionId = backStackEntry.arguments?.getString("transactionId")
+
+                    DetailTransactionScreen(
+                        transactionId = transactionId,
+                        onBackClick = {
+                            navController.popBackStack()
+                        },
+                        navigateToUpdate = { transactionId ->
+                            val id = transactionId ?: return@DetailTransactionScreen
+                            navController.navigate(Screen.AddTransaction.createRoute(transactionId = id))
+                        }
+                    )
+                }
             }
         }
     }
