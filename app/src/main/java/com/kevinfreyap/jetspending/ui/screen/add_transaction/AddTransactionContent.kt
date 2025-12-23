@@ -1,6 +1,7 @@
 package com.kevinfreyap.jetspending.ui.screen.add_transaction
 
 import android.content.res.Configuration
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -28,6 +29,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
@@ -56,11 +58,14 @@ import com.kevinfreyap.jetspending.ui.state.TransactionAction
 import com.kevinfreyap.jetspending.ui.state.TransactionState
 import com.kevinfreyap.jetspending.ui.state.UiState
 import com.kevinfreyap.jetspending.ui.theme.Green500
+import com.kevinfreyap.jetspending.ui.theme.Grey500
 import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
+import com.kevinfreyap.jetspending.ui.theme.Orange700
 import com.kevinfreyap.jetspending.ui.theme.Red500
 import com.kevinfreyap.jetspending.ui.theme.Theme
 import com.kevinfreyap.jetspending.utils.CurrencyVisualTransformation
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
@@ -75,16 +80,19 @@ fun AddTransactionContent(
     transactionAction: TransactionAction,
     showSuccessDialog: Boolean,
     showFailureDialog: Boolean,
+    showConfirmationDialog: Boolean,
     uiState: UiState<Unit>,
     amountSheetState: SheetState,
     showAmountSheet: Boolean,
     onBackClick: () -> Unit,
     onSelectCurrency: (AppCurrency) -> Unit,
+    onShowConfirmationDialog: (Boolean) -> Unit,
     onShowAmountSheet: () -> Unit,
     onDismissAmountSheet: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val focusManager = LocalFocusManager.current
+    val scope = rememberCoroutineScope()
 
     val nameError = if (uiState is UiState.ValidationErrors){
         uiState.errors[Field.TRANSACTION_NAME]
@@ -102,6 +110,12 @@ fun AddTransactionContent(
         uiState.errors[Field.TRANSACTION_NOTES]
     } else null
 
+    BackHandler (
+        enabled = transactionId != null
+    ) {
+        onShowConfirmationDialog(true)
+    }
+
     Scaffold(
         topBar = {
             ViewTopBar(
@@ -113,7 +127,13 @@ fun AddTransactionContent(
                     }
                 ),
                 showActionButton = false,
-                onBackClick = onBackClick,
+                onBackClick = {
+                    if (transactionId.isNullOrBlank()) {
+                        onBackClick()
+                    } else {
+                        onShowConfirmationDialog(true)
+                    }
+                },
                 onSelectCurrency = {},
                 isLoading = uiState is UiState.Loading
             )
@@ -393,6 +413,52 @@ fun AddTransactionContent(
                 message = stringResource(R.string.description_transaction_missing)
             )
         }
+
+        if (showConfirmationDialog) {
+            ViewCustomDialog(
+                onDismissRequest = {
+                    onShowConfirmationDialog(false)
+                },
+                icon = R.drawable.ic_error_outline_24,
+                iconColor = Orange700,
+                title = stringResource(R.string.discard_changes),
+                message = stringResource(R.string.description_discard_change),
+                positiveBtn = {
+                    Button(
+                        onClick = {
+                            onShowConfirmationDialog(false)
+                            scope.launch {
+                                delay(200)
+                                onBackClick()
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Red500
+                        )
+                    ) {
+                        Text(
+                            text = stringResource(R.string.discard),
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                    }
+                },
+                negativeBtn = {
+                    Button(
+                        onClick = {
+                            onShowConfirmationDialog(false)
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Grey500
+                        )
+                    ) {
+                        Text(
+                            text = stringResource(R.string.cancel),
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                    }
+                }
+            )
+        }
     }
 }
 
@@ -444,9 +510,11 @@ fun AddTransactionContentPreview() {
             currencyCode = AppCurrency.IDR,
             showSuccessDialog = false,
             showFailureDialog = false,
+            showConfirmationDialog = false,
             uiState = UiState.Idle,
             amountSheetState = rememberModalBottomSheetState(),
             showAmountSheet = false,
+            onShowConfirmationDialog = {},
             onShowAmountSheet = {},
             onDismissAmountSheet = {},
             onSelectCurrency = {},

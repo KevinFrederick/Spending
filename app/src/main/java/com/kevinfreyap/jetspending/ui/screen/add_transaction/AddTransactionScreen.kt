@@ -30,6 +30,7 @@ fun AddTransactionScreen(
     val showSuccessDialog by viewModel.showSuccessDialog.collectAsState()
     val showFailureDialog by viewModel.showFailureDialog.collectAsState()
 
+    var showConfirmationDialog by remember { mutableStateOf(false) }
     var showAmountSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
@@ -107,12 +108,16 @@ fun AddTransactionScreen(
         transactionAction = transactionAction,
         showSuccessDialog = showSuccessDialog,
         showFailureDialog = showFailureDialog,
+        showConfirmationDialog = showConfirmationDialog,
         uiState = uiState,
         amountSheetState = sheetState,
         showAmountSheet = showAmountSheet,
         onBackClick = onBackClick,
         onSelectCurrency = {
             viewModel.onSelectCurrency(it)
+        },
+        onShowConfirmationDialog = {
+            showConfirmationDialog = it
         },
         onShowAmountSheet = {
             showAmountSheet = true
