@@ -61,7 +61,7 @@ interface TransactionDao {
     @Query("""
         SELECT DISTINCT t.stringDate
         FROM transactions t
-        WHERE t.date NOT IN (SELECT date FROM daily_rates)
+        WHERE t.stringDate NOT IN (SELECT dateKey FROM daily_rates)
     """)
     fun getDatesOfMissingRates(): Flow<List<String>>
 

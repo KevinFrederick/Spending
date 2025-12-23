@@ -19,6 +19,7 @@ class CurrencyInteractor @Inject constructor(
         targetCurrency: AppCurrency,
         rates: ExchangeRates?
     ): BigDecimal? {
+        if (sourceCurrency == targetCurrency) return amount
         if (rates == null) return null
 
         // Example: Base = USD | USD to IDR = ...

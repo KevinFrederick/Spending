@@ -9,7 +9,7 @@ import com.kevinfreyap.domain.usecase.currency.CurrencyUseCase
 import com.kevinfreyap.domain.usecase.rates.ExchangeRatesUseCase
 import com.kevinfreyap.domain.usecase.transaction.TransactionUseCase
 import com.kevinfreyap.jetspending.ui.navigation.Screen
-import com.kevinfreyap.jetspending.utils.NetworkMonitor
+import com.kevinfreyap.domain.usecase.connectivity.ConnectivityUseCase
 import com.kevinfreyap.jetspending.utils.formatter.DateFormatter
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -33,7 +33,7 @@ class MainViewModel @Inject constructor(
     private val exchangeRatesUseCase: ExchangeRatesUseCase,
     private val transactionUseCase: TransactionUseCase,
     private val categoryUseCase: CategoryUseCase,
-    networkMonitor: NetworkMonitor
+    connectivityUseCase: ConnectivityUseCase
 ): ViewModel(){
     private val _startDestination = MutableStateFlow<String?>(null)
     val startDestination = _startDestination.asStateFlow()
@@ -45,7 +45,7 @@ class MainViewModel @Inject constructor(
             initialValue = AppCurrency.IDR
         )
 
-    val isOnline = networkMonitor.isOnline
+    val isOnline = connectivityUseCase.isOnline
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
@@ -54,7 +54,7 @@ class MainViewModel @Inject constructor(
 
     init {
         // viewModelScope.launch runs line by line
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             exchangeRatesUseCase.startRatesHealer()
         }
         viewModelScope.launch {

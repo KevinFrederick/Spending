@@ -67,7 +67,7 @@ fun SummaryCard(
             if (isIncomplete == true) {
                 Text(
                     text = stringResource(R.string.error_some_transaction_rate_unavailable),
-                    style = MaterialTheme.typography.labelSmall,
+                    style = MaterialTheme.typography.labelMedium,
                     color = Red500,
                     textAlign = TextAlign.Center,
                     modifier = Modifier

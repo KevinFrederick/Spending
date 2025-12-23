@@ -4,6 +4,8 @@ import com.kevinfreyap.domain.usecase.authentication.AuthenticationInteractor
 import com.kevinfreyap.domain.usecase.authentication.AuthenticationUseCase
 import com.kevinfreyap.domain.usecase.category.CategoryInteractor
 import com.kevinfreyap.domain.usecase.category.CategoryUseCase
+import com.kevinfreyap.domain.usecase.connectivity.ConnectivityInteractor
+import com.kevinfreyap.domain.usecase.connectivity.ConnectivityUseCase
 import com.kevinfreyap.domain.usecase.currency.CurrencyInteractor
 import com.kevinfreyap.domain.usecase.currency.CurrencyUseCase
 import com.kevinfreyap.domain.usecase.rates.ExchangeRatesInteractor
@@ -45,4 +47,8 @@ abstract class UseCaseModule {
     @Binds
     @Singleton
     abstract fun provideCurrencyUseCase(currencyInteractor: CurrencyInteractor): CurrencyUseCase
+
+    @Binds
+    @Singleton
+    abstract fun provideConnectivityUseCase(connectivityInteractor: ConnectivityInteractor): ConnectivityUseCase
 }

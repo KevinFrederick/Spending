@@ -75,48 +75,49 @@ class TransactionListViewModel @Inject constructor(
     val activeSheetContent = _activeSheetContent.asStateFlow()
 
     private val _uiState = MutableStateFlow<UiState<Unit>>(UiState.Idle)
-    val uiState = _uiState.asStateFlow()
-
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     val transactions: Flow<PagingData<TransactionsUi>> = combine(
         flow = _query.debounce(300),
-        flow2 = _filter
-    ) { query, filter ->
-        query to filter
+        flow2 = _filter,
+        flow3 = currencyCode
+    ) { query, filter, currency ->
+        Triple(query, filter, currency)
     }
-        .flatMapLatest { (query, filter) ->
+        .flatMapLatest { (query, filter, currency) ->
             transactionUseCase.getTransactions(query, filter)
-        }
-        .map { pagingData ->
-            pagingData
-                .map { transaction ->
-                    TransactionsUi.Item (
-                        transactionItemUiMapper.mapTransactionDomainToUi(
-                            transaction,
-                            currencyCode.value
-                        )
-                    )
-                }
-                .insertSeparators { before: TransactionsUi.Item?, after: TransactionsUi.Item? ->
-                    if (after == null) return@insertSeparators null
+                .map { pagingData ->
+                    pagingData
+                        .map { transaction ->
+                            TransactionsUi.Item (
+                                transactionItemUiMapper.mapTransactionDomainToUi(
+                                    transaction,
+                                    currency
+                                )
+                            )
+                        }
+                        .insertSeparators { before: TransactionsUi.Item?, after: TransactionsUi.Item? ->
+                            if (after == null) return@insertSeparators null
 
-                    if (before == null) {
-                        return@insertSeparators TransactionsUi.Header(
-                            DateFormatter.formatToMonthYear(after.transaction.transactionDateRaw)
-                        )
-                    }
+                            if (before == null) {
+                                return@insertSeparators TransactionsUi.Header(
+                                    DateFormatter.formatToMonthYear(after.transaction.transactionDateRaw)
+                                )
+                            }
 
-                    val beforeDate = DateFormatter.formatToMonthYear(before.transaction.transactionDateRaw)
-                    val afterDate = DateFormatter.formatToMonthYear(after.transaction.transactionDateRaw)
+                            val beforeDate = DateFormatter.formatToMonthYear(before.transaction.transactionDateRaw)
+                            val afterDate = DateFormatter.formatToMonthYear(after.transaction.transactionDateRaw)
 
-                    if (beforeDate != afterDate){
-                        TransactionsUi.Header(afterDate)
-                    } else {
-                        null
-                    }
+                            if (beforeDate != afterDate){
+                                TransactionsUi.Header(afterDate)
+                            } else {
+                                null
+                            }
+                        }
                 }
         }
         .cachedIn(viewModelScope)
+
+    val uiState = _uiState.asStateFlow()
 
     private val dateFilterOptions = TimeFilterOption.entries
         .filter {

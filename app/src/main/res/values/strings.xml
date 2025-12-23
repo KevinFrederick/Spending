@@ -140,7 +140,7 @@
     <string name="error_no_transaction">No transaction yet</string>
     <string name="error_transaction_not_found">No transactions found</string>
     <string name="error_rate_unavailable">Rate Unavailable</string>
-    <string name="error_some_transaction_rate_unavailable">Some transaction rate unavailable</string>
+    <string name="error_some_transaction_rate_unavailable">Some transaction\'s exchange rate unavailable</string>
     <string name="error_transaction_missing">Transaction Not Found</string>
     <string name="error_notes_too_long">Notes too long</string>
     <string name="error_transaction_currency">Currency data not loaded yet. Please wait.</string>

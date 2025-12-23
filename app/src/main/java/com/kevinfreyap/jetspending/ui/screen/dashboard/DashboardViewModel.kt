@@ -36,21 +36,18 @@ class DashboardViewModel @Inject constructor(
             initialValue = AppCurrency.IDR
         )
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val latestTransactions = currencyCode
-        .flatMapLatest { currency ->
-            transactionUseCase.getLatestTransactions()
-                .map { transactions ->
-                    transactions.map { transaction ->
-                        transactionItemUiMapper.mapTransactionDomainToUi(transaction, currency)
-                    }
-                }
+    val latestTransactions = combine(
+        transactionUseCase.getLatestTransactions(),
+        currencyCode
+    ) { transactions, currency ->
+        transactions.map { transaction ->
+            transactionItemUiMapper.mapTransactionDomainToUi(transaction, currency)
         }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = emptyList()
-        )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = emptyList()
+    )
 
     private val _currentMonth = MutableStateFlow(YearMonth.now())
 

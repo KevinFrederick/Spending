@@ -1,4 +1,4 @@
-package com.kevinfreyap.jetspending.utils
+package com.kevinfreyap.data.source
 
 import android.content.Context
 import android.net.ConnectivityManager
