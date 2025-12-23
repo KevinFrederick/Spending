@@ -164,16 +164,59 @@ class TransactionInteractor @Inject constructor(
             lastUpdated = System.currentTimeMillis()
         )
 
-        try {
-            exchangeRatesRepository.ensureRatesExist(stringDate)
-        } catch (e: Exception) {
-            Log.e("TransactionInteractor", e.message ?: "Something Wrong")
-        }
+        ensureRatesExist(stringDate)
 
         return try {
             transactionRepository.insertTransaction(transaction)
             DomainResult.Success(Unit)
         } catch (e: Exception){
+            DomainResult.Failure(e)
+        }
+    }
+
+    override suspend fun updateTransaction(
+        id: String,
+        name: String,
+        amount: BigDecimal,
+        currency: AppCurrency,
+        type: TransactionType,
+        categoryId: String,
+        date: Instant,
+        stringDate: String,
+        notes: String
+    ): DomainResult<Unit> {
+        val category = categoryRepository.getCategoryById(categoryId)
+
+        val errors = validateTransaction(
+            name = name,
+            amount = amount,
+            category = category,
+            notes = notes
+        )
+
+        if (errors.isNotEmpty()) {
+            return DomainResult.ValidationFailed(errors)
+        }
+
+        val transaction = Transaction(
+            id = id,
+            name = name,
+            amount = amount,
+            currency = currency,
+            type = type,
+            category = category!!,
+            date = date,
+            stringDate = stringDate,
+            notes = notes,
+            lastUpdated = System.currentTimeMillis()
+        )
+
+        ensureRatesExist(stringDate)
+
+        return try {
+            transactionRepository.updateTransaction(transaction)
+            DomainResult.Success(Unit)
+        } catch (e: Exception) {
             DomainResult.Failure(e)
         }
     }
@@ -196,5 +239,13 @@ class TransactionInteractor @Inject constructor(
         if (notes.length > 1000) errors.add(ValidationError.TransactionNotesTooLong)
 
         return errors
+    }
+
+    private suspend fun ensureRatesExist(stringDate: String) {
+        try {
+            exchangeRatesRepository.ensureRatesExist(stringDate)
+        } catch (e: Exception) {
+            Log.e("TransactionInteractor", e.message ?: "Something Wrong")
+        }
     }
 }

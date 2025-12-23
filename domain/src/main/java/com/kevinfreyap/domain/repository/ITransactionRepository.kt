@@ -27,5 +27,6 @@ interface ITransactionRepository {
     fun syncTransactionsFromFirestore(): Flow<Boolean>
 
     suspend fun insertTransaction(transaction: Transaction)
+    suspend fun updateTransaction(transaction: Transaction)
     suspend fun deleteTransaction(transactionId: String)
 }

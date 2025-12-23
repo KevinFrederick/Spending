@@ -108,4 +108,8 @@ class DetailTransactionViewModel @Inject constructor(
             }
         }
     }
+
+    fun onDismissSuccessDialog() {
+        _showDeleteSuccessDialog.value = false
+    }
 }

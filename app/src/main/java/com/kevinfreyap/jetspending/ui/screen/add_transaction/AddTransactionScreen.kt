@@ -12,7 +12,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.kevinfreyap.domain.model.TransactionType
-import com.kevinfreyap.jetspending.ui.main.MainViewModel
 import com.kevinfreyap.jetspending.ui.state.TransactionAction
 import kotlinx.coroutines.launch
 
@@ -21,14 +20,15 @@ import kotlinx.coroutines.launch
 fun AddTransactionScreen(
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
-    mainViewModel: MainViewModel = hiltViewModel(),
     viewModel: AddTransactionViewModel = hiltViewModel(),
 ) {
-    val currencyCode by mainViewModel.selectedCurrency.collectAsState()
+    val transactionId by viewModel.transactionId.collectAsState()
+    val currencyCode by viewModel.currencyCode.collectAsState()
 
     val transactionState by viewModel.transactionState.collectAsState()
     val uiState by viewModel.uiState.collectAsState()
     val showSuccessDialog by viewModel.showSuccessDialog.collectAsState()
+    val showFailureDialog by viewModel.showFailureDialog.collectAsState()
 
     var showAmountSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
@@ -80,11 +80,20 @@ fun AddTransactionScreen(
             }
 
             override fun onSaveTransaction() {
-                viewModel.onSaveTransaction()
+                if (transactionId.isNullOrBlank()) {
+                    viewModel.onSaveTransaction()
+                } else {
+                    viewModel.onUpdateTransaction()
+                }
             }
 
             override fun onDismissSuccessDialog() {
-                viewModel.onDialogDismissed()
+                viewModel.onDialogSuccessDismissed()
+                onBackClick()
+            }
+
+            override fun onDismissFailureDialog() {
+                viewModel.onDialogFailureDismissed()
                 onBackClick()
             }
 
@@ -92,16 +101,18 @@ fun AddTransactionScreen(
     }
 
     AddTransactionContent(
-        currencyCode = currencyCode,
+        transactionId = transactionId,
+        currencyCode = transactionState.transactionCurrency ?: currencyCode,
         transactionState = transactionState,
         transactionAction = transactionAction,
         showSuccessDialog = showSuccessDialog,
+        showFailureDialog = showFailureDialog,
         uiState = uiState,
         amountSheetState = sheetState,
         showAmountSheet = showAmountSheet,
         onBackClick = onBackClick,
         onSelectCurrency = {
-            mainViewModel.onSelectCurrency(it)
+            viewModel.onSelectCurrency(it)
         },
         onShowAmountSheet = {
             showAmountSheet = true

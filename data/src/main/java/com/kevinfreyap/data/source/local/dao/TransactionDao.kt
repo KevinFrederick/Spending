@@ -45,7 +45,7 @@ interface TransactionDao {
 
     // Update
     @Update
-    fun updateTransaction(transaction: TransactionEntity)
+    suspend fun updateTransaction(transaction: TransactionEntity)
 
     // Delete
     @Query("DELETE FROM transactions")

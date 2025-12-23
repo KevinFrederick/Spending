@@ -8,6 +8,7 @@ import androidx.paging.map
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import com.kevinfreyap.data.mapper.TransactionMapper
 import com.kevinfreyap.data.source.local.dao.TransactionDao
 import com.kevinfreyap.data.source.local.entity.TransactionEntity
@@ -20,11 +21,15 @@ import com.kevinfreyap.domain.model.TransactionFilter
 import com.kevinfreyap.domain.model.TransactionMathWithRates
 import com.kevinfreyap.domain.model.TransactionWithRates
 import com.kevinfreyap.domain.repository.ITransactionRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import java.lang.Exception
 import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -163,16 +168,44 @@ class TransactionRepository @Inject constructor(
             .copy(lastUpdated = currentTimeStamp)
         transactionDao.insertTransaction(entity)
 
-        insertTransactionToFirestore(transaction, currentTimeStamp)
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                insertTransactionToFirestore(transaction, currentTimeStamp)
+            } catch (e: Exception) {
+                Log.e(TAG + "Insert", e.message ?: "Something Wrong")
+            }
+        }
+    }
+
+    override suspend fun updateTransaction(transaction: Transaction) {
+        val currentTimeStamp = System.currentTimeMillis()
+
+        val entity = transactionMapper.mapTransactionDomainToEntity(transaction)
+            .copy(lastUpdated = currentTimeStamp)
+        transactionDao.updateTransaction(entity)
+
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                insertTransactionToFirestore(transaction, currentTimeStamp)
+            } catch (e: Exception) {
+                Log.e(TAG + "Update", e.message ?: "Something Wrong")
+            }
+        }
     }
 
     override suspend fun deleteTransaction(transactionId: String) {
         transactionDao.deleteTransactionById(transactionId)
 
-        deleteTransactionFromFirestore(transactionId)
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                deleteTransactionFromFirestore(transactionId)
+            } catch (e: Exception) {
+                Log.e(TAG + "Delete", e.message ?: "Something Wrong")
+            }
+        }
     }
 
-    private fun insertTransactionToFirestore(transaction: Transaction, timeStamp: Long) {
+    private suspend fun insertTransactionToFirestore(transaction: Transaction, timeStamp: Long) {
         val currentUserId = fireAuth.currentUser?.uid ?: return
 
         val transactionFirestore = transactionMapper.mapTransactionDomainToFirestore(transaction)
@@ -182,13 +215,11 @@ class TransactionRepository @Inject constructor(
             .document(currentUserId)
             .collection(TRANSACTION_COLLECTION)
             .document(transaction.id)
-            .set(transactionFirestore)
-            .addOnFailureListener { e ->
-                Log.e(TAG + "Insert Firestore", e.message ?: "Something Wrong")
-            }
+            .set(transactionFirestore, SetOptions.merge())
+            .await()
     }
 
-    private fun deleteTransactionFromFirestore(transactionId: String) {
+    private suspend fun deleteTransactionFromFirestore(transactionId: String) {
         val currentUserId = fireAuth.currentUser?.uid ?: return
 
         firestore.collection(USER_COLLECTION)
@@ -196,9 +227,7 @@ class TransactionRepository @Inject constructor(
             .collection(TRANSACTION_COLLECTION)
             .document(transactionId)
             .delete()
-            .addOnFailureListener { e ->
-                Log.e(TAG + "Delete Firestore", e.message ?: "Something Wrong")
-            }
+            .await()
     }
 
     companion object {

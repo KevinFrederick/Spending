@@ -146,7 +146,18 @@ fun JetSpendingApp(
                     }
                 )
             }
-            composable(Screen.AddTransaction.route) {
+            composable(
+                route = Screen.AddTransaction.routeWithArgs,
+                arguments = listOf(
+                    navArgument(
+                        "transactionId"
+                    ) {
+                        type = NavType.StringType
+                        nullable = true
+                        defaultValue = null
+                    }
+                )
+            ) { backStackEntry ->
                 AddTransactionScreen(
                     onBackClick = {
                         navController.popBackStack()
@@ -173,6 +184,10 @@ fun JetSpendingApp(
                     transactionId = transactionId,
                     onBackClick = {
                         navController.popBackStack()
+                    },
+                    navigateToUpdate = { transactionId ->
+                        val id = transactionId ?: return@DetailTransactionScreen
+                        navController.navigate(Screen.AddTransaction.createRoute(transactionId = id))
                     }
                 )
             }

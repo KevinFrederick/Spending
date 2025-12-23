@@ -64,6 +64,7 @@ import kotlinx.coroutines.delay
 fun DetailTransactionScreen(
     transactionId: String?,
     onBackClick: () -> Unit,
+    navigateToUpdate: (String?) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: DetailTransactionViewModel = hiltViewModel()
 ) {
@@ -90,6 +91,13 @@ fun DetailTransactionScreen(
         onSelectCurrency = {
             viewModel.onSelectCurrency(it)
         },
+        onDismissDeleteSuccessDialog = {
+            viewModel.onDismissSuccessDialog()
+            onBackClick()
+        },
+        navigateToUpdate = {
+            navigateToUpdate (transactionId)
+        },
         onBackClick = onBackClick,
         modifier = modifier
     )
@@ -105,6 +113,8 @@ fun DetailTransactionContent(
     onShowDeleteDialog: (Boolean) -> Unit,
     onPositiveDialogClicked: () -> Unit,
     onSelectCurrency: (AppCurrency) -> Unit,
+    onDismissDeleteSuccessDialog: () -> Unit,
+    navigateToUpdate: () -> Unit,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -147,7 +157,7 @@ fun DetailTransactionContent(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = {},
+                onClick = navigateToUpdate,
                 containerColor = Blue500,
                 contentColor = Color.White,
                 shape = RoundedCornerShape(16.dp)
@@ -434,11 +444,11 @@ fun DetailTransactionContent(
         if (showDeleteSuccessDialog) {
             LaunchedEffect(Unit) {
                 delay(2000)
-                onBackClick()
+                onDismissDeleteSuccessDialog()
             }
 
             ViewCustomDialog(
-                onDismissRequest = onBackClick,
+                onDismissRequest = onDismissDeleteSuccessDialog,
                 icon = R.drawable.ic_check_24,
                 iconColor = Orange700,
                 title = stringResource(R.string.transaction_deleted),
@@ -474,11 +484,13 @@ fun DetailTransactionPreview() {
             isDeleting = false,
             showDeleteSuccessDialog = false,
             showDeleteDialog = false,
-            onShowDeleteDialog = {  },
+            onShowDeleteDialog = { },
             onPositiveDialogClicked = {},
-            onSelectCurrency = {  },
-            onBackClick = {  },
-            modifier = Modifier
+            onSelectCurrency = { },
+            onBackClick = { },
+            navigateToUpdate = { },
+            modifier = Modifier,
+            onDismissDeleteSuccessDialog = {}
         )
     }
 }

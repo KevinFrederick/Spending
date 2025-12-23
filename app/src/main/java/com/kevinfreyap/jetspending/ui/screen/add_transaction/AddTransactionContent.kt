@@ -57,6 +57,7 @@ import com.kevinfreyap.jetspending.ui.state.TransactionState
 import com.kevinfreyap.jetspending.ui.state.UiState
 import com.kevinfreyap.jetspending.ui.theme.Green500
 import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
+import com.kevinfreyap.jetspending.ui.theme.Red500
 import com.kevinfreyap.jetspending.ui.theme.Theme
 import com.kevinfreyap.jetspending.utils.CurrencyVisualTransformation
 import kotlinx.coroutines.delay
@@ -68,10 +69,12 @@ import kotlin.collections.forEach
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddTransactionContent(
+    transactionId: String?,
     currencyCode: AppCurrency,
     transactionState: TransactionState,
     transactionAction: TransactionAction,
     showSuccessDialog: Boolean,
+    showFailureDialog: Boolean,
     uiState: UiState<Unit>,
     amountSheetState: SheetState,
     showAmountSheet: Boolean,
@@ -102,11 +105,16 @@ fun AddTransactionContent(
     Scaffold(
         topBar = {
             ViewTopBar(
-                title = stringResource(R.string.add_transaction),
-                showActionButton = true,
-                onBackClick = { onBackClick() },
-                selectedCurrency = currencyCode,
-                onSelectCurrency = onSelectCurrency,
+                title = stringResource(
+                    if (transactionId.isNullOrBlank()){
+                        R.string.add_transaction
+                    } else {
+                        R.string.update_transaction
+                    }
+                ),
+                showActionButton = false,
+                onBackClick = onBackClick,
+                onSelectCurrency = {},
                 isLoading = uiState is UiState.Loading
             )
         }
@@ -302,6 +310,7 @@ fun AddTransactionContent(
             )
 
             Button (
+                enabled = transactionState.transactionCurrency != null,
                 onClick = transactionAction::onSaveTransaction,
                 colors = ButtonDefaults.elevatedButtonColors(
                     containerColor = MaterialTheme.colorScheme.primary
@@ -311,7 +320,7 @@ fun AddTransactionContent(
                     .fillMaxWidth()
             ) {
                 Text(
-                    text = stringResource(R.string.save_transaction),
+                    text = stringResource(if (transactionId.isNullOrBlank()) R.string.save_transaction else R.string.update_transaction),
                     color = MaterialTheme.colorScheme.onPrimary,
                     style = MaterialTheme.typography.titleLarge
                 )
@@ -360,7 +369,28 @@ fun AddTransactionContent(
                 icon = R.drawable.ic_check_circle_outline_24,
                 iconColor = Green500,
                 title = stringResource(R.string.success),
-                message = stringResource(R.string.success_message_transaction_saved)
+                message = stringResource(
+                    if (transactionId.isNullOrBlank()){
+                        R.string.success_message_transaction_saved
+                    } else {
+                        R.string.success_message_transaction_updated
+                    }
+                )
+            )
+        }
+
+        if (showFailureDialog) {
+            LaunchedEffect(Unit) {
+                delay(1500)
+                transactionAction.onDismissFailureDialog()
+            }
+
+            ViewCustomDialog(
+                onDismissRequest = transactionAction::onDismissFailureDialog,
+                icon = R.drawable.ic_error_outline_24,
+                iconColor = Red500,
+                title = stringResource(R.string.error_transaction_missing),
+                message = stringResource(R.string.description_transaction_missing)
             )
         }
     }
@@ -409,9 +439,11 @@ fun AddTransactionContentPreview() {
     )
     JetSpendingTheme {
         AddTransactionContent(
+            transactionId = "",
             onBackClick = {},
             currencyCode = AppCurrency.IDR,
             showSuccessDialog = false,
+            showFailureDialog = false,
             uiState = UiState.Idle,
             amountSheetState = rememberModalBottomSheetState(),
             showAmountSheet = false,
@@ -421,7 +453,8 @@ fun AddTransactionContentPreview() {
             transactionState = TransactionState(
                 transactionAmountDisplay = "Rp 0",
                 transactionCategories = listCategory,
-                transactionDateDisplay = "Today, 16 December 2025"
+                transactionDateDisplay = "Today, 16 December 2025",
+                transactionCurrency = AppCurrency.IDR
             ),
             transactionAction = object : TransactionAction {
                 override fun onNameChange(name: String) {}
@@ -443,6 +476,8 @@ fun AddTransactionContentPreview() {
                 override fun onSaveTransaction() {}
 
                 override fun onDismissSuccessDialog() {}
+
+                override fun onDismissFailureDialog() {}
             },
         )
     }

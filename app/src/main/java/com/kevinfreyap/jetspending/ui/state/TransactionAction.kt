@@ -13,4 +13,5 @@ interface TransactionAction {
     fun onNotesChange(notes: String)
     fun onSaveTransaction()
     fun onDismissSuccessDialog()
+    fun onDismissFailureDialog()
 }

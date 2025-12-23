@@ -16,6 +16,10 @@ sealed class ValidationError(
         Field.TRANSACTION_AMOUNT,
         ErrorMessage.TRANSACTION_AMOUNT_FROM_GREATER_THAN_TO
     )
+    object TransactionCurrencyNotValid: ValidationError(
+        Field.TRANSACTION_AMOUNT,
+        ErrorMessage.TRANSACTION_CURRENCY_NOT_VALID
+    )
     object TransactionCategoryMissing: ValidationError(
         Field.TRANSACTION_CATEGORY,
         ErrorMessage.TRANSACTION_CATEGORY_NOT_SELECTED

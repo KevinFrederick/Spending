@@ -1,6 +1,7 @@
 package com.kevinfreyap.jetspending.ui.screen.add_transaction
 
 import android.util.Log
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kevinfreyap.domain.error.Field
@@ -27,6 +28,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
@@ -42,7 +44,11 @@ class AddTransactionViewModel @Inject constructor(
     currencyUseCase: CurrencyUseCase,
     private val transactionUseCase: TransactionUseCase,
     private val categoryUseCase: CategoryUseCase,
+    savedStateHandle: SavedStateHandle
 ): ViewModel(){
+    private val _transactionId = MutableStateFlow<String?>(null)
+    val transactionId = _transactionId.asStateFlow()
+
     val currencyCode = currencyUseCase.getCurrency()
         .stateIn(
             scope = viewModelScope,
@@ -86,7 +92,8 @@ class AddTransactionViewModel @Inject constructor(
         _categories,
         currencyCode,
         _transactionNotes
-    ) { draft, name, amount, categories, currency, notes ->
+    ) { draft, name, amount, categories, appCurrency, notes ->
+        val currency = draft.transactionCurrency ?: appCurrency
 
         val validCategory = categories.find { it.id == draft.transactionCategoryId }
         val dateDisplay = DateFormatter.formatToDateWithDay(draft.transactionDate)
@@ -95,6 +102,7 @@ class AddTransactionViewModel @Inject constructor(
             transactionName = name,
             transactionAmountInput = amount,
             transactionAmountDisplay = CurrencyUiFormatter.formatWithCode(draft.transactionAmountRaw, currency),
+            transactionCurrency = draft.transactionCurrency,
             transactionType = draft.transactionType,
             transactionCategories = categories,
             transactionCategoryId = validCategory?.id,
@@ -116,6 +124,39 @@ class AddTransactionViewModel @Inject constructor(
     private val _showSuccessDialog = MutableStateFlow(false)
     val showSuccessDialog = _showSuccessDialog.asStateFlow()
 
+    // Failure
+    private val _showFailureDialog = MutableStateFlow(false)
+    val showFailureDialog = _showFailureDialog.asStateFlow()
+
+
+    init {
+        val id = savedStateHandle.get<String>("transactionId")
+
+        viewModelScope.launch{
+            if (!id.isNullOrBlank()) {
+                _transactionId.value = id
+                val existingTransaction = transactionUseCase.getTransactionById(id).first()
+
+                existingTransaction?.let { data ->
+                    _draftState.update { currentDraft ->
+                        currentDraft.copy(
+                            transactionAmountRaw = data.transaction.amount,
+                            transactionType = data.transaction.type,
+                            transactionCategoryId = data.transaction.category.id,
+                            transactionDate = data.transaction.date,
+                            transactionCurrency = data.transaction.currency
+                        )
+                    }
+
+                    _transactionName.value = data.transaction.name
+                    _transactionNotes.value = data.transaction.notes
+                }
+            } else {
+                onSelectCurrency(currencyUseCase.getCurrency().first())
+            }
+        }
+    }
+
 
     // Name
     fun onNameChange(name: String) {
@@ -131,7 +172,8 @@ class AddTransactionViewModel @Inject constructor(
     }
 
     fun onAmountChange(amount: String) {
-        val cleanAmount = CurrencyUiFormatter.cleanAmount(amount, currencyCode.value)
+        val currencyCode = _draftState.value.transactionCurrency ?: currencyCode.value
+        val cleanAmount = CurrencyUiFormatter.cleanAmount(amount, currencyCode)
 
         if (cleanAmount == null) return
 
@@ -148,6 +190,13 @@ class AddTransactionViewModel @Inject constructor(
         }
     }
 
+    // Currency
+    fun onSelectCurrency(currency: AppCurrency) {
+        _draftState.update {
+            it.copy(transactionCurrency = currency)
+        }
+    }
+
     // Type
     fun onSelectType(type: TransactionType) {
         _draftState.update {
@@ -155,7 +204,7 @@ class AddTransactionViewModel @Inject constructor(
         }
     }
 
-    /// Categories
+    // Categories
     fun onSelectCategory(categoryId: String) {
         _draftState.update {
             it.copy(transactionCategoryId = categoryId)
@@ -195,6 +244,7 @@ class AddTransactionViewModel @Inject constructor(
         val validationRes = validateTransaction(
             name = _transactionName.value,
             amount = draft.transactionAmountRaw,
+            currency = draft.transactionCurrency,
             category = draft.transactionCategoryId,
             notes = _transactionNotes.value
         )
@@ -208,7 +258,7 @@ class AddTransactionViewModel @Inject constructor(
             val result = transactionUseCase.insertTransaction(
                 name = _transactionName.value,
                 amount = draft.transactionAmountRaw,
-                currency = currencyCode.value,
+                currency = draft.transactionCurrency!!,
                 type = draft.transactionType,
                 categoryId = draft.transactionCategoryId ?: "",
                 date = draft.transactionDate,
@@ -232,9 +282,74 @@ class AddTransactionViewModel @Inject constructor(
         }
     }
 
-    fun validateTransaction(
+    // Update Transaction
+    fun onUpdateTransaction() {
+        _uiState.value = UiState.Loading
+
+        val id = _transactionId.value
+        val draft = _draftState.value
+        val name = _transactionName.value
+        val notes = _transactionNotes.value
+
+        val validationRes = validateTransaction(
+            name = name,
+            amount = draft.transactionAmountRaw,
+            currency = draft.transactionCurrency,
+            category = draft.transactionCategoryId,
+            notes = notes
+        )
+
+        if (validationRes.isNotEmpty()) {
+            _uiState.value = UiState.ValidationErrors(ErrorHelper.validationErrorsToUiError(validationRes))
+            return
+        }
+
+        if (id.isNullOrBlank()) {
+            _showFailureDialog.value = true
+            return
+        }
+
+        viewModelScope.launch { 
+            val result = transactionUseCase.updateTransaction(
+                id = id,
+                name = name,
+                amount = draft.transactionAmountRaw,
+                currency = draft.transactionCurrency ?: AppCurrency.IDR,
+                type = draft.transactionType,
+                categoryId = draft.transactionCategoryId ?: "",
+                date = draft.transactionDate,
+                stringDate = DateFormatter.formatToDailyRatesString(draft.transactionDate),
+                notes = _transactionNotes.value,
+            )
+
+            when(result) {
+                is DomainResult.Success -> {
+                    _uiState.value = UiState.Success(Unit)
+                    _showSuccessDialog.value = true
+                }
+                is DomainResult.ValidationFailed -> {
+                    _uiState.value = UiState.ValidationErrors(ErrorHelper.validationErrorsToUiError(result.errors))
+                }
+                is DomainResult.Failure -> {
+                    Log.e(VIEWMODEL_TAG, result.throwable.message ?: "Something Wrong")
+                    _uiState.value = UiState.Failure(result.throwable)
+                }
+            }
+        }
+    }
+
+    fun onDialogSuccessDismissed() {
+        _showSuccessDialog.value = false
+    }
+
+    fun onDialogFailureDismissed() {
+        _showFailureDialog.value = false
+    }
+
+    private fun validateTransaction(
         name: String,
         amount: BigDecimal,
+        currency: AppCurrency?,
         category: String?,
         notes: String
     ): List<ValidationError> {
@@ -242,14 +357,11 @@ class AddTransactionViewModel @Inject constructor(
 
         if (name.isBlank()) currentErrors.add(ValidationError.TransactionNameRequired)
         if (amount <= BigDecimal.ZERO) currentErrors.add(ValidationError.TransactionAmountInvalid)
+        if (currency == null) currentErrors.add(ValidationError.TransactionCurrencyNotValid)
         if (category == null) currentErrors.add(ValidationError.TransactionCategoryMissing)
         if (notes.length > 1000) currentErrors.add(ValidationError.TransactionNotesTooLong)
 
         return currentErrors
-    }
-
-    fun onDialogDismissed() {
-        _showSuccessDialog.value = false
     }
 
     companion object {

@@ -31,5 +31,16 @@ interface TransactionUseCase {
         stringDate: String,
         notes: String
     ): DomainResult<Unit>
+    suspend fun updateTransaction(
+        id: String,
+        name: String,
+        amount: BigDecimal,
+        currency: AppCurrency,
+        type: TransactionType,
+        categoryId: String,
+        date: Instant,
+        stringDate: String,
+        notes: String
+    ): DomainResult<Unit>
     suspend fun deleteTransaction(transactionId: String)
 }

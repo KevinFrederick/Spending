@@ -95,6 +95,7 @@
     <string name="set_date">Set Date</string>
     <string name="edit">Edit</string>
     <string name="delete_transaction">Delete Transaction</string>
+    <string name="update_transaction">Update Transaction</string>
 
     <!-- Theme -->
     <string name="theme">Theme</string>
@@ -120,6 +121,7 @@
     <string name="success_message_transaction_saved">Transaction saved successfully!</string>
     <string name="success_message_register_success">Account created successfully</string>
     <string name="success_message_welcome_back">Welcome back!</string>
+    <string name="success_message_transaction_updated">Transaction updated successfully!</string>
 
     <!-- Error Message -->
     <string name="error_required_transaction_name">Please enter a name for this transaction</string>
@@ -141,6 +143,7 @@
     <string name="error_some_transaction_rate_unavailable">Some transaction rate unavailable</string>
     <string name="error_transaction_missing">Transaction Not Found</string>
     <string name="error_notes_too_long">Notes too long</string>
+    <string name="error_transaction_currency">Currency data not loaded yet. Please wait.</string>
 
     <!-- Description -->
     <string name="description_sign_up">Let\'s get started with a free account</string>
