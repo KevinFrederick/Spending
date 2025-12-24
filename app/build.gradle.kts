@@ -73,6 +73,9 @@ dependencies {
     ksp(libs.hilt.android.compiler)
     ksp(libs.kotlinx.metadata.jvm)
 
+    implementation(libs.vico.compose)
+    implementation(libs.vico.compose.m3)
+
     coreLibraryDesugaring(libs.android.desugarJdkLibs)
 
     testImplementation(libs.junit)

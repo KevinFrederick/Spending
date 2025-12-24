@@ -28,7 +28,7 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kevinfreyap.jetspending.R
-import com.kevinfreyap.jetspending.ui.model.MonthlyBalanceUi
+import com.kevinfreyap.jetspending.ui.model.SpendingIncomeBalanceUi
 import com.kevinfreyap.jetspending.ui.theme.Green500
 import com.kevinfreyap.jetspending.ui.theme.Grey400
 import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
@@ -40,7 +40,7 @@ import com.kevinfreyap.jetspending.utils.rememberShimmerBrush
 @Composable
 fun SummaryCard(
     totalBalance: String,
-    monthlyBalanceUi: MonthlyBalanceUi,
+    monthlyBalanceUi: SpendingIncomeBalanceUi,
     dateSelectorSlot: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     isIncomplete: Boolean? = null,
@@ -137,7 +137,7 @@ fun SummaryCard(
                         fontWeight = FontWeight.SemiBold
                     )
                     Text(
-                        text = if (isLoading) "000.000" else monthlyBalanceUi.monthlyIncome,
+                        text = if (isLoading) "000.000" else monthlyBalanceUi.income,
                         fontWeight = FontWeight.SemiBold,
                         color = if (isLoading) Color.Transparent else Green500,
                         modifier = Modifier
@@ -169,7 +169,7 @@ fun SummaryCard(
                         fontWeight = FontWeight.SemiBold
                     )
                     Text(
-                        text = if (isLoading) "000.000" else monthlyBalanceUi.monthlySpending,
+                        text = if (isLoading) "000.000" else monthlyBalanceUi.spending,
                         fontWeight = FontWeight.SemiBold,
                         color = if (isLoading) Color.Transparent else Orange700,
                         modifier = Modifier
@@ -211,9 +211,9 @@ fun SummaryCardLightPreview() {
                 )
             },
             isIncomplete = true,
-            monthlyBalanceUi = MonthlyBalanceUi(
-                monthlyIncome = "Rp 100.000",
-                monthlySpending = "Rp 120.000"
+            monthlyBalanceUi = SpendingIncomeBalanceUi(
+                income = "Rp 100.000",
+                spending = "Rp 120.000"
             )
         )
     }
@@ -239,9 +239,9 @@ fun SummaryCardDarkPreview() {
                     onNextBtnEnabled = true,
                 )
             },
-            monthlyBalanceUi = MonthlyBalanceUi(
-                monthlyIncome = "Rp 100.000",
-                monthlySpending = "Rp 120.000"
+            monthlyBalanceUi = SpendingIncomeBalanceUi(
+                income = "Rp 100.000",
+                spending = "Rp 120.000"
             )
         )
     }

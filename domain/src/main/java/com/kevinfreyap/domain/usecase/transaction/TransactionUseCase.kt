@@ -2,7 +2,7 @@ package com.kevinfreyap.domain.usecase.transaction
 
 import androidx.paging.PagingData
 import com.kevinfreyap.domain.model.AppCurrency
-import com.kevinfreyap.domain.model.MonthlyStatus
+import com.kevinfreyap.domain.model.SpendingIncomeStatus
 import com.kevinfreyap.domain.model.TotalBalanceStatus
 import com.kevinfreyap.domain.model.TransactionFilter
 import com.kevinfreyap.domain.model.TransactionType
@@ -11,7 +11,6 @@ import com.kevinfreyap.domain.resource.DomainResult
 import kotlinx.coroutines.flow.Flow
 import java.math.BigDecimal
 import java.time.Instant
-import java.time.YearMonth
 
 interface TransactionUseCase {
     val earliestTransactionYear: Int
@@ -19,7 +18,11 @@ interface TransactionUseCase {
     fun getLatestTransactions(): Flow<List<TransactionWithRates>>
     fun getTransactionById(transactionId: String): Flow<TransactionWithRates?>
     fun getTotalBalance(selectedCurrency: AppCurrency): Flow<TotalBalanceStatus>
-    fun getMonthlyStats(month: YearMonth, selectedCurrency: AppCurrency): Flow<MonthlyStatus>
+    fun getStatsByTimeFrame(
+        startDate: Instant,
+        endDate: Instant,
+        selectedCurrency: AppCurrency
+    ): Flow<SpendingIncomeStatus>
     fun syncTransactionsFromFirestore(): Flow<Boolean>
     suspend fun insertTransaction(
         name: String,

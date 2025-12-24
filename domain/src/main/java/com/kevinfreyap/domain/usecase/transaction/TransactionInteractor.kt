@@ -5,7 +5,7 @@ import androidx.paging.PagingData
 import com.kevinfreyap.domain.error.ValidationError
 import com.kevinfreyap.domain.model.AppCurrency
 import com.kevinfreyap.domain.model.Category
-import com.kevinfreyap.domain.model.MonthlyStatus
+import com.kevinfreyap.domain.model.SpendingIncomeStatus
 import com.kevinfreyap.domain.model.TotalBalanceStatus
 import com.kevinfreyap.domain.model.Transaction
 import com.kevinfreyap.domain.model.TransactionFilter
@@ -24,9 +24,6 @@ import java.lang.Exception
 import java.math.BigDecimal
 import javax.inject.Inject
 import java.time.Instant
-import java.time.LocalTime
-import java.time.YearMonth
-import java.time.ZoneId
 import java.util.UUID
 
 class TransactionInteractor @Inject constructor(
@@ -82,15 +79,12 @@ class TransactionInteractor @Inject constructor(
         }.flowOn(Dispatchers.Default)
     }
 
-    override fun getMonthlyStats(
-        month: YearMonth,
+    override fun getStatsByTimeFrame(
+        startDate: Instant,
+        endDate: Instant,
         selectedCurrency: AppCurrency
-    ): Flow<MonthlyStatus> {
-        val zoneId = ZoneId.systemDefault()
-        val startOfMonth = month.atDay(1).atStartOfDay(zoneId).toInstant()
-        val endOfMonth = month.atEndOfMonth().atTime(LocalTime.MAX).atZone(zoneId).toInstant()
-
-        return transactionRepository.getTransactionsByTimeFrame(startOfMonth, endOfMonth)
+    ): Flow<SpendingIncomeStatus> {
+        return transactionRepository.getTransactionsByTimeFrame(startDate, endDate)
             .map { transactions ->
                 var monthlyIncome = BigDecimal.ZERO
                 var monthlySpending = BigDecimal.ZERO
@@ -115,9 +109,9 @@ class TransactionInteractor @Inject constructor(
                     }
                 }
 
-                MonthlyStatus(
-                    monthlyIncome = monthlyIncome,
-                    monthlySpending = monthlySpending,
+                SpendingIncomeStatus(
+                    income = monthlyIncome,
+                    spending = monthlySpending,
                     isIncomplete = missingRateCounts > 0
                 )
             }

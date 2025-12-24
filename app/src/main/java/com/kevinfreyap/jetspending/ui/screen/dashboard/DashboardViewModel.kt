@@ -2,10 +2,11 @@ package com.kevinfreyap.jetspending.ui.screen.dashboard
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kevinfreyap.domain.model.PeriodSelectorOption
 import com.kevinfreyap.domain.usecase.currency.CurrencyUseCase
 import com.kevinfreyap.domain.usecase.transaction.TransactionUseCase
 import com.kevinfreyap.jetspending.ui.model.DashboardUi
-import com.kevinfreyap.jetspending.ui.model.MonthlyBalanceUi
+import com.kevinfreyap.jetspending.ui.model.SpendingIncomeBalanceUi
 import com.kevinfreyap.jetspending.ui.model.TotalBalanceUi
 import com.kevinfreyap.jetspending.ui.state.UiState
 import com.kevinfreyap.jetspending.utils.formatter.CurrencyUiFormatter
@@ -21,7 +22,8 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
-import java.time.YearMonth
+import java.time.LocalDate
+import java.time.temporal.TemporalAdjusters
 import javax.inject.Inject
 
 @HiltViewModel
@@ -41,22 +43,23 @@ class DashboardViewModel @Inject constructor(
         }
     }
 
-    private val _currentMonth = MutableStateFlow(YearMonth.now())
+    private val _currentMonth = MutableStateFlow(LocalDate.now())
 
-    val nextBtnEnabled: StateFlow<Boolean> = _currentMonth.map { month ->
-        val now = YearMonth.now()
-        month < now
+    val nextBtnEnabled: StateFlow<Boolean> = _currentMonth.map { selectedMonth ->
+        val now = LocalDate.now()
+            .withDayOfMonth(1)
+        selectedMonth.withDayOfMonth(1).isBefore(now)
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = true
     )
 
-    val previousBtnEnabled: StateFlow<Boolean> = _currentMonth.map { month ->
-        val minYear = YearMonth.now()
-            .minusYears(2)
-            .withMonth(1)
-        month > minYear
+    val previousBtnEnabled: StateFlow<Boolean> = _currentMonth.map { selectedMonth ->
+        val minYear = LocalDate.now()
+            .with(TemporalAdjusters.firstDayOfYear())
+
+        selectedMonth.withDayOfMonth(1).isAfter(minYear)
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
@@ -64,11 +67,11 @@ class DashboardViewModel @Inject constructor(
     )
 
     val monthDisplay = _currentMonth.map {
-        DateFormatter.formatYearMonthToString(it)
+        DateFormatter.formatMonthToString(it)
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
-        initialValue = DateFormatter.formatYearMonthToString(YearMonth.now())
+        initialValue = DateFormatter.formatMonthToString(LocalDate.now())
     )
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -95,11 +98,12 @@ class DashboardViewModel @Inject constructor(
     ) { month, currency ->
         Pair(month, currency)
     }.flatMapLatest {  (month, currency) ->
-        transactionUseCase.getMonthlyStats(month, currency)
+        val (startDate, endDate) = DateFormatter.formatRangeInstant(PeriodSelectorOption.MONTHLY, month)
+        transactionUseCase.getStatsByTimeFrame(startDate, endDate, currency)
             .map {
-                MonthlyBalanceUi(
-                    monthlyIncome = CurrencyUiFormatter.formatWithCode(it.monthlyIncome,currency),
-                    monthlySpending = CurrencyUiFormatter.formatWithCode(it.monthlySpending, currency)
+                SpendingIncomeBalanceUi(
+                    income = CurrencyUiFormatter.formatWithCode(it.income,currency),
+                    spending = CurrencyUiFormatter.formatWithCode(it.spending, currency)
                 )
             }
     }

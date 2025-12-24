@@ -45,6 +45,7 @@ import com.kevinfreyap.jetspending.ui.screen.dashboard.DashboardScreen
 import com.kevinfreyap.jetspending.ui.screen.detail.DetailTransactionScreen
 import com.kevinfreyap.jetspending.ui.screen.list.TransactionListScreen
 import com.kevinfreyap.jetspending.ui.screen.onboarding.OnboardingScreen
+import com.kevinfreyap.jetspending.ui.screen.report.ReportScreen
 import com.kevinfreyap.jetspending.ui.screen.settings.SettingsScreen
 import com.kevinfreyap.jetspending.ui.screen.signin.SignInScreen
 import com.kevinfreyap.jetspending.ui.screen.signup.SignUpScreen
@@ -170,6 +171,11 @@ fun JetSpendingApp(
                                 )
                             )
                         }
+                    )
+                }
+                composable(Screen.Report.route) {
+                    ReportScreen(
+
                     )
                 }
                 composable(Screen.Settings.route) {

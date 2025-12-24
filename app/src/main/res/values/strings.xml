@@ -72,6 +72,9 @@
     <string name="notes">Notes</string>
     <string name="transaction_deleted">Transaction Deleted</string>
     <string name="discard_changes">Discard Changes?</string>
+    <string name="total_income">Total Income</string>
+    <string name="total_spending">Total Spending</string>
+    <string name="spending_chart">Spending Chart</string>
 
     <!-- Button -->
     <string name="cancel">Cancel</string>
@@ -158,4 +161,9 @@
     <string name="description_transaction_missing">This transaction may have been deleted or is unavailable</string>
     <string name="description_delete_transaction_success">Transaction deleted successfully</string>
     <string name="description_discard_change">You have unsaved changes. Are you sure you want to discard them?</string>
+
+    <!-- Period Option -->
+    <string name="period_weekly">Weekly</string>
+    <string name="period_monthly">Monthly</string>
+    <string name="period_yearly">Yearly</string>
 </resources>

@@ -31,7 +31,7 @@ import com.kevinfreyap.jetspending.ui.components.ViewDateSelector
 import com.kevinfreyap.jetspending.ui.components.ViewTopBar
 import com.kevinfreyap.jetspending.ui.main.MainViewModel
 import com.kevinfreyap.jetspending.ui.model.DashboardUi
-import com.kevinfreyap.jetspending.ui.model.MonthlyBalanceUi
+import com.kevinfreyap.jetspending.ui.model.SpendingIncomeBalanceUi
 import com.kevinfreyap.jetspending.ui.model.TotalBalanceUi
 import com.kevinfreyap.jetspending.ui.model.TransactionItemUi
 import com.kevinfreyap.jetspending.ui.state.UiState
@@ -185,9 +185,9 @@ fun DashboardContentPreview(){
                         balance = "Rp 100.000",
                         isIncomplete = false
                     ),
-                    monthlyBalance = MonthlyBalanceUi(
-                        monthlyIncome = "Rp 1.000.000",
-                        monthlySpending = "Rp 500.000"
+                    monthlyBalance = SpendingIncomeBalanceUi(
+                        income = "Rp 1.000.000",
+                        spending = "Rp 500.000"
                     ),
                     latestTransactions = listOf(
                         TransactionItemUi(
