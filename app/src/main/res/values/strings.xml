@@ -74,7 +74,7 @@
     <string name="discard_changes">Discard Changes?</string>
     <string name="total_income">Total Income</string>
     <string name="total_spending">Total Spending</string>
-    <string name="spending_chart">Spending Chart</string>
+    <string name="transaction_chart">Transactions Chart</string>
 
     <!-- Button -->
     <string name="cancel">Cancel</string>

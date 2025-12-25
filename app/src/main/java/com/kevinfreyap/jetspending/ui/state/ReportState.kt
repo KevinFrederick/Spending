@@ -1,6 +1,7 @@
 package com.kevinfreyap.jetspending.ui.state
 
 import com.kevinfreyap.domain.model.PeriodSelectorOption
+import com.kevinfreyap.jetspending.ui.model.ChartDataUi
 import com.kevinfreyap.jetspending.ui.model.SpendingIncomeBalanceUi
 
 data class ReportState(
@@ -8,5 +9,6 @@ data class ReportState(
     val rangeLabel: String = "",
     val isNextEnabled: Boolean = true,
     val isPreviousEnabled: Boolean = true,
-    val spendingIncomeBalanceUi: SpendingIncomeBalanceUi = SpendingIncomeBalanceUi()
+    val spendingIncomeBalanceUi: SpendingIncomeBalanceUi = SpendingIncomeBalanceUi(),
+    val chartData: List<ChartDataUi> = emptyList()
 )

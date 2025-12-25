@@ -5,10 +5,13 @@ import androidx.paging.PagingData
 import com.kevinfreyap.domain.error.ValidationError
 import com.kevinfreyap.domain.model.AppCurrency
 import com.kevinfreyap.domain.model.Category
+import com.kevinfreyap.domain.model.ChartData
+import com.kevinfreyap.domain.model.PeriodSelectorOption
 import com.kevinfreyap.domain.model.SpendingIncomeStatus
 import com.kevinfreyap.domain.model.TotalBalanceStatus
 import com.kevinfreyap.domain.model.Transaction
 import com.kevinfreyap.domain.model.TransactionFilter
+import com.kevinfreyap.domain.model.TransactionMathWithRates
 import com.kevinfreyap.domain.model.TransactionType
 import com.kevinfreyap.domain.model.TransactionWithRates
 import com.kevinfreyap.domain.repository.ICategoryRepository
@@ -22,8 +25,11 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import java.lang.Exception
 import java.math.BigDecimal
+import java.time.DayOfWeek
 import javax.inject.Inject
 import java.time.Instant
+import java.time.Month
+import java.time.ZoneId
 import java.util.UUID
 
 class TransactionInteractor @Inject constructor(
@@ -116,6 +122,22 @@ class TransactionInteractor @Inject constructor(
                 )
             }
             .flowOn(Dispatchers.Default)
+    }
+
+    override fun getChartData(
+        period: PeriodSelectorOption,
+        startDate: Instant,
+        endDate: Instant,
+        selectedCurrency: AppCurrency
+    ): Flow<List<ChartData>> {
+        return transactionRepository.getTransactionsByTimeFrame(startDate, endDate)
+            .map { transactions ->
+                when(period) {
+                    PeriodSelectorOption.WEEKLY -> groupedByDay(transactions, selectedCurrency)
+                    PeriodSelectorOption.MONTHLY -> groupedByWeek(transactions, endDate, selectedCurrency)
+                    PeriodSelectorOption.YEARLY -> groupedByMonth(transactions, selectedCurrency)
+                }
+            }
     }
 
     override fun syncTransactionsFromFirestore(): Flow<Boolean> {
@@ -219,6 +241,8 @@ class TransactionInteractor @Inject constructor(
         transactionRepository.deleteTransaction(transactionId)
     }
 
+    private val zoneId = ZoneId.systemDefault()
+
     private fun validateTransaction(
         name: String,
         amount: BigDecimal,
@@ -240,6 +264,86 @@ class TransactionInteractor @Inject constructor(
             exchangeRatesRepository.ensureRatesExist(stringDate)
         } catch (e: Exception) {
             Log.e("TransactionInteractor", e.message ?: "Something Wrong")
+        }
+    }
+
+    private fun groupedByDay(list: List<TransactionMathWithRates>, selectedCurrency: AppCurrency): List<ChartData> {
+        val groupedMap = list.groupingBy {
+            it.date.atZone(zoneId).dayOfWeek
+        }.fold(SpendingIncomeStatus()) { accumulator, transaction ->
+            calculateAmount(accumulator, transaction, selectedCurrency)
+        }
+
+        return DayOfWeek.entries.mapIndexed { index,dayOfWeek ->
+            ChartData(
+                xLabel = dayOfWeek.name,
+                amount = groupedMap[dayOfWeek] ?: SpendingIncomeStatus(),
+                index = index // 0 for Mon, 6 for Sun
+            )
+        }
+    }
+
+    private fun groupedByWeek(list: List<TransactionMathWithRates>, endDate: Instant, selectedCurrency: AppCurrency): List<ChartData> {
+        val groupedMap = list.groupingBy {
+            val localDate = it.date.atZone(zoneId).toLocalDate()
+            (localDate.dayOfMonth - 1) / 7
+        }.fold(SpendingIncomeStatus()) {accumulator, transaction ->
+            calculateAmount(accumulator, transaction, selectedCurrency)
+        }
+
+        val lastDayOfMonth = endDate.atZone(zoneId).dayOfMonth
+        val maxIndex = (lastDayOfMonth - 1) / 7
+
+        return (0..maxIndex).map { weekIndex ->
+            val startDate = (weekIndex * 7) + 1
+            val endDate = minOf((weekIndex + 1) * 7, lastDayOfMonth )
+
+            ChartData(
+                xLabel = "$startDate - $endDate",
+                amount = groupedMap[weekIndex] ?: SpendingIncomeStatus(),
+                index = weekIndex
+            )
+        }
+    }
+
+    private fun groupedByMonth(list: List<TransactionMathWithRates>, selectedCurrency: AppCurrency): List<ChartData> {
+        val groupedMap = list.groupingBy {
+            it.date.atZone(zoneId).month
+        }.fold(SpendingIncomeStatus()) { accumulator, transaction ->
+            calculateAmount(accumulator, transaction, selectedCurrency)
+        }
+
+        return Month.entries.mapIndexed { index, month ->
+            ChartData(
+                xLabel = month.name,
+                amount = groupedMap[month] ?: SpendingIncomeStatus(),
+                index = index
+            )
+        }
+    }
+
+    private fun calculateAmount(accumulator: SpendingIncomeStatus, transaction: TransactionMathWithRates, selectedCurrency: AppCurrency): SpendingIncomeStatus {
+        val convertedAmount = currencyUseCase.calculateAmountBasedOnRates(
+            amount = transaction.amount,
+            sourceCurrency = transaction.currency,
+            targetCurrency = selectedCurrency,
+            rates = transaction.rates
+        )
+
+        return if (convertedAmount != null) {
+            if (transaction.type == TransactionType.INCOME) {
+                accumulator.copy(
+                    income = accumulator.income + convertedAmount
+                )
+            } else {
+                accumulator.copy(
+                    spending = accumulator.spending + convertedAmount
+                )
+            }
+        } else {
+            accumulator.copy(
+                isIncomplete = true
+            )
         }
     }
 }

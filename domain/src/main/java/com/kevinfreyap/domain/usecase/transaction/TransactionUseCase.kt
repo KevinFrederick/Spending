@@ -2,6 +2,8 @@ package com.kevinfreyap.domain.usecase.transaction
 
 import androidx.paging.PagingData
 import com.kevinfreyap.domain.model.AppCurrency
+import com.kevinfreyap.domain.model.ChartData
+import com.kevinfreyap.domain.model.PeriodSelectorOption
 import com.kevinfreyap.domain.model.SpendingIncomeStatus
 import com.kevinfreyap.domain.model.TotalBalanceStatus
 import com.kevinfreyap.domain.model.TransactionFilter
@@ -23,6 +25,12 @@ interface TransactionUseCase {
         endDate: Instant,
         selectedCurrency: AppCurrency
     ): Flow<SpendingIncomeStatus>
+    fun getChartData(
+        period: PeriodSelectorOption,
+        startDate: Instant,
+        endDate: Instant,
+        selectedCurrency: AppCurrency
+    ): Flow<List<ChartData>>
     fun syncTransactionsFromFirestore(): Flow<Boolean>
     suspend fun insertTransaction(
         name: String,

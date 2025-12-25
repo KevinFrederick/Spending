@@ -18,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -41,6 +42,13 @@ import com.kevinfreyap.jetspending.ui.state.UiState
 import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
 import com.kevinfreyap.jetspending.ui.theme.Red500
 import com.kevinfreyap.jetspending.ui.theme.Theme
+import com.kevinfreyap.jetspending.utils.formatter.CurrencyUiFormatter
+import com.kevinfreyap.jetspending.utils.rememberCurrencyMarker
+import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
+import com.patrykandpatrick.vico.core.cartesian.data.CartesianValueFormatter
+import com.patrykandpatrick.vico.core.cartesian.data.columnSeries
+import com.patrykandpatrick.vico.core.cartesian.marker.CartesianMarker
+import kotlinx.coroutines.runBlocking
 
 @Composable
 fun ReportScreen (
@@ -51,9 +59,32 @@ fun ReportScreen (
     val selectedCurrency by mainViewModel.selectedCurrency.collectAsState()
     val reportState by viewModel.reportState.collectAsState()
 
+    val chartData = (reportState as? UiState.Success<ReportState>)?.data?.chartData ?: emptyList()
+    val marker = rememberCurrencyMarker(selectedCurrency)
+
+    val bottomAxisFormatter = remember(chartData) {
+        CartesianValueFormatter { _, value, _  ->
+            val index = value.toInt()
+            val label = chartData.find { it.index == index }?.xLabel
+            label ?: value.toInt().toString()
+        }
+    }
+
+    val startAxisFormatter = remember(selectedCurrency) {
+        CartesianValueFormatter { _, value, _ ->
+            CurrencyUiFormatter.formatWithCode(value.toBigDecimal(), selectedCurrency)
+        }
+    }
+
+    val chartProducer = viewModel.chartProducer
+
     ReportContent(
         selectedCurrency = selectedCurrency,
         reportState = reportState,
+        chartProducer = chartProducer,
+        bottomLabel = bottomAxisFormatter,
+        startLabel = startAxisFormatter,
+        marker = marker,
         onSelectCurrency = {
             mainViewModel.onSelectCurrency(it)
         },
@@ -74,6 +105,10 @@ fun ReportScreen (
 fun ReportContent(
     selectedCurrency: AppCurrency,
     reportState: UiState<ReportState>,
+    chartProducer: CartesianChartModelProducer,
+    bottomLabel: CartesianValueFormatter,
+    startLabel: CartesianValueFormatter,
+    marker: CartesianMarker,
     onSelectCurrency: (AppCurrency) -> Unit,
     onSelectPeriod: (PeriodSelectorOption) -> Unit,
     onNextClick: () -> Unit,
@@ -168,7 +203,12 @@ fun ReportContent(
                     .height(16.dp)
             )
 
-            BarChart()
+            BarChart(
+                modelProducer = chartProducer,
+                bottomLabel = bottomLabel,
+                startLabel = startLabel,
+                marker = marker
+            )
 
             Spacer(
                 modifier = Modifier
@@ -186,6 +226,52 @@ fun ReportContent(
 )
 @Composable
 fun ReportContentPreview() {
+    val modelProducer = remember { CartesianChartModelProducer() }
+
+    val dataMap = remember {
+        linkedMapOf(
+            "Mon" to 50000,
+            "Tue" to 12000,
+            "Wed" to 8000,
+            "Thu" to 16000,
+            "Fri" to 12000,
+            "Sat" to 8000,
+            "Sun" to 5000
+        )
+    }
+
+    val testMap = remember {
+        linkedMapOf(
+            "Mon" to 5000,
+            "Tue" to 22000,
+            "Wed" to 8000,
+            "Thu" to 15000,
+            "Fri" to 10000,
+            "Sat" to 8000,
+            "Sun" to 5000
+        )
+    }
+
+    val bottomValueFormatter = CartesianValueFormatter { x, value, _ ->
+        dataMap.keys.elementAtOrElse(value.toInt()) { "" }
+    }
+
+
+    val startValueFormatter = CartesianValueFormatter { x, value, _ ->
+        CurrencyUiFormatter.formatWithCode(value.toBigDecimal(), AppCurrency.IDR)
+    }
+
+    // 2. Load dummy data immediately
+    runBlocking {
+        modelProducer.runTransaction {
+            // Add a line series with hardcoded values for the preview
+            columnSeries {
+                series(dataMap.values)
+                series(testMap.values)
+            }
+        }
+    }
+
     JetSpendingTheme {
         ReportContent(
             selectedCurrency = AppCurrency.IDR,
@@ -200,6 +286,10 @@ fun ReportContentPreview() {
                     )
                 )
             ),
+            chartProducer = modelProducer,
+            bottomLabel = bottomValueFormatter,
+            startLabel = startValueFormatter,
+            marker = rememberCurrencyMarker(AppCurrency.IDR),
             onSelectCurrency = {},
             onSelectPeriod = {},
             onNextClick = {},

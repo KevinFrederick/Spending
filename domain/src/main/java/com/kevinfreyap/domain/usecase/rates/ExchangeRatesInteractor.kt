@@ -30,8 +30,6 @@ class ExchangeRatesInteractor @Inject constructor(
                 .distinctUntilChanged(),
             connectivityRepository.isOnline
         ) { transactions, isOnline ->
-            Log.d("ExchangeInteractor", transactions.size.toString())
-
             Pair(transactions, isOnline)
         }.collect { (dates, isOnline) ->
             if (!isOnline || dates.isEmpty()) return@collect

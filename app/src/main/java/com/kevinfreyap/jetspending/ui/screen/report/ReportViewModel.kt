@@ -3,14 +3,18 @@ package com.kevinfreyap.jetspending.ui.screen.report
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kevinfreyap.domain.model.AppCurrency
+import com.kevinfreyap.domain.model.ChartData
 import com.kevinfreyap.domain.model.PeriodSelectorOption
 import com.kevinfreyap.domain.usecase.currency.CurrencyUseCase
 import com.kevinfreyap.domain.usecase.transaction.TransactionUseCase
 import com.kevinfreyap.jetspending.ui.model.SpendingIncomeBalanceUi
 import com.kevinfreyap.jetspending.ui.state.ReportState
 import com.kevinfreyap.jetspending.ui.state.UiState
+import com.kevinfreyap.jetspending.utils.formatter.ChartUiFormatter
 import com.kevinfreyap.jetspending.utils.formatter.CurrencyUiFormatter
 import com.kevinfreyap.jetspending.utils.formatter.DateFormatter
+import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
+import com.patrykandpatrick.vico.core.cartesian.data.columnSeries
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -42,6 +46,8 @@ class ReportViewModel @Inject constructor(
     private val _anchorDate = MutableStateFlow(LocalDate.now())
     private val appMinDate = LocalDate.of(2020, 1, 2)
 
+    val chartProducer = CartesianChartModelProducer()
+
     @OptIn(ExperimentalCoroutinesApi::class)
     val reportState: StateFlow<UiState<ReportState>> = combine(
         _selectedPeriod,
@@ -65,8 +71,33 @@ class ReportViewModel @Inject constructor(
             period = period,
             date = date
         )
-        transactionUseCase.getStatsByTimeFrame(start, end, currency)
-            .map {
+
+        val statsFlow = transactionUseCase.getStatsByTimeFrame(
+            start,
+            end,
+            currency
+        )
+
+        val chartDataFlow = transactionUseCase.getChartData(
+            period = period,
+            startDate = start,
+            endDate = end,
+            selectedCurrency = currency
+        )
+
+        combine(
+            statsFlow,
+            chartDataFlow
+        ) { stats, chart ->
+            updateChart(chart)
+
+            val uiLabels = chart.map {
+                ChartUiFormatter.mapChartDomainToUi(it, period)
+            }
+
+            Pair(stats, uiLabels)
+        }
+            .map { (stats, chartUi) ->
                 UiState.Success(
                     ReportState(
                         selectedPeriod = period,
@@ -74,10 +105,11 @@ class ReportViewModel @Inject constructor(
                         isPreviousEnabled = canGoPrevious(date, period, effectiveMinDate),
                         isNextEnabled = canGoNext(date, period, maxDate),
                         spendingIncomeBalanceUi = SpendingIncomeBalanceUi(
-                            income = CurrencyUiFormatter.formatWithCode(it.income, currency),
-                            spending = CurrencyUiFormatter.formatWithCode(it.spending, currency),
-                            ratesIncomplete = it.isIncomplete
-                        )
+                            income = CurrencyUiFormatter.formatWithCode(stats.income, currency),
+                            spending = CurrencyUiFormatter.formatWithCode(stats.spending, currency),
+                            ratesIncomplete = stats.isIncomplete
+                        ),
+                        chartData = chartUi
                     )
                 )
             }
@@ -133,5 +165,20 @@ class ReportViewModel @Inject constructor(
             PeriodSelectorOption.YEARLY -> currentDate.with(TemporalAdjusters.firstDayOfYear())
         }
         return startOfCurrent.isAfter(min)
+    }
+
+    private suspend fun updateChart(
+        chartData: List<ChartData>
+    ) {
+        chartProducer.runTransaction {
+            val xValues = chartData.map { it.index }
+            val incomeValues = chartData.map { it.amount.income }
+            val spendingValues = chartData.map { it.amount.spending }
+
+            columnSeries {
+                series(xValues, incomeValues)
+                series(xValues, spendingValues)
+            }
+        }
     }
 }

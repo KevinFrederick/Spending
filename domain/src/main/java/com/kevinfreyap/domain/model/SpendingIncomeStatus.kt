@@ -3,7 +3,7 @@ package com.kevinfreyap.domain.model
 import java.math.BigDecimal
 
 data class SpendingIncomeStatus (
-    val income: BigDecimal,
-    val spending: BigDecimal,
-    val isIncomplete: Boolean
+    val income: BigDecimal = BigDecimal.ZERO,
+    val spending: BigDecimal = BigDecimal.ZERO,
+    val isIncomplete: Boolean = false
 )
