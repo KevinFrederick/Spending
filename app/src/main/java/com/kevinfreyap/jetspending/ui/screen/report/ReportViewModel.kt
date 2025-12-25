@@ -5,11 +5,15 @@ import androidx.lifecycle.viewModelScope
 import com.kevinfreyap.domain.model.AppCurrency
 import com.kevinfreyap.domain.model.ChartData
 import com.kevinfreyap.domain.model.PeriodSelectorOption
+import com.kevinfreyap.domain.model.TransactionType
 import com.kevinfreyap.domain.usecase.currency.CurrencyUseCase
 import com.kevinfreyap.domain.usecase.transaction.TransactionUseCase
+import com.kevinfreyap.jetspending.ui.model.CategoryPercentageUi
+import com.kevinfreyap.jetspending.ui.model.ReportParams
 import com.kevinfreyap.jetspending.ui.model.SpendingIncomeBalanceUi
 import com.kevinfreyap.jetspending.ui.state.ReportState
 import com.kevinfreyap.jetspending.ui.state.UiState
+import com.kevinfreyap.jetspending.utils.formatter.CategoryUiFormatter
 import com.kevinfreyap.jetspending.utils.formatter.ChartUiFormatter
 import com.kevinfreyap.jetspending.utils.formatter.CurrencyUiFormatter
 import com.kevinfreyap.jetspending.utils.formatter.DateFormatter
@@ -44,6 +48,7 @@ class ReportViewModel @Inject constructor(
 
     private val _selectedPeriod = MutableStateFlow(PeriodSelectorOption.WEEKLY)
     private val _anchorDate = MutableStateFlow(LocalDate.now())
+    private val _selectedCategoryType = MutableStateFlow(TransactionType.SPENDING)
     private val appMinDate = LocalDate.of(2020, 1, 2)
 
     val chartProducer = CartesianChartModelProducer()
@@ -52,10 +57,16 @@ class ReportViewModel @Inject constructor(
     val reportState: StateFlow<UiState<ReportState>> = combine(
         _selectedPeriod,
         _anchorDate,
+        _selectedCategoryType,
         _selectedCurrency
-    ) { period, date, currency ->
-        Triple(period, date, currency)
-    }.flatMapLatest { (period, date, currency) ->
+    ) { period, date, categoryType, currency ->
+        ReportParams(
+            period = period,
+            date = date,
+            categoryType = categoryType,
+            currency = currency
+        )
+    }.flatMapLatest { (period, date, categoryType, currency) ->
         val rangeDateDisplay = DateFormatter.formatRangeDisplay(period, date)
 
         val minDate = when(period) {
@@ -73,9 +84,9 @@ class ReportViewModel @Inject constructor(
         )
 
         val statsFlow = transactionUseCase.getStatsByTimeFrame(
-            start,
-            end,
-            currency
+            startDate = start,
+            endDate = end,
+            selectedCurrency = currency
         )
 
         val chartDataFlow = transactionUseCase.getChartData(
@@ -85,19 +96,28 @@ class ReportViewModel @Inject constructor(
             selectedCurrency = currency
         )
 
+        val categoryFlow = transactionUseCase.getCategories(
+            period = period,
+            startDate = start,
+            endDate = end,
+            selectedType = categoryType,
+            selectedCurrency = currency
+        )
+
         combine(
             statsFlow,
-            chartDataFlow
-        ) { stats, chart ->
+            chartDataFlow,
+            categoryFlow
+        ) { stats, chart, category ->
             updateChart(chart)
 
             val uiLabels = chart.map {
                 ChartUiFormatter.mapChartDomainToUi(it, period)
             }
 
-            Pair(stats, uiLabels)
+            Triple(stats, uiLabels, category)
         }
-            .map { (stats, chartUi) ->
+            .map { (stats, chartUi, category) ->
                 UiState.Success(
                     ReportState(
                         selectedPeriod = period,
@@ -109,7 +129,17 @@ class ReportViewModel @Inject constructor(
                             spending = CurrencyUiFormatter.formatWithCode(stats.spending, currency),
                             ratesIncomplete = stats.isIncomplete
                         ),
-                        chartData = chartUi
+                        chartData = chartUi,
+                        selectedCategoryType = categoryType,
+                        categoryList = category.map { categoryPercentage -> 
+                            CategoryPercentageUi(
+                                categoryAmount = CurrencyUiFormatter.formatWithCode(categoryPercentage.amount, currency),
+                                categoryColor = CategoryUiFormatter.getBackgroundColor(categoryPercentage.type),
+                                percentage = categoryPercentage.percentage,
+                                name = CategoryUiFormatter.mapCategoryNameToString(categoryPercentage.categoryId),
+                                iconRes = CategoryUiFormatter.mapIconIdToDrawable(categoryPercentage.categoryIconId)
+                            )
+                        }
                     )
                 )
             }
@@ -147,6 +177,10 @@ class ReportViewModel @Inject constructor(
             PeriodSelectorOption.MONTHLY -> currentSelectedDate.minusMonths(1)
             PeriodSelectorOption.YEARLY -> currentSelectedDate.minusYears(1)
         }
+    }
+
+    fun onTypeSelected(type: TransactionType) {
+        _selectedCategoryType.value = type
     }
 
     private fun canGoNext(currentDate: LocalDate, period: PeriodSelectorOption, max: LocalDate): Boolean {

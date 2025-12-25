@@ -5,6 +5,7 @@ import androidx.paging.PagingData
 import com.kevinfreyap.domain.error.ValidationError
 import com.kevinfreyap.domain.model.AppCurrency
 import com.kevinfreyap.domain.model.Category
+import com.kevinfreyap.domain.model.CategoryPercentage
 import com.kevinfreyap.domain.model.ChartData
 import com.kevinfreyap.domain.model.PeriodSelectorOption
 import com.kevinfreyap.domain.model.SpendingIncomeStatus
@@ -25,6 +26,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import java.lang.Exception
 import java.math.BigDecimal
+import java.math.RoundingMode
 import java.time.DayOfWeek
 import javax.inject.Inject
 import java.time.Instant
@@ -137,6 +139,68 @@ class TransactionInteractor @Inject constructor(
                     PeriodSelectorOption.MONTHLY -> groupedByWeek(transactions, endDate, selectedCurrency)
                     PeriodSelectorOption.YEARLY -> groupedByMonth(transactions, selectedCurrency)
                 }
+            }
+    }
+
+    override fun getCategories(
+        period: PeriodSelectorOption,
+        startDate: Instant,
+        endDate: Instant,
+        selectedType: TransactionType,
+        selectedCurrency: AppCurrency
+    ): Flow<List<CategoryPercentage>> {
+        return transactionRepository.getTransactionsByTimeFrame(startDate, endDate)
+            .map { transactions ->
+                val transactions = transactions.filter { it.type == selectedType }
+
+                val groupedTransactions = transactions.groupingBy {
+                    Pair(it.type, it.category)
+                }.fold(BigDecimal.ZERO) { accumulator, transaction ->
+                    val convertedAmount = currencyUseCase.calculateAmountBasedOnRates(
+                        amount = transaction.amount,
+                        sourceCurrency = transaction.currency,
+                        targetCurrency = selectedCurrency,
+                        rates = transaction.rates
+                    )
+                    if (convertedAmount != null) {
+                        accumulator.add(convertedAmount)
+                    } else {
+                        accumulator
+                    }
+                }
+
+                val totalIncome = groupedTransactions
+                    .filterKeys { it.first == TransactionType.INCOME }
+                    .values
+                    .fold(BigDecimal.ZERO) { acc, decimal ->
+                        acc.add(decimal)
+                    }
+
+                val totalSpending = groupedTransactions
+                    .filterKeys { it.first == TransactionType.SPENDING }
+                    .values
+                    .fold(BigDecimal.ZERO) { acc, decimal ->
+                        acc.add(decimal)
+                    }
+
+                groupedTransactions.map { (key, totalAmount) ->
+                    val (type, category) = key
+
+                    val grandTotal = if (type == TransactionType.INCOME) totalIncome else totalSpending
+                    val percentage = if (grandTotal.compareTo(BigDecimal.ZERO) != 0) {
+                        totalAmount.divide(grandTotal, 4, RoundingMode.HALF_UP).toFloat()
+                    } else {
+                        0f
+                    }
+
+                    CategoryPercentage(
+                        categoryId = category.id,
+                        categoryIconId = category.iconId,
+                        type = type,
+                        percentage = percentage,
+                        amount = totalAmount
+                    )
+                }.sortedByDescending { it.percentage }
             }
     }
 

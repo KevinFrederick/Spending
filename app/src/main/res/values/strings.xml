@@ -39,6 +39,7 @@
     <string name="amount">Amount</string>
     <string name="type">Type</string>
     <string name="category">Category</string>
+    <string name="categories">Categories</string>
     <string name="date">Date</string>
     <string name="transaction_name">Transaction Name</string>
     <string name="transaction_amount">Transaction Amount</string>
@@ -101,6 +102,8 @@
     <string name="delete_transaction">Delete Transaction</string>
     <string name="update_transaction">Update Transaction</string>
     <string name="discard">Discard</string>
+    <string name="show_less">Show Less</string>
+    <string name="show_all">Show All</string>
 
     <!-- Theme -->
     <string name="theme">Theme</string>
@@ -150,6 +153,7 @@
     <string name="error_notes_too_long">Notes too long</string>
     <string name="error_transaction_currency">Currency data not loaded yet. Please wait.</string>
     <string name="error_network_offline">You are offline. Data will sync when online</string>
+    <string name="error_no_data">No data yet</string>
 
     <!-- Description -->
     <string name="description_sign_up">Let\'s get started with a free account</string>

@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.kevinfreyap.domain.model.AppCurrency
 import com.kevinfreyap.domain.model.PeriodSelectorOption
+import com.kevinfreyap.domain.model.TransactionType
 import com.kevinfreyap.jetspending.R
 import com.kevinfreyap.jetspending.ui.components.BarChart
 import com.kevinfreyap.jetspending.ui.components.CategoriesReport
@@ -91,6 +92,9 @@ fun ReportScreen (
         onSelectPeriod = {
             viewModel.onSelectPeriod(it)
         },
+        onSelectType = {
+            viewModel.onTypeSelected(it)
+        },
         onNextClick = {
             viewModel.onNextClick()
         },
@@ -111,6 +115,7 @@ fun ReportContent(
     marker: CartesianMarker,
     onSelectCurrency: (AppCurrency) -> Unit,
     onSelectPeriod: (PeriodSelectorOption) -> Unit,
+    onSelectType: (TransactionType) -> Unit,
     onNextClick: () -> Unit,
     onPreviousClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -215,7 +220,11 @@ fun ReportContent(
                     .height(16.dp)
             )
 
-            CategoriesReport()
+            CategoriesReport(
+                selectedOption = data.selectedCategoryType,
+                categories = data.categoryList,
+                onSelectOption = onSelectType,
+            )
         }
     }
 }
@@ -292,6 +301,7 @@ fun ReportContentPreview() {
             marker = rememberCurrencyMarker(AppCurrency.IDR),
             onSelectCurrency = {},
             onSelectPeriod = {},
+            onSelectType = {},
             onNextClick = {},
             onPreviousClick = {}
         )

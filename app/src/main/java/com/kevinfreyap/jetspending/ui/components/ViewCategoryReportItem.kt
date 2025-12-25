@@ -1,5 +1,6 @@
 package com.kevinfreyap.jetspending.ui.components
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,6 +24,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,16 +39,22 @@ import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
 import com.kevinfreyap.jetspending.ui.theme.Orange700
 import com.kevinfreyap.jetspending.ui.theme.Theme
 import com.kevinfreyap.jetspending.utils.rememberShimmerBrush
+import kotlin.math.roundToInt
 
 @Composable
 fun ViewCategoryReportItem (
     categoryIcon: Int,
     categoryName: String,
     categoryAmount: String,
-    percentage: String,
+    percentage: Float,
     color: Color,
     modifier: Modifier = Modifier
 ) {
+    val animatedProgress by animateFloatAsState(
+        targetValue = percentage,
+        label = "ProgressAnimation"
+    )
+
     Card (
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
@@ -120,14 +128,16 @@ fun ViewCategoryReportItem (
                     )
 
                     LinearProgressIndicator(
+                        progress = { animatedProgress },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(8.dp)
+                            .height(8.dp),
+                        drawStopIndicator = {}
                     )
                 }
 
                 Text(
-                    text = percentage,
+                    text = "${(percentage * 100).roundToInt()}%",
                     style = MaterialTheme.typography.labelMedium,
                     color = Theme.custom.hintColor,
                     modifier = Modifier
@@ -238,7 +248,7 @@ fun ViewCategoryReportItemPreview() {
             categoryName = "Salary",
             categoryAmount = "Rp 100.000",
             color = Orange700,
-            percentage = "97%"
+            percentage = 0.97f,
         )
     }
 }

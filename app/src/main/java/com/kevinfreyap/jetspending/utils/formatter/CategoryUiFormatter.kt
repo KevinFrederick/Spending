@@ -1,8 +1,12 @@
 package com.kevinfreyap.jetspending.utils.formatter
 
+import androidx.compose.ui.graphics.Color
 import com.kevinfreyap.domain.model.Category
+import com.kevinfreyap.domain.model.TransactionType
 import com.kevinfreyap.jetspending.R
 import com.kevinfreyap.jetspending.ui.model.CategoryUI
+import com.kevinfreyap.jetspending.ui.theme.Green500
+import com.kevinfreyap.jetspending.ui.theme.Orange700
 
 object CategoryUiFormatter {
     fun mapCategoryDomainToUi(domain: Category): CategoryUI {
@@ -51,6 +55,13 @@ object CategoryUiFormatter {
             "CAT_TRANSPORTATION" -> R.string.category_transportation
             "CAT_OTHER" -> R.string.category_others
             else -> R.string.category_others
+        }
+    }
+
+    fun getBackgroundColor(transactionType: TransactionType): Color {
+        return when (transactionType) {
+            TransactionType.INCOME -> Green500
+            TransactionType.SPENDING -> Orange700
         }
     }
 }

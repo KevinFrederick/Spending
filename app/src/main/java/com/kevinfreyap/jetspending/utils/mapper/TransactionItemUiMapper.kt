@@ -1,13 +1,10 @@
 package com.kevinfreyap.jetspending.utils.mapper
 
-import androidx.compose.ui.graphics.Color
 import com.kevinfreyap.domain.model.AppCurrency
 import com.kevinfreyap.domain.model.TransactionType
 import com.kevinfreyap.domain.model.TransactionWithRates
 import com.kevinfreyap.domain.usecase.currency.CurrencyUseCase
 import com.kevinfreyap.jetspending.ui.model.TransactionItemUi
-import com.kevinfreyap.jetspending.ui.theme.Green500
-import com.kevinfreyap.jetspending.ui.theme.Orange700
 import com.kevinfreyap.jetspending.utils.formatter.CategoryUiFormatter
 import com.kevinfreyap.jetspending.utils.formatter.CurrencyUiFormatter
 import com.kevinfreyap.jetspending.utils.formatter.DateFormatter
@@ -34,7 +31,7 @@ class TransactionItemUiMapper @Inject constructor(
         return TransactionItemUi(
             transactionId = transaction.id,
             transactionName = transaction.name,
-            transactionTypeBackground = getBackgroundColor(transaction.type),
+            transactionTypeBackground = CategoryUiFormatter.getBackgroundColor(transaction.type),
             transactionCategoryIcon = CategoryUiFormatter.mapCategoryDomainToUi(transaction.category).iconRes,
             transactionAmount =
                 formatAmountType(
@@ -60,12 +57,5 @@ class TransactionItemUiMapper @Inject constructor(
 
         val amountWithCode = CurrencyUiFormatter.formatWithCode(transactionAmount, selectedCurrency)
         return "$symbol $amountWithCode"
-    }
-
-    fun getBackgroundColor(transactionType: TransactionType): Color {
-        return when (transactionType) {
-            TransactionType.INCOME -> Green500
-            TransactionType.SPENDING -> Orange700
-        }
     }
 }

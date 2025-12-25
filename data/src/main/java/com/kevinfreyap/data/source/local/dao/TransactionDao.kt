@@ -66,9 +66,11 @@ interface TransactionDao {
     fun getDatesOfMissingRates(): Flow<List<String>>
 
     // Summary
-    @Query("SELECT amount, currency, type, date, stringDate FROM transactions")
+    @Transaction
+    @Query("SELECT amount, currency, type, categoryId, date, stringDate FROM transactions")
     fun getAllTransactionsForBalance(): Flow<List<TransactionMath>>
 
-    @Query("SELECT amount, currency, type, date, stringDate FROM transactions WHERE date >= :start AND date <= :end")
+    @Transaction
+    @Query("SELECT amount, currency, type, categoryId, date, stringDate FROM transactions WHERE date >= :start AND date <= :end")
     fun getTransactionsByTimeFrame(start: Instant, end: Instant): Flow<List<TransactionMath>>
 }

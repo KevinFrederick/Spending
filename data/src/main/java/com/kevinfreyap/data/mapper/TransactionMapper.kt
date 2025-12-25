@@ -61,6 +61,7 @@ class TransactionMapper @Inject constructor(
             amount = entity.amount,
             currency = entity.currency,
             type = entity.type,
+            category = categoryMapper.mapCategoryEntityToDomain(entity.category),
             date = entity.date,
             stringDate = entity.stringDate,
             rates = entity.rate?.let { exchangeRatesMapper.mapRatesEntityToDomain(it) }

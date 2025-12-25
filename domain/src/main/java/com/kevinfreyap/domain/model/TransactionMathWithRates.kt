@@ -7,6 +7,7 @@ data class TransactionMathWithRates(
     val amount: BigDecimal,
     val currency: AppCurrency,
     val type: TransactionType,
+    val category: Category,
     val date: Instant,
     val stringDate: String,
     val rates: ExchangeRates?
