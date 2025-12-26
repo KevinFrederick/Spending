@@ -1,4 +1,4 @@
-package com.kevinfreyap.jetspending.ui.state
+package com.kevinfreyap.jetspending.ui.main
 
 import com.kevinfreyap.domain.model.AppTheme
 

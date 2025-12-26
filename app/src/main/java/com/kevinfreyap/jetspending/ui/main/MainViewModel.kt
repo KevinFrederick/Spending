@@ -11,7 +11,6 @@ import com.kevinfreyap.domain.usecase.transaction.TransactionUseCase
 import com.kevinfreyap.jetspending.ui.navigation.Screen
 import com.kevinfreyap.domain.usecase.connectivity.ConnectivityUseCase
 import com.kevinfreyap.domain.usecase.user.UserUseCase
-import com.kevinfreyap.jetspending.ui.state.MainActivityState
 import com.kevinfreyap.jetspending.utils.formatter.DateFormatter
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
