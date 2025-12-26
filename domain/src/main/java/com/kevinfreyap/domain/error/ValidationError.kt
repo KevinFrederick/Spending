@@ -65,4 +65,12 @@ sealed class ValidationError(
         Field.AUTHENTICATION_CONFIRM_PASSWORD,
         ErrorMessage.AUTHENTICATION_CONFIRM_PASSWORD_NOT_MATCH
     )
+    object AuthenticationResetPasswordEmailBlank: ValidationError(
+        Field.AUTHENTICATION_CHANGE_PASSWORD_EMAIL,
+        ErrorMessage.AUTHENTICATION_EMAIL_BLANK
+    )
+    object AuthenticationResetPasswordEmailWrongFormat: ValidationError(
+        Field.AUTHENTICATION_CHANGE_PASSWORD_EMAIL,
+        ErrorMessage.AUTHENTICATION_EMAIL_WRONG_FORMAT
+    )
 }

@@ -14,4 +14,12 @@ object AuthUiValidation {
 
         return errors
     }
+
+    fun validateEmail(email: String): List<ValidationError> {
+        val errors = mutableListOf<ValidationError>()
+
+        if (email.isBlank()) errors.add(ValidationError.AuthenticationResetPasswordEmailBlank)
+
+        return errors
+    }
 }

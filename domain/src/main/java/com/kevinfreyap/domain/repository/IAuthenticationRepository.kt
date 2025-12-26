@@ -9,5 +9,6 @@ interface IAuthenticationRepository {
     suspend fun isUserLoggedIn(): Boolean
     suspend fun register(authRequest: AuthenticationRequest): DomainResult<Unit>
     suspend fun login(authRequest: AuthenticationRequest): DomainResult<Unit>
+    suspend fun resetPassword(email: String): DomainResult<Unit>
     suspend fun logout(): DomainResult<Unit>
 }

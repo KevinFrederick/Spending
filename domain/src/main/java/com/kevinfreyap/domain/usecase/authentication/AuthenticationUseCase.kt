@@ -15,5 +15,8 @@ interface AuthenticationUseCase {
         email: String,
         password: String
     ): DomainResult<Unit>
+    suspend fun resetPassword(
+        email: String
+    ): DomainResult<Unit>
     suspend fun logout() : DomainResult<Unit>
 }

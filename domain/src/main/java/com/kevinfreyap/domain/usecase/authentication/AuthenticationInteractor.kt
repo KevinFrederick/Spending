@@ -56,6 +56,16 @@ class AuthenticationInteractor @Inject constructor(
         return authenticationRepository.login(authRequest)
     }
 
+    override suspend fun resetPassword(email: String): DomainResult<Unit> {
+        val validationRes = validateResetPasswordEmail(email)
+
+        if (validationRes.isNotEmpty()) {
+            return DomainResult.ValidationFailed(validationRes)
+        }
+
+        return authenticationRepository.resetPassword(email)
+    }
+
     override suspend fun logout(): DomainResult<Unit> = authenticationRepository.logout()
 
     private fun validateEmailAndPassword(
@@ -76,6 +86,17 @@ class AuthenticationInteractor @Inject constructor(
             if (confirmPassword.length < 8) errors.add(ValidationError.AuthenticationConfirmPasswordTooShort)
             if (password != confirmPassword) errors.add(ValidationError.AuthenticationConfirmPasswordNotMatch)
         }
+
+        return errors
+    }
+
+    private fun validateResetPasswordEmail(
+        email: String
+    ): List<ValidationError> {
+        val errors = mutableListOf<ValidationError>()
+
+        if (email.isBlank()) errors.add(ValidationError.AuthenticationResetPasswordEmailBlank)
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) errors.add(ValidationError.AuthenticationResetPasswordEmailWrongFormat)
 
         return errors
     }

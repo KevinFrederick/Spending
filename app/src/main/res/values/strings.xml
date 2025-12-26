@@ -76,6 +76,7 @@
     <string name="total_income">Total Income</string>
     <string name="total_spending">Total Spending</string>
     <string name="transaction_chart">Transactions Chart</string>
+    <string name="reset_password">Reset Password</string>
 
     <!-- Button -->
     <string name="cancel">Cancel</string>
@@ -104,6 +105,7 @@
     <string name="discard">Discard</string>
     <string name="show_less">Show Less</string>
     <string name="show_all">Show All</string>
+    <string name="send_link">Send Link</string>
 
     <!-- Theme -->
     <string name="select_theme">Select Theme</string>
@@ -127,11 +129,13 @@
 
     <!-- Success Message -->
     <string name="success">Success</string>
-    <string name="success_login_success">Sign in successfully</string>
+    <string name="success_login_success">Sign In Success</string>
+    <string name="success_register_success">Sign Up Success</string>
     <string name="success_message_transaction_saved">Transaction saved successfully!</string>
     <string name="success_message_register_success">Account created successfully</string>
     <string name="success_message_welcome_back">Welcome back!</string>
     <string name="success_message_transaction_updated">Transaction updated successfully!</string>
+    <string name="success_email_sent">Email Sent!</string>
 
     <!-- Error Message -->
     <string name="error_required_transaction_name">Please enter a name for this transaction</string>
@@ -167,6 +171,8 @@
     <string name="description_transaction_missing">This transaction may have been deleted or is unavailable</string>
     <string name="description_delete_transaction_success">Transaction deleted successfully</string>
     <string name="description_discard_change">You have unsaved changes. Are you sure you want to discard them?</string>
+    <string name="description_reset_password">Enter your email to receive a reset link</string>
+    <string name="description_email_sent">We have sent a password recover instruction to your email</string>
 
     <!-- Period Option -->
     <string name="period_weekly">Weekly</string>

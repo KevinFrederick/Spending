@@ -94,6 +94,16 @@ class AuthenticationRepository @Inject constructor(
         }
     }
 
+    override suspend fun resetPassword(email: String): DomainResult<Unit> {
+        return try {
+            firebaseAuth.sendPasswordResetEmail(email).await()
+
+            DomainResult.Success(Unit)
+        } catch (e: Exception) {
+            DomainResult.Failure(e)
+        }
+    }
+
     override suspend fun logout(): DomainResult<Unit> {
         return try {
             userPreferences.clearSession()

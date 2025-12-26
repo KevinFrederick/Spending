@@ -13,6 +13,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -48,6 +49,7 @@ import com.kevinfreyap.domain.error.Field
 import com.kevinfreyap.jetspending.R
 import com.kevinfreyap.jetspending.ui.components.ViewCustomDialog
 import com.kevinfreyap.jetspending.ui.components.ViewGoogleBtn
+import com.kevinfreyap.jetspending.ui.components.ViewInputDialog
 import com.kevinfreyap.jetspending.ui.components.ViewTextField
 import com.kevinfreyap.jetspending.ui.components.ViewTopBar
 import com.kevinfreyap.jetspending.ui.state.UiState
@@ -69,15 +71,24 @@ fun SignInScreen(
     val email by viewModel.email.collectAsState()
     val password by viewModel.password.collectAsState()
     val uiState by viewModel.uiState.collectAsState()
-    val showDialog by viewModel.showDialog.collectAsState()
+    val showSuccessDialog by viewModel.showDialog.collectAsState()
+    val resetEmail by viewModel.resetEmail.collectAsState()
+    val showEmailSentDialog by viewModel.showEmailSentDialog.collectAsState()
+
+    var showForgotPasswordDialog by remember { mutableStateOf(false) }
 
     SignInContent(
         onBackClick = onBackClick,
         email = email,
+        password = password,
+        resetEmail = resetEmail,
+        uiState = uiState,
+        showForgotPasswordDialog = showForgotPasswordDialog,
+        showEmailSentDialog = showEmailSentDialog,
+        showSuccessDialog = showSuccessDialog,
         onEmailChange = {
             viewModel.onEmailChange(it)
         },
-        password = password,
         onPasswordChange = {
             viewModel.onPassChange(it)
         },
@@ -85,11 +96,21 @@ fun SignInScreen(
             viewModel.onSignInClicked()
         },
         onSignUpClicked = onSignUpClicked,
-        uiState = uiState,
-        showSuccessDialog = showDialog,
-        onDismissDialog = {
+        onResetEmailValueChange = {
+            viewModel.onResetEmailChange(it)
+        },
+        onShowForgotPasswordDialog = {
+            showForgotPasswordDialog = it
+        },
+        onConfirmBtnDialog = {
+            viewModel.onSendResetEmail()
+        },
+        onDismissSuccessDialog = {
             viewModel.onDismissDialog()
             navigateToDashboard()
+        },
+        onDismissSentPasswordDialog = {
+            viewModel.onDismissEmailSentDialog()
         },
         modifier = modifier
     )
@@ -97,16 +118,23 @@ fun SignInScreen(
 
 @Composable
 fun SignInContent(
-    onBackClick: () -> Unit,
     email: String,
-    onEmailChange: (String) -> Unit,
     password: String,
+    showForgotPasswordDialog: Boolean,
+    showEmailSentDialog: Boolean,
+    showSuccessDialog: Boolean,
+    resetEmail: String,
+    uiState: UiState<Unit>,
+    onBackClick: () -> Unit,
+    onEmailChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
     onSignInClicked: () -> Unit,
     onSignUpClicked: () -> Unit,
-    uiState: UiState<Unit>,
-    showSuccessDialog: Boolean,
-    onDismissDialog: () -> Unit,
+    onResetEmailValueChange: (String) -> Unit,
+    onShowForgotPasswordDialog: (Boolean) -> Unit,
+    onConfirmBtnDialog: () -> Unit,
+    onDismissSuccessDialog: () -> Unit,
+    onDismissSentPasswordDialog: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val focusManager = LocalFocusManager.current
@@ -119,6 +147,10 @@ fun SignInContent(
 
     val passwordError = if (uiState is UiState.ValidationErrors) {
         uiState.errors[Field.AUTHENTICATION_PASSWORD]
+    } else null
+
+    val emailResetPasswordError = if (uiState is UiState.ValidationErrors) {
+        uiState.errors[Field.AUTHENTICATION_CHANGE_PASSWORD_EMAIL]
     } else null
 
     Scaffold(
@@ -213,7 +245,7 @@ fun SignInContent(
                         Alignment.End
                     )
                     .clickable {
-
+                        onShowForgotPasswordDialog(true)
                     }
             )
 
@@ -315,15 +347,81 @@ fun SignInContent(
         if (showSuccessDialog) {
             LaunchedEffect(Unit) {
                 delay(2000)
-                onDismissDialog()
+                onDismissSuccessDialog()
             }
 
             ViewCustomDialog(
-                onDismissRequest = onDismissDialog,
+                onDismissRequest = onDismissSuccessDialog,
                 icon = R.drawable.ic_check_circle_outline_24,
                 iconColor = Green500,
                 title = stringResource(R.string.success),
                 message = stringResource(R.string.success_message_welcome_back)
+            )
+        }
+
+        if (showEmailSentDialog) {
+            onShowForgotPasswordDialog(false)
+
+            LaunchedEffect(Unit) {
+                delay(2000)
+                onDismissSentPasswordDialog()
+            }
+
+            ViewCustomDialog(
+                onDismissRequest = onDismissSentPasswordDialog,
+                icon = R.drawable.ic_check_circle_outline_24,
+                iconColor = Green500,
+                title = stringResource(R.string.success_email_sent),
+                message = stringResource(R.string.description_email_sent)
+            )
+        }
+
+        if (showForgotPasswordDialog) {
+            ViewInputDialog(
+                title = stringResource(R.string.reset_password),
+                subtitle = stringResource(R.string.description_reset_password),
+                onDismissRequest = {
+                    onShowForgotPasswordDialog(false)
+                },
+                textField = {
+                    ViewTextField(
+                        value = resetEmail,
+                        onValueChange = onResetEmailValueChange,
+                        label = "",
+                        placeholder = stringResource(R.string.email),
+                        isError = emailResetPasswordError != null,
+                        errorMessage = emailResetPasswordError?.let { stringResource(it) } ?: "",
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Email,
+                            imeAction = ImeAction.Done
+                        )
+                    )
+                },
+                positiveBtn = {
+                    Button(
+                        onClick = onConfirmBtnDialog
+                    ) {
+                        Text(
+                            text = stringResource(R.string.send_link),
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                },
+                negativeBtn = {
+                    Button(
+                        onClick = {
+                            onShowForgotPasswordDialog(false)
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Grey500
+                        )
+                    ) {
+                        Text(
+                            text = stringResource(R.string.cancel),
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                },
             )
         }
     }
@@ -354,7 +452,14 @@ fun SignInContentPreview() {
             onSignInClicked = {},
             uiState = UiState.Idle,
             showSuccessDialog = false,
-            onDismissDialog = {},
+            onDismissSuccessDialog = {},
+            showForgotPasswordDialog = true,
+            onShowForgotPasswordDialog = {},
+            onConfirmBtnDialog = {},
+            resetEmail = "",
+            onResetEmailValueChange = {},
+            showEmailSentDialog = false,
+            onDismissSentPasswordDialog = {},
         )
     }
 }

@@ -345,8 +345,8 @@ fun SignUpContent(
                 onDismissRequest = onDismissDialog,
                 icon = R.drawable.ic_check_circle_outline_24,
                 iconColor = Green500,
-                title = stringResource(R.string.success_login_success),
-                message = stringResource(R.string.success_message_welcome_back)
+                title = stringResource(R.string.success_register_success),
+                message = stringResource(R.string.success_message_register_success)
             )
         }
     }
