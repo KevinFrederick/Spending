@@ -33,7 +33,7 @@ fun IncomeSpendingRow (
     ) {
         // Income
         ViewStatCard(
-            cardLabel = stringResource(R.string.total_income),
+            cardLabel = stringResource(R.string.income),
             amount = spendingIncomeStats.income,
             color = Green500,
             isLoading = isLoading,
@@ -48,7 +48,7 @@ fun IncomeSpendingRow (
 
         // Spending
         ViewStatCard(
-            cardLabel = stringResource(R.string.total_spending),
+            cardLabel = stringResource(R.string.spending),
             amount = spendingIncomeStats.spending,
             color = Orange700,
             isLoading = isLoading,

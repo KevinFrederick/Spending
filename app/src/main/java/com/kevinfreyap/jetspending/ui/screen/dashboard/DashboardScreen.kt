@@ -3,11 +3,15 @@ package com.kevinfreyap.jetspending.ui.screen.dashboard
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -26,7 +30,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kevinfreyap.domain.model.AppCurrency
 import com.kevinfreyap.jetspending.R
 import com.kevinfreyap.jetspending.ui.components.RecentTransactions
-import com.kevinfreyap.jetspending.ui.components.SummaryCard
+import com.kevinfreyap.jetspending.ui.components.SummaryInformation
 import com.kevinfreyap.jetspending.ui.components.ViewDateSelector
 import com.kevinfreyap.jetspending.ui.components.ViewTopBar
 import com.kevinfreyap.jetspending.ui.main.MainViewModel
@@ -38,6 +42,7 @@ import com.kevinfreyap.jetspending.ui.state.UiState
 import com.kevinfreyap.jetspending.ui.theme.Blue500
 import com.kevinfreyap.jetspending.ui.theme.Green500
 import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
+import com.kevinfreyap.jetspending.ui.theme.Theme
 import java.time.Instant
 
 @Composable
@@ -134,20 +139,33 @@ fun DashboardContent(
                 )
                 .verticalScroll(rememberScrollState())
         ) {
-            SummaryCard(
+            SummaryInformation(
                 totalBalance = data.totalBalance.balance,
-                dateSelectorSlot = {
-                    ViewDateSelector(
-                        centerText = monthDisplay,
-                        onPreviousClick = onPreviousBtnClicked,
-                        onPreviousBtnEnabled = previousBtnEnabled,
-                        onNextClick = onNextBtnClicked,
-                        onNextBtnEnabled = nextBtnEnabled,
-                    )
-                },
-                isIncomplete = data.totalBalance.isIncomplete,
                 monthlyBalanceUi = data.monthlyBalance,
-                isLoading = isLoading
+                isIncomplete = data.totalBalance.isIncomplete,
+                isLoading = isLoading,
+                dateSelectorSlot = {
+                    Card (
+                        shape = RoundedCornerShape(50),
+                        colors = CardDefaults.cardColors(
+                            containerColor = Theme.custom.cardColor
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(36.dp)
+                    ) {
+                        ViewDateSelector(
+                            centerText = monthDisplay,
+                            onPreviousClick = onPreviousBtnClicked,
+                            onPreviousBtnEnabled = previousBtnEnabled,
+                            onNextClick = onNextBtnClicked,
+                            onNextBtnEnabled = nextBtnEnabled,
+                            isLoading = isLoading,
+                            modifier = Modifier
+                                .fillMaxHeight()
+                        )
+                    }
+                }
             )
 
             Spacer(
