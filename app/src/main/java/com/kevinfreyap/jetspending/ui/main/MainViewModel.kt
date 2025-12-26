@@ -10,15 +10,18 @@ import com.kevinfreyap.domain.usecase.rates.ExchangeRatesUseCase
 import com.kevinfreyap.domain.usecase.transaction.TransactionUseCase
 import com.kevinfreyap.jetspending.ui.navigation.Screen
 import com.kevinfreyap.domain.usecase.connectivity.ConnectivityUseCase
+import com.kevinfreyap.domain.usecase.user.UserUseCase
+import com.kevinfreyap.jetspending.ui.state.MainActivityState
 import com.kevinfreyap.jetspending.utils.formatter.DateFormatter
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -33,41 +36,50 @@ class MainViewModel @Inject constructor(
     private val exchangeRatesUseCase: ExchangeRatesUseCase,
     private val transactionUseCase: TransactionUseCase,
     private val categoryUseCase: CategoryUseCase,
+    userUseCase: UserUseCase,
     connectivityUseCase: ConnectivityUseCase
 ): ViewModel(){
-    private val _startDestination = MutableStateFlow<String?>(null)
-    val startDestination = _startDestination.asStateFlow()
+    val isOnline = connectivityUseCase.isOnline
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
 
     val selectedCurrency = currencyUseCase.getCurrency()
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = AppCurrency.IDR
-        )
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), AppCurrency.IDR)
 
-    val isOnline = connectivityUseCase.isOnline
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = true
+    private val isLoggedInFlow = flow {
+        emit(authenticationUseCase.isUserLoggedIn())
+    }
+
+    val uiState: StateFlow<MainActivityState> = combine(
+        userUseCase.getCurrentTheme(),
+        isLoggedInFlow,
+    ) { theme, isLoggedIn ->
+        val startDestination = if (isLoggedIn) Screen.Dashboard.route else Screen.OnBoarding.route
+
+        MainActivityState.Success(
+            theme = theme,
+            startDestination = startDestination,
         )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = MainActivityState.Loading
+    )
 
     init {
         // viewModelScope.launch runs line by line
-        viewModelScope.launch(Dispatchers.IO) {
-            exchangeRatesUseCase.startRatesHealer()
-        }
-        viewModelScope.launch {
-            categoryUseCase.syncCategoriesFromFirestore()
-        }
-        viewModelScope.launch {
-            exchangeRatesUseCase.syncDailyRates()
-        }
-        viewModelScope.launch {
-            val isLoggedIn = authenticationUseCase.isUserLoggedIn()
-            _startDestination.value = if (isLoggedIn) Screen.Dashboard.route else Screen.OnBoarding.route
-        }
+        startBackgroundSync()
+        observeAuthState()
+    }
 
+    fun startBackgroundSync() {
+        viewModelScope.launch(Dispatchers.IO) {
+            launch { exchangeRatesUseCase.startRatesHealer() }
+            launch { exchangeRatesUseCase.syncDailyRates() }
+            launch { categoryUseCase.syncCategoriesFromFirestore() }
+        }
+    }
+
+    fun observeAuthState() {
         authenticationUseCase.getAuthState()
             .flatMapLatest { isLoggedIn ->
                 if (isLoggedIn) {

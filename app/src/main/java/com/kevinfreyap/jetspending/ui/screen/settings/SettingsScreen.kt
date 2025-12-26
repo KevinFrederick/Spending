@@ -27,6 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.kevinfreyap.domain.model.AppCurrency
+import com.kevinfreyap.domain.model.AppTheme
 import com.kevinfreyap.jetspending.R
 import com.kevinfreyap.jetspending.ui.components.ProfileCard
 import com.kevinfreyap.jetspending.ui.components.ViewCustomDialog
@@ -55,10 +56,12 @@ fun SettingsScreen(
 ) {
     val currencyCode by mainViewModel.selectedCurrency.collectAsState()
 
+    val selectedTheme by viewModel.selectedTheme.collectAsState()
     val settingsGroup by viewModel.settingsState.collectAsState()
     val userProfile by viewModel.userProfile.collectAsState()
 
     var showCurrencyDialog by remember { mutableStateOf(false) }
+    var showThemeDialog by remember { mutableStateOf(false) }
     var showLogoutDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
@@ -69,6 +72,7 @@ fun SettingsScreen(
 
     SettingsContent(
         currencyCode = currencyCode,
+        selectedTheme = selectedTheme,
         user = userProfile,
         settingsGroup = settingsGroup,
         onSettingsClicked = { settingsOption ->
@@ -86,7 +90,7 @@ fun SettingsScreen(
                     showCurrencyDialog = true
                 }
                 SettingsOption.THEME -> {
-
+                    showThemeDialog = true
                 }
                 SettingsOption.LOG_OUT -> {
                     showLogoutDialog = true
@@ -94,12 +98,21 @@ fun SettingsScreen(
             }
         },
         showCurrencyDialog = showCurrencyDialog,
+        showThemeDialog = showThemeDialog,
         showLogoutDialog = showLogoutDialog,
         onSelectCurrency = {
             mainViewModel.onSelectCurrency(it)
+            showCurrencyDialog = false
+        },
+        onSelectTheme = {
+            viewModel.onThemeSelected(it)
+            showThemeDialog = false
         },
         onDismissCurrencyDialog = {
             showCurrencyDialog = false
+        },
+        onDismissThemeDialog = {
+            showThemeDialog = false
         },
         onLogoutDialogPositiveBtn = {
             showLogoutDialog = false
@@ -115,13 +128,17 @@ fun SettingsScreen(
 @Composable
 fun SettingsContent(
     currencyCode: AppCurrency,
+    selectedTheme: AppTheme,
     user: UserProfileUi,
     settingsGroup: List<SettingsGroup>,
     showCurrencyDialog: Boolean,
+    showThemeDialog: Boolean,
     showLogoutDialog: Boolean,
     onSettingsClicked: (SettingsOption) -> Unit,
     onSelectCurrency: (AppCurrency) -> Unit,
+    onSelectTheme: (AppTheme) -> Unit,
     onDismissCurrencyDialog: () -> Unit,
+    onDismissThemeDialog: () -> Unit,
     onLogoutDialogPositiveBtn: () -> Unit,
     onLogoutDialogNegativeBtn: () -> Unit,
     modifier: Modifier = Modifier
@@ -186,6 +203,32 @@ fun SettingsContent(
                                     .padding(horizontal = 16.dp)
                             )
                         }
+                    }
+                }
+            )
+        }
+
+        if (showThemeDialog) {
+            ViewSelectionDialog(
+                title = stringResource(R.string.select_theme),
+                subtitle = stringResource(R.string.select_theme_subtitle),
+                onDismissRequest = onDismissThemeDialog,
+                options = {
+                    AppTheme.entries.forEachIndexed { index, theme ->
+                        val displayName = when(theme) {
+                            AppTheme.LIGHT -> R.string.light_mode
+                            AppTheme.DARK -> R.string.dark_mode
+                            AppTheme.SYSTEM -> R.string.follow_system
+                        }
+
+                        ViewSelectionItem(
+                            title = stringResource(displayName),
+                            selected = selectedTheme == theme,
+                            modifier = Modifier
+                                .clickable(
+                                    onClick = { onSelectTheme(theme) }
+                                )
+                        )
                     }
                 }
             )
@@ -296,11 +339,15 @@ fun SettingsContentPreview() {
             onSettingsClicked = {},
             showCurrencyDialog = false,
             showLogoutDialog = false,
+            showThemeDialog = true,
             onLogoutDialogPositiveBtn = {},
             onLogoutDialogNegativeBtn = {},
             currencyCode = AppCurrency.IDR,
             onDismissCurrencyDialog = {},
             onSelectCurrency = {},
+            selectedTheme = AppTheme.SYSTEM,
+            onSelectTheme = {},
+            onDismissThemeDialog = {},
         )
     }
 }

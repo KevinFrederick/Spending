@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kevinfreyap.domain.model.AppCurrency
+import com.kevinfreyap.domain.model.AppTheme
 import com.kevinfreyap.domain.resource.DomainResult
 import com.kevinfreyap.domain.usecase.authentication.AuthenticationUseCase
 import com.kevinfreyap.domain.usecase.currency.CurrencyUseCase
@@ -14,10 +15,10 @@ import com.kevinfreyap.jetspending.ui.model.SettingsItem
 import com.kevinfreyap.jetspending.ui.model.SettingsOption
 import com.kevinfreyap.jetspending.ui.model.UserProfileUi
 import com.kevinfreyap.jetspending.ui.theme.Red500
+import com.kevinfreyap.jetspending.utils.mapper.ThemeUiMapper
 import com.kevinfreyap.jetspending.utils.mapper.UserProfileUiMapper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
@@ -28,10 +29,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-    userUseCase: UserUseCase,
     currencyUseCase: CurrencyUseCase,
+    private val userUseCase: UserUseCase,
     private val authenticationUseCase: AuthenticationUseCase,
-    private val userProfileUiMapper: UserProfileUiMapper
+    private val userProfileUiMapper: UserProfileUiMapper,
+    private val themeUiMapper: ThemeUiMapper
 ): ViewModel() {
     val userProfile = userUseCase.getUserProfile()
         .map {
@@ -61,11 +63,16 @@ class SettingsViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = AppCurrency.IDR
         )
-    private val _selectedTheme = MutableStateFlow(R.string.light_mode)
+    val selectedTheme = userUseCase.getCurrentTheme()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = AppTheme.SYSTEM
+        )
 
     val settingsState = combine(
         _selectedCurrency,
-        _selectedTheme
+        selectedTheme
     ) { currency, theme ->
         val generalList = listOf(
             SettingsItem(
@@ -95,8 +102,8 @@ class SettingsViewModel @Inject constructor(
             SettingsItem(
                 id = SettingsOption.THEME,
                 title = R.string.theme,
-                icon = R.drawable.ic_light_mode_24,
-                subtitle = "Light Mode"
+                icon = themeUiMapper.mapThemeToIconRes(theme),
+                subtitleRes = themeUiMapper.mapThemeToNameRes(theme)
             ),
         )
 
@@ -123,6 +130,12 @@ class SettingsViewModel @Inject constructor(
 
     private val _navigationChannel = Channel<Unit>()
     val navigationChannel = _navigationChannel.receiveAsFlow()
+
+    fun onThemeSelected(theme: AppTheme) {
+        viewModelScope.launch {
+            userUseCase.setTheme(theme)
+        }
+    }
 
     fun logout() {
         viewModelScope.launch {

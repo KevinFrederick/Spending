@@ -106,6 +106,8 @@
     <string name="show_all">Show All</string>
 
     <!-- Theme -->
+    <string name="select_theme">Select Theme</string>
+    <string name="select_theme_subtitle">Choose your preferred appearance</string>
     <string name="theme">Theme</string>
     <string name="follow_system">Follow System</string>
     <string name="light_mode">Light Mode</string>

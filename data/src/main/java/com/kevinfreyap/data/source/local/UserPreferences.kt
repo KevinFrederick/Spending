@@ -4,9 +4,9 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.kevinfreyap.domain.model.AppCurrency
+import com.kevinfreyap.domain.model.AppTheme
 import com.kevinfreyap.domain.model.User
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -42,6 +42,13 @@ class UserPreferences @Inject constructor(
         }
     }
 
+    fun getTheme(): Flow<AppTheme> {
+        return dataStore.data.map { preferences ->
+            val theme = preferences[THEME_KEY] ?: "SYSTEM"
+            AppTheme.valueOf(theme)
+        }
+    }
+
     suspend fun saveUser(user: User) {
         dataStore.edit { preferences ->
             with(user){
@@ -57,6 +64,12 @@ class UserPreferences @Inject constructor(
     suspend fun saveCurrency(appCurrency: AppCurrency) {
         dataStore.edit { preferences ->
             preferences[CURRENCY_KEY] = appCurrency.name
+        }
+    }
+
+    suspend fun saveTheme(appTheme: AppTheme) {
+        dataStore.edit { preferences ->
+            preferences[THEME_KEY] = appTheme.name
         }
     }
 
@@ -77,7 +90,7 @@ class UserPreferences @Inject constructor(
         private val EMAIL_KEY = stringPreferencesKey("email")
         private val PHOTO_URL_KEY = stringPreferencesKey("photo_url")
         private val IS_GOOGLE_KEY = booleanPreferencesKey("is_google")
-        private val THEME_KEY = intPreferencesKey("theme_mode")
+        private val THEME_KEY = stringPreferencesKey("theme_mode")
         private val CURRENCY_KEY = stringPreferencesKey("currency")
     }
 }

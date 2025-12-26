@@ -1,5 +1,6 @@
 package com.kevinfreyap.jetspending.ui.components
 
+import android.graphics.Typeface
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -31,6 +32,7 @@ import com.patrykandpatrick.vico.compose.cartesian.axis.rememberEnd
 import com.patrykandpatrick.vico.compose.cartesian.layer.grouped
 import com.patrykandpatrick.vico.compose.cartesian.layer.rememberColumnCartesianLayer
 import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
+import com.patrykandpatrick.vico.compose.common.component.rememberTextComponent
 import com.patrykandpatrick.vico.compose.common.fill
 import com.patrykandpatrick.vico.core.cartesian.axis.HorizontalAxis
 import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
@@ -99,11 +101,18 @@ fun BarChart (
                     ),
                     startAxis = null,
                     endAxis = VerticalAxis.rememberEnd(
-                        valueFormatter = startLabel
+                        valueFormatter = startLabel,
+                        label = rememberTextComponent(
+                            color = Theme.custom.textColor,
+                        )
                     ),
                     bottomAxis = HorizontalAxis.rememberBottom(
                         guideline = null,
-                        valueFormatter = bottomLabel
+                        valueFormatter = bottomLabel,
+                        label = rememberTextComponent(
+                            color = Theme.custom.textColor,
+                            typeface = Typeface.DEFAULT_BOLD
+                        )
                     ),
                     marker = marker
                 ),

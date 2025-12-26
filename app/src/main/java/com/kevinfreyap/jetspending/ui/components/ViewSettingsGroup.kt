@@ -61,7 +61,12 @@ fun ViewSettingsGroup (
                 ViewSettingItem(
                     title = setting.title,
                     icon = setting.icon,
-                    subtitle = setting.subtitle,
+                    subtitle = setting.subtitle ?:
+                    if (
+                        setting.subtitleRes != null
+                    ) {
+                        stringResource(setting.subtitleRes)
+                    } else null,
                     chevronIcon = setting.showChevron,
                     contentColor = setting.contentColor,
                     modifier = Modifier
