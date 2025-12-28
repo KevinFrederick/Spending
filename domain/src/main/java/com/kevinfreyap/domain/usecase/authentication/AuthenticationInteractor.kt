@@ -1,5 +1,6 @@
 package com.kevinfreyap.domain.usecase.authentication
 
+import android.app.Activity
 import android.util.Patterns
 import com.kevinfreyap.domain.error.ValidationError
 import com.kevinfreyap.domain.model.AuthenticationRequest
@@ -13,6 +14,10 @@ class AuthenticationInteractor @Inject constructor(
 ): AuthenticationUseCase {
     override fun getAuthState(): Flow<Boolean> {
         return authenticationRepository.getAuthState()
+    }
+
+    override suspend fun authWithGoogle(activity: Activity): DomainResult<Unit> {
+        return authenticationRepository.authWithGoogle(activity)
     }
 
     override suspend fun isUserLoggedIn(): Boolean {

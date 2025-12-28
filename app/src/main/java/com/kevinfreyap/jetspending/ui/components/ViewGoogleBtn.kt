@@ -21,10 +21,11 @@ import com.kevinfreyap.jetspending.ui.theme.Theme
 
 @Composable
 fun ViewGoogleBtn(
+    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     OutlinedButton(
-        onClick = {  },
+        onClick = onClick,
         border = BorderStroke(
             1.dp,
             Theme.custom.textColor

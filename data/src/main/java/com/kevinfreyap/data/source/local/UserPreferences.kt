@@ -22,12 +22,15 @@ class UserPreferences @Inject constructor(
             val uid = preferences[USER_UID]
 
             if (uid != null) {
+                val currency = preferences[CURRENCY_KEY] ?: "IDR"
+
                 User(
                     uid = uid,
                     email = preferences[EMAIL_KEY] ?: "",
                     displayName = preferences[USERNAME_KEY] ?: "",
                     photoUrl = preferences[PHOTO_URL_KEY],
-                    isGoogleAccount = preferences[IS_GOOGLE_KEY] ?: false
+                    isGoogleAccount = preferences[IS_GOOGLE_KEY] ?: false,
+                    currency = AppCurrency.valueOf(currency)
                 )
             } else {
                 null
@@ -56,6 +59,7 @@ class UserPreferences @Inject constructor(
                 preferences[EMAIL_KEY] = email
                 preferences[USERNAME_KEY] = displayName
                 preferences[PHOTO_URL_KEY] = photoUrl ?: ""
+                preferences[CURRENCY_KEY] = currency.name
                 preferences[IS_GOOGLE_KEY] = isGoogleAccount
             }
         }

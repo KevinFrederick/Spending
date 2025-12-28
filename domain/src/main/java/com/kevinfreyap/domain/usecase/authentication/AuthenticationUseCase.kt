@@ -1,10 +1,12 @@
 package com.kevinfreyap.domain.usecase.authentication
 
+import android.app.Activity
 import com.kevinfreyap.domain.resource.DomainResult
 import kotlinx.coroutines.flow.Flow
 
 interface AuthenticationUseCase {
     fun getAuthState(): Flow<Boolean>
+    suspend fun authWithGoogle(activity: Activity): DomainResult<Unit>
     suspend fun isUserLoggedIn(): Boolean
     suspend fun register(
         email: String,

@@ -1,4 +1,6 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.io.FileInputStream
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.library)
@@ -17,7 +19,14 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
 
+        val localProperties = Properties()
+        val localPropertiesFile = rootProject.file("local.properties")
+        if (localPropertiesFile.exists()){
+            localProperties.load(FileInputStream(localPropertiesFile))
+        }
+
         buildConfigField("String", "CURRENCY_URL", "\"https://%s.currency-api.pages.dev/v1/\"")
+        buildConfigField("String", "WEB_CLIENT_ID", localProperties.getProperty("GOOGLE_WEB_CLIENT_ID") ?: "")
     }
 
     buildTypes {
@@ -55,6 +64,7 @@ dependencies {
     implementation(libs.googleid)
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.fireauth)
+    implementation(libs.coroutine.play.services)
 
     implementation(libs.androidx.datastore)
     implementation(libs.androidx.datastore.preference)

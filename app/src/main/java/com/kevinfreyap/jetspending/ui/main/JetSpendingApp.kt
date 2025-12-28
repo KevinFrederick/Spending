@@ -110,6 +110,14 @@ fun JetSpendingApp(
                         onSignInClicked = {
                             navController.navigate(Screen.SignIn.route)
                         },
+                        navigateToDashboard = {
+                            navController.navigate(Screen.Dashboard.route) {
+                                popUpTo(Screen.OnBoarding.route) {
+                                    inclusive = true
+                                }
+                                launchSingleTop = true
+                            }
+                        }
                     )
                 }
                 composable(Screen.SignUp.route) {

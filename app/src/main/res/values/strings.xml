@@ -133,6 +133,7 @@
     <string name="success_register_success">Sign Up Success</string>
     <string name="success_message_transaction_saved">Transaction saved successfully!</string>
     <string name="success_message_register_success">Account created successfully</string>
+    <string name="success_message_welcome">Hi, Welcome!</string>
     <string name="success_message_welcome_back">Welcome back!</string>
     <string name="success_message_transaction_updated">Transaction updated successfully!</string>
     <string name="success_email_sent">Email Sent!</string>

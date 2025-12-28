@@ -29,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -58,6 +59,8 @@ import com.kevinfreyap.jetspending.ui.theme.Green500
 import com.kevinfreyap.jetspending.ui.theme.Grey500
 import com.kevinfreyap.jetspending.ui.theme.Grey700
 import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
+import com.kevinfreyap.jetspending.ui.theme.Theme
+import com.kevinfreyap.jetspending.utils.findActivity
 import kotlinx.coroutines.delay
 
 @Composable
@@ -68,6 +71,8 @@ fun SignInScreen(
     modifier: Modifier = Modifier,
     viewModel: SignInViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
+
     val email by viewModel.email.collectAsState()
     val password by viewModel.password.collectAsState()
     val uiState by viewModel.uiState.collectAsState()
@@ -78,7 +83,6 @@ fun SignInScreen(
     var showForgotPasswordDialog by remember { mutableStateOf(false) }
 
     SignInContent(
-        onBackClick = onBackClick,
         email = email,
         password = password,
         resetEmail = resetEmail,
@@ -86,6 +90,13 @@ fun SignInScreen(
         showForgotPasswordDialog = showForgotPasswordDialog,
         showEmailSentDialog = showEmailSentDialog,
         showSuccessDialog = showSuccessDialog,
+        onBackClick = onBackClick,
+        onGoogleClick = {
+            val activity = context.findActivity()
+            activity?.let {
+                viewModel.onAuthWithGoogle(it)
+            }
+        },
         onEmailChange = {
             viewModel.onEmailChange(it)
         },
@@ -126,6 +137,7 @@ fun SignInContent(
     resetEmail: String,
     uiState: UiState<Unit>,
     onBackClick: () -> Unit,
+    onGoogleClick: () -> Unit,
     onEmailChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
     onSignInClicked: () -> Unit,
@@ -178,12 +190,14 @@ fun SignInContent(
             Text(
                 text = stringResource(R.string.sign_in),
                 fontWeight = FontWeight.SemiBold,
-                style = MaterialTheme.typography.headlineLarge
+                style = MaterialTheme.typography.headlineLarge,
+                color = Theme.custom.textColor
             )
 
             Text(
                 text = stringResource(R.string.description_sign_in),
-                style = MaterialTheme.typography.labelLarge
+                style = MaterialTheme.typography.labelLarge,
+                color = Theme.custom.textColor
             )
 
             Spacer(
@@ -312,9 +326,10 @@ fun SignInContent(
             )
 
             ViewGoogleBtn(
+                onClick = onGoogleClick,
                 modifier = Modifier
                     .padding(
-                        horizontal = 64.dp
+                        horizontal = 32.dp
                     )
             )
 
@@ -354,7 +369,7 @@ fun SignInContent(
                 onDismissRequest = onDismissSuccessDialog,
                 icon = R.drawable.ic_check_circle_outline_24,
                 iconColor = Green500,
-                title = stringResource(R.string.success),
+                title = stringResource(R.string.success_login_success),
                 message = stringResource(R.string.success_message_welcome_back)
             )
         }
@@ -453,13 +468,14 @@ fun SignInContentPreview() {
             uiState = UiState.Idle,
             showSuccessDialog = false,
             onDismissSuccessDialog = {},
-            showForgotPasswordDialog = true,
+            showForgotPasswordDialog = false,
             onShowForgotPasswordDialog = {},
             onConfirmBtnDialog = {},
             resetEmail = "",
             onResetEmailValueChange = {},
             showEmailSentDialog = false,
             onDismissSentPasswordDialog = {},
+            onGoogleClick = {}
         )
     }
 }

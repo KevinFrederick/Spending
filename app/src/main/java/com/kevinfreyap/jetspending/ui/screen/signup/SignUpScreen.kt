@@ -28,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -55,6 +56,8 @@ import com.kevinfreyap.jetspending.ui.theme.Blue500
 import com.kevinfreyap.jetspending.ui.theme.Green500
 import com.kevinfreyap.jetspending.ui.theme.Grey700
 import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
+import com.kevinfreyap.jetspending.ui.theme.Theme
+import com.kevinfreyap.jetspending.utils.findActivity
 import kotlinx.coroutines.delay
 
 @Composable
@@ -65,6 +68,8 @@ fun SignUpScreen(
     modifier: Modifier = Modifier,
     viewModel: SignUpViewModel = hiltViewModel(),
 ) {
+    val context = LocalContext.current
+
     val email by viewModel.email.collectAsState()
     val password by viewModel.password.collectAsState()
     val confirmPassword by viewModel.confirmPassword.collectAsState()
@@ -73,16 +78,23 @@ fun SignUpScreen(
 
     SignUpContent(
         uiState = uiState,
-        onBackClick = onBackClick,
         email = email,
+        password = password,
+        confirmPassword = confirmPassword,
+        showSuccessDialog = showDialog,
+        onBackClick = onBackClick,
+        onGoogleClicked = {
+            val activity = context.findActivity()
+            activity?.let {
+                viewModel.onAuthWithGoogle(it)
+            }
+        },
         onEmailChange = {
             viewModel.onEmailChange(it)
         },
-        password = password,
         onPasswordChange = {
             viewModel.onPassChange(it)
         },
-        confirmPassword = confirmPassword,
         onConfirmPasswordChange = {
             viewModel.onConfirmPassChange(it)
         },
@@ -90,7 +102,6 @@ fun SignUpScreen(
             viewModel.onSignUpClicked()
         },
         onSignInClicked = onSignInClicked,
-        showSuccessDialog = showDialog,
         onDismissDialog = {
             viewModel.onDismissDialog()
             navigateToDashboard()
@@ -103,16 +114,17 @@ fun SignUpScreen(
 @Composable
 fun SignUpContent(
     uiState: UiState<Unit>,
-    onBackClick: () -> Unit,
     email: String,
-    onEmailChange: (String) -> Unit,
     password: String,
-    onPasswordChange: (String) -> Unit,
     confirmPassword: String,
+    showSuccessDialog: Boolean,
+    onBackClick: () -> Unit,
+    onGoogleClicked: () -> Unit,
+    onEmailChange: (String) -> Unit,
+    onPasswordChange: (String) -> Unit,
     onConfirmPasswordChange: (String) -> Unit,
     onSignUpClicked: () -> Unit,
     onSignInClicked: () -> Unit,
-    showSuccessDialog: Boolean,
     onDismissDialog: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -158,12 +170,14 @@ fun SignUpContent(
             Text(
                 text = stringResource(R.string.sign_up),
                 fontWeight = FontWeight.SemiBold,
-                style = MaterialTheme.typography.headlineLarge
+                style = MaterialTheme.typography.headlineLarge,
+                color = Theme.custom.textColor
             )
 
             Text(
                 text = stringResource(R.string.description_sign_up),
-                style = MaterialTheme.typography.labelLarge
+                style = MaterialTheme.typography.labelLarge,
+                color = Theme.custom.textColor
             )
 
             Spacer(
@@ -303,9 +317,10 @@ fun SignUpContent(
             )
 
             ViewGoogleBtn(
+                onClick = onGoogleClicked,
                 modifier = Modifier
                     .padding(
-                        horizontal = 64.dp
+                        horizontal = 32.dp
                     )
             )
 
@@ -382,6 +397,7 @@ fun SignUpContentPreview() {
             onSignInClicked = {},
             showSuccessDialog = false,
             onDismissDialog = {},
+            onGoogleClicked = {}
         )
     }
 }

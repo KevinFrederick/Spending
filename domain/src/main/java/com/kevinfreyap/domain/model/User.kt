@@ -5,5 +5,6 @@ data class User(
     val email: String,
     val displayName: String,
     val photoUrl: String?,
-    val isGoogleAccount: Boolean
+    val isGoogleAccount: Boolean,
+    val currency: AppCurrency
 )

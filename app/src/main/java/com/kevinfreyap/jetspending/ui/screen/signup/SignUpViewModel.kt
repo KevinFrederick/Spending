@@ -1,5 +1,6 @@
 package com.kevinfreyap.jetspending.ui.screen.signup
 
+import android.app.Activity
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -17,7 +18,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
-    private val authenticationUseCae: AuthenticationUseCase
+    private val authenticationUseCase: AuthenticationUseCase
 ): ViewModel() {
 
     private val _email = MutableStateFlow("")
@@ -68,11 +69,33 @@ class SignUpViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            val result = authenticationUseCae.register(
+            val result = authenticationUseCase.register(
                 email = _email.value,
                 password = _password.value,
                 confirmPassword = _confirmPassword.value
             )
+
+            when(result) {
+                is DomainResult.Success -> {
+                    _uiState.value = UiState.Success(Unit)
+                    _showDialog.value = true
+                }
+                is DomainResult.ValidationFailed -> {
+                    _uiState.value = UiState.ValidationErrors(ErrorHelper.validationErrorsToUiError(result.errors))
+                }
+                is DomainResult.Failure -> {
+                    Log.e(VIEW_MODEL_TAG, result.throwable.message ?: "Something Wrong")
+                    _uiState.value = UiState.Failure(result.throwable)
+                }
+            }
+        }
+    }
+
+    fun onAuthWithGoogle(activity: Activity) {
+        viewModelScope.launch {
+            _uiState.value = UiState.Loading
+
+            val result = authenticationUseCase.authWithGoogle(activity)
 
             when(result) {
                 is DomainResult.Success -> {
