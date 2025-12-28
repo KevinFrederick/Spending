@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">JetSpending</string>
+    <string name="app_name">Spending</string>
     <string name="tagline">Simple Expense Tracker</string>
 
     <!-- Screen Name -->
