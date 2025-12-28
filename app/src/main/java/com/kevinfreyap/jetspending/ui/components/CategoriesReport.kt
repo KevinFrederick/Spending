@@ -1,5 +1,6 @@
 package com.kevinfreyap.jetspending.ui.components
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -14,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -81,7 +83,9 @@ fun CategoriesReport(
             )
 
             Column (
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier
+                    .animateContentSize()
             ) {
                 if (isLoading) {
                     repeat(3) {
@@ -89,13 +93,15 @@ fun CategoriesReport(
                     }
                 } else {
                     visibleItems.forEach { category ->
-                        ViewCategoryReportItem(
-                            categoryIcon = category.iconRes,
-                            categoryName = stringResource(category.name),
-                            categoryAmount = category.categoryAmount,
-                            color = category.categoryColor,
-                            percentage = category.percentage
-                        )
+                        key (category) {
+                            ViewCategoryReportItem(
+                                categoryIcon = category.iconRes,
+                                categoryName = stringResource(category.name),
+                                categoryAmount = category.categoryAmount,
+                                color = category.categoryColor,
+                                percentage = category.percentage
+                            )
+                        }
                     }
 
                     if (categories.isEmpty()) {
