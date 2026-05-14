@@ -1,6 +1,6 @@
 # 💰 Multi Currency Expense Tracker
 
-An offline-first Android application to track income and expenses across various categories and multiple currencies with intelligent, date specific exchange rates synchronization. Built using Multi-Module Clean Architecture to ensure a clear separation of concerns with Dagger Hilt for dependency injection. The application utilize Room for local reliability and persistence while integrating Firebase for real-time syncronization across devices. With a modern UI built entirely on Jetpack Compose, the application features dynamic data visualization through charts that turn transactions into financial insights.
+An offline-first Android application to track income and expenses across various categories and multiple currencies with intelligent, date specific exchange rates synchronization. Built using Multi-Module Clean Architecture to ensure a clear separation of concerns with Dagger Hilt for dependency injection. Built with Room for local reliability and persistence while integrating Firebase for real-time syncronization across devices. With a modern UI built entirely on Jetpack Compose, the application features dynamic data visualization through charts that turn transactions into financial insights.
 
 ## 🌟 Key Features
 * **User Authentication**\
