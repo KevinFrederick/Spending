@@ -33,6 +33,7 @@ fun ViewTextField(
     onValueChange: (String) -> Unit,
     label: String,
     modifier: Modifier = Modifier,
+    isEnabled: Boolean = true,
     placeholder: String? = null,
     isError: Boolean = false,
     errorMessage: String = "",
@@ -61,6 +62,7 @@ fun ViewTextField(
         } else {
             null
         },
+        enabled = isEnabled,
         isError = isError,
         keyboardOptions = keyboardOptions,
         keyboardActions = KeyboardActions(
@@ -73,12 +75,15 @@ fun ViewTextField(
         colors = TextFieldDefaults.colors(
             unfocusedContainerColor = Theme.custom.cardColor,
             focusedContainerColor = Theme.custom.cardColor,
-            unfocusedLabelColor = Theme.custom.hintColor,
             errorContainerColor = Theme.custom.cardColor,
+            unfocusedLabelColor = Theme.custom.hintColor,
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
             disabledIndicatorColor = Color.Transparent,
-            errorIndicatorColor = Color.Transparent
+            errorIndicatorColor = Color.Transparent,
+            disabledContainerColor = Theme.custom.cardColor,
+            disabledTextColor = Theme.custom.hintColor,
+            disabledLabelColor = Theme.custom.hintColor
         ),
         visualTransformation = visualTransformation ?: VisualTransformation.None,
         trailingIcon = {
@@ -119,7 +124,8 @@ fun ViewTextFieldPreview(){
             },
             label = "Text Field Label",
             placeholder = "Text",
-            isError = true,
+            isError = false,
+            isEnabled = false,
             errorMessage = "Required"
         )
     }

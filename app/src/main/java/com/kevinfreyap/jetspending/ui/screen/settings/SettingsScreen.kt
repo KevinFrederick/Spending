@@ -18,8 +18,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Devices
@@ -50,6 +49,7 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun SettingsScreen(
     navigateToOnBoarding: () -> Unit,
+    navigateToEditProfile: () -> Unit,
     modifier: Modifier = Modifier,
     mainViewModel: MainViewModel = hiltViewModel(),
     viewModel: SettingsViewModel = hiltViewModel(),
@@ -60,9 +60,9 @@ fun SettingsScreen(
     val settingsGroup by viewModel.settingsState.collectAsState()
     val userProfile by viewModel.userProfile.collectAsState()
 
-    var showCurrencyDialog by remember { mutableStateOf(false) }
-    var showThemeDialog by remember { mutableStateOf(false) }
-    var showLogoutDialog by remember { mutableStateOf(false) }
+    val (showCurrencyDialog, setShowCurrencyDialog) = rememberSaveable { mutableStateOf(false) }
+    val (showThemeDialog, setShowThemeDialog) = rememberSaveable { mutableStateOf(false) }
+    val (showLogoutDialog, setShowLogoutDialog) = rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.navigationChannel.collectLatest {
@@ -78,7 +78,7 @@ fun SettingsScreen(
         onSettingsClicked = { settingsOption ->
             when(settingsOption) {
                 SettingsOption.EDIT_PROFILE -> {
-
+                    navigateToEditProfile()
                 }
                 SettingsOption.NOTIFICATION -> {
 
@@ -87,13 +87,13 @@ fun SettingsScreen(
 
                 }
                 SettingsOption.CURRENCY -> {
-                    showCurrencyDialog = true
+                    setShowCurrencyDialog(true)
                 }
                 SettingsOption.THEME -> {
-                    showThemeDialog = true
+                    setShowThemeDialog(true)
                 }
                 SettingsOption.LOG_OUT -> {
-                    showLogoutDialog = true
+                    setShowLogoutDialog(true)
                 }
             }
         },
@@ -102,24 +102,24 @@ fun SettingsScreen(
         showLogoutDialog = showLogoutDialog,
         onSelectCurrency = {
             mainViewModel.onSelectCurrency(it)
-            showCurrencyDialog = false
+            setShowCurrencyDialog(false)
         },
         onSelectTheme = {
             viewModel.onThemeSelected(it)
-            showThemeDialog = false
+            setShowThemeDialog(false)
         },
         onDismissCurrencyDialog = {
-            showCurrencyDialog = false
+            setShowCurrencyDialog(false)
         },
         onDismissThemeDialog = {
-            showThemeDialog = false
+            setShowThemeDialog(false)
         },
         onLogoutDialogPositiveBtn = {
-            showLogoutDialog = false
+            setShowLogoutDialog(false)
             viewModel.logout()
         },
         onLogoutDialogNegativeBtn = {
-            showLogoutDialog = false
+            setShowLogoutDialog(false)
         },
         modifier = modifier
     )
@@ -214,7 +214,7 @@ fun SettingsContent(
                 subtitle = stringResource(R.string.select_theme_subtitle),
                 onDismissRequest = onDismissThemeDialog,
                 options = {
-                    AppTheme.entries.forEachIndexed { index, theme ->
+                    AppTheme.entries.forEachIndexed { _, theme ->
                         val displayName = when(theme) {
                             AppTheme.LIGHT -> R.string.light_mode
                             AppTheme.DARK -> R.string.dark_mode
@@ -339,7 +339,7 @@ fun SettingsContentPreview() {
             onSettingsClicked = {},
             showCurrencyDialog = false,
             showLogoutDialog = false,
-            showThemeDialog = true,
+            showThemeDialog = false,
             onLogoutDialogPositiveBtn = {},
             onLogoutDialogNegativeBtn = {},
             currencyCode = AppCurrency.IDR,

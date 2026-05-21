@@ -20,6 +20,9 @@ object ErrorFormatter {
             ErrorMessage.AUTHENTICATION_CONFIRM_PASSWORD_NOT_MATCH -> R.string.error_authentication_confirm_password_not_match
             ErrorMessage.TRANSACTION_NOTES_TOO_LONG -> R.string.error_notes_too_long
             ErrorMessage.TRANSACTION_CURRENCY_NOT_VALID -> R.string.error_transaction_currency
+            ErrorMessage.USERNAME_BLANK -> R.string.error_username_blank
+            ErrorMessage.IMAGE_URL_BLANK -> R.string.error_img_url_blank
+            else -> R.string.error_something_went_wrong
         }
     }
 }

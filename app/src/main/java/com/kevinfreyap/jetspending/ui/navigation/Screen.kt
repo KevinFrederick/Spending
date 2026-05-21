@@ -21,4 +21,5 @@ sealed class Screen(val route: String) {
     data object TransactionDetail: Screen("detail/{transactionId}") { // detail/{transactionId} -> using '/' transaction is required
         fun createRoute(transactionId: String) = "detail/$transactionId"
     }
+    data object EditProfile: Screen("edit_profile")
 }

@@ -8,6 +8,8 @@ import com.kevinfreyap.domain.model.AppCurrency
 import com.kevinfreyap.domain.model.AppTheme
 import com.kevinfreyap.domain.model.User
 import com.kevinfreyap.domain.repository.IUserRepository
+import com.kevinfreyap.domain.resource.DomainResult
+import com.kevinfreyap.domain.resource.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.tasks.await
 import java.lang.Exception
@@ -25,6 +27,35 @@ class UserRepository @Inject constructor(
     override fun getSelectedCurrency(): Flow<AppCurrency> = userPreferences.getCurrency()
 
     override fun getCurrentTheme(): Flow<AppTheme> = userPreferences.getTheme()
+
+    override suspend fun updateUserProfile(
+        userId: String,
+        newUsername: String?,
+        newImageUrl: String?
+    ): DomainResult<Unit> {
+        return try {
+            val updates = mutableMapOf<String, Any>()
+
+            if (!newUsername.isNullOrBlank()) updates["name"] = newUsername
+            if (!newImageUrl.isNullOrBlank()) updates["photoUrl"] = newImageUrl
+
+            if (updates.isNotEmpty()) {
+                firestore.collection(USER_COLLECTION)
+                    .document(userId)
+                    .update(updates)
+                    .await()
+
+                userPreferences.updateUser(
+                    newUsername = newUsername,
+                    newImageUrl = newImageUrl
+                )
+            }
+
+            DomainResult.Success(Unit)
+        } catch (e: Exception) {
+            DomainResult.Failure(e)
+        }
+    }
 
     override suspend fun setCurrency(appCurrency: AppCurrency) {
         userPreferences.saveCurrency(appCurrency)

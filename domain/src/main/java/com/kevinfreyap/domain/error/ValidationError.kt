@@ -73,4 +73,12 @@ sealed class ValidationError(
         Field.AUTHENTICATION_CHANGE_PASSWORD_EMAIL,
         ErrorMessage.AUTHENTICATION_EMAIL_WRONG_FORMAT
     )
+    object UsernameBlank: ValidationError(
+        Field.USERNAME,
+        ErrorMessage.USERNAME_BLANK
+    )
+    object ImageUrlBlank: ValidationError(
+        Field.IMAGE_URL,
+        ErrorMessage.IMAGE_URL_BLANK
+    )
 }

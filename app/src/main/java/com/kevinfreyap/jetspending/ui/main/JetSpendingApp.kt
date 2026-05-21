@@ -43,6 +43,7 @@ import com.kevinfreyap.jetspending.ui.navigation.Screen
 import com.kevinfreyap.jetspending.ui.screen.add_transaction.AddTransactionScreen
 import com.kevinfreyap.jetspending.ui.screen.dashboard.DashboardScreen
 import com.kevinfreyap.jetspending.ui.screen.detail.DetailTransactionScreen
+import com.kevinfreyap.jetspending.ui.screen.edit_profile.EditProfileScreen
 import com.kevinfreyap.jetspending.ui.screen.list.TransactionListScreen
 import com.kevinfreyap.jetspending.ui.screen.onboarding.OnboardingScreen
 import com.kevinfreyap.jetspending.ui.screen.report.ReportScreen
@@ -52,8 +53,8 @@ import com.kevinfreyap.jetspending.ui.screen.signup.SignUpScreen
 
 @Composable
 fun JetSpendingApp(
-    modifier: Modifier = Modifier,
     startDestination: String,
+    modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
     mainViewModel: MainViewModel = hiltViewModel()
 ) {
@@ -181,11 +182,6 @@ fun JetSpendingApp(
                         }
                     )
                 }
-                composable(Screen.Report.route) {
-                    ReportScreen(
-
-                    )
-                }
                 composable(Screen.Settings.route) {
                     SettingsScreen(
                         navigateToOnBoarding = {
@@ -194,6 +190,19 @@ fun JetSpendingApp(
                                     inclusive = true
                                 }
                             }
+                        },
+                        navigateToEditProfile = {
+                            navController.navigate(Screen.EditProfile.route)
+                        }
+                    )
+                }
+                composable(Screen.Report.route) {
+                    ReportScreen()
+                }
+                composable(Screen.EditProfile.route) {
+                    EditProfileScreen(
+                        onBackClick = {
+                            navController.popBackStack()
                         }
                     )
                 }
@@ -208,7 +217,7 @@ fun JetSpendingApp(
                             defaultValue = null
                         }
                     )
-                ) { backStackEntry ->
+                ) { _ ->
                     AddTransactionScreen(
                         onBackClick = {
                             navController.popBackStack()
@@ -280,7 +289,7 @@ fun BottomBar(
             )
         )
 
-        navigationItems.map { item ->
+        navigationItems.forEach { item ->
             NavigationBarItem(
                 icon = {
                     Icon(

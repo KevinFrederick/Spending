@@ -40,6 +40,7 @@ fun ViewUserProfile(
             loading = {
                 ViewInitialsAvatar(
                     name,
+                    size = size,
                     modifier = Modifier
                         .fillMaxSize()
                 )
@@ -47,6 +48,7 @@ fun ViewUserProfile(
             error = {
                 ViewInitialsAvatar(
                     name,
+                    size = size,
                     modifier = Modifier
                         .fillMaxSize()
                 )
