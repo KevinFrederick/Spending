@@ -64,6 +64,18 @@ class UserPreferences @Inject constructor(
         }
     }
 
+    fun getAppLockPreference(): Flow<Boolean> {
+        return dataStore.data.map { preferences ->
+            preferences[APP_LOCK_PREFERENCE] ?: false
+        }
+    }
+
+    fun getBlockScreenPreference(): Flow<Boolean> {
+        return dataStore.data.map { preferences ->
+            preferences[BLOCK_SCREEN_PREFERENCE] ?: true
+        }
+    }
+
     suspend fun saveUser(user: User) {
         dataStore.edit { preferences ->
             with(user){
@@ -100,6 +112,18 @@ class UserPreferences @Inject constructor(
         }
     }
 
+    suspend fun saveAppLockPreference(isEnabled: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[APP_LOCK_PREFERENCE] = isEnabled
+        }
+    }
+
+    suspend fun saveBlockScreenPreference(isEnabled: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[BLOCK_SCREEN_PREFERENCE] = isEnabled
+        }
+    }
+
     suspend fun updateUser(
         newUsername: String?,
         newImageUrl: String?
@@ -133,5 +157,7 @@ class UserPreferences @Inject constructor(
         private val DAILY_NOTIFICATION = booleanPreferencesKey("daily_notification")
         private val NOTIFICATION_TIME_HOUR = stringPreferencesKey("time_notification_hour")
         private val NOTIFICATION_TIME_MINUTE = stringPreferencesKey("time_notification_minute")
+        private val APP_LOCK_PREFERENCE = booleanPreferencesKey("app_lock_preference")
+        private val BLOCK_SCREEN_PREFERENCE = booleanPreferencesKey("block_screen_preference")
     }
 }

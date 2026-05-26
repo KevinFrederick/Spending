@@ -51,6 +51,7 @@ fun SettingsScreen(
     navigateToOnBoarding: () -> Unit,
     navigateToEditProfile: () -> Unit,
     navigateToNotification: () -> Unit,
+    navigateToPrivacySecurity: () -> Unit,
     modifier: Modifier = Modifier,
     mainViewModel: MainViewModel = hiltViewModel(),
     viewModel: SettingsViewModel = hiltViewModel(),
@@ -85,7 +86,7 @@ fun SettingsScreen(
                     navigateToNotification()
                 }
                 SettingsOption.PRIVACY_SECURITY -> {
-
+                    navigateToPrivacySecurity()
                 }
                 SettingsOption.CURRENCY -> {
                     setShowCurrencyDialog(true)

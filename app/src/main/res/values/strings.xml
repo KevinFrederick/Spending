@@ -78,10 +78,20 @@
     <string name="total_spending">Total Spending</string>
     <string name="transaction_chart">Transactions Chart</string>
     <string name="reset_password">Reset Password</string>
-    <string name="set_app_notification">Set app notifications</string>
+    <string name="set_notification">Set notifications</string>
     <string name="daily_reminder">Daily Reminder</string>
     <string name="daily_reminder_time">Daily Reminder Time</string>
     <string name="monthly_summary">Monthly Summary</string>
+    <string name="secure_access">App Privacy</string>
+    <string name="account_security">Account Security</string>
+    <string name="app_lock">App Lock</string>
+    <string name="app_lock_subtitle">Unlock with device credentials.</string>
+    <string name="block_screenshot">Block Screenshot</string>
+    <string name="block_screenshot_subtitle">Hide data in background previews &amp; screenshot</string>
+    <string name="change_password">Change Password</string>
+    <string name="delete_account">Delete Account</string>
+    <string name="app_locked">App Locked</string>
+    <string name="verify_identity">Verify Your Identity</string>
     <string name="coming_soon">Coming Soon</string>
 
     <!-- Button -->
@@ -114,6 +124,7 @@
     <string name="send_link">Send Link</string>
     <string name="change_picture">Change Picture</string>
     <string name="save_changes">Save Changes</string>
+    <string name="unlock">Unlock</string>
 
     <!-- Theme -->
     <string name="select_theme">Select Theme</string>
@@ -173,6 +184,7 @@
     <string name="error_no_data">No data yet</string>
     <string name="error_username_blank">Username is required</string>
     <string name="error_img_url_blank">Selected image invalid</string>
+    <string name="error_no_biometric">Please set up a PIN or Fingerprint in your Device Settings first.</string>
 
     <!-- Description -->
     <string name="description_sign_up">Let\'s get started with a free account</string>
@@ -187,6 +199,8 @@
     <string name="description_reset_password">Enter your email to receive a reset link</string>
     <string name="description_email_sent">We have sent a password recover instruction to your email</string>
     <string name="description_notification_settings">Control how and when you receive updates. Tailor your notification preferences to ensure you always stay informed.</string>
+    <string name="description_secure_access">Restrict who can open the app and view your transactions.</string>
+    <string name="description_account_security">Update your login credentials or permanently delete your account.</string>
     <string name="description_feature_coming_soon">This feature is currently under development</string>
 
     <!-- Period Option -->

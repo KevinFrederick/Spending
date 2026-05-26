@@ -20,6 +20,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -47,6 +48,7 @@ import com.kevinfreyap.jetspending.ui.screen.edit_profile.EditProfileScreen
 import com.kevinfreyap.jetspending.ui.screen.list.TransactionListScreen
 import com.kevinfreyap.jetspending.ui.screen.notification.NotificationScreen
 import com.kevinfreyap.jetspending.ui.screen.onboarding.OnboardingScreen
+import com.kevinfreyap.jetspending.ui.screen.privacy_security.PrivacySecurityScreen
 import com.kevinfreyap.jetspending.ui.screen.report.ReportScreen
 import com.kevinfreyap.jetspending.ui.screen.settings.SettingsScreen
 import com.kevinfreyap.jetspending.ui.screen.signin.SignInScreen
@@ -71,6 +73,17 @@ fun JetSpendingApp(
         Screen.Report.route,
         Screen.Settings.route
     )
+
+    LaunchedEffect(Unit) {
+        mainViewModel.emergencyLogoutChannel.collect {
+            navController.navigate(Screen.OnBoarding.route) {
+                popUpTo(navController.graph.id) {
+                    inclusive = true
+                }
+                launchSingleTop = true
+            }
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -197,6 +210,9 @@ fun JetSpendingApp(
                         },
                         navigateToNotification = {
                             navController.navigate(Screen.Notification.route)
+                        },
+                        navigateToPrivacySecurity = {
+                            navController.navigate(Screen.PrivacySecurity.route)
                         }
                     )
                 }
@@ -261,6 +277,13 @@ fun JetSpendingApp(
                 }
                 composable(Screen.Notification.route) {
                     NotificationScreen(
+                        onBackClick = {
+                            navController.popBackStack()
+                        }
+                    )
+                }
+                composable(Screen.PrivacySecurity.route) {
+                    PrivacySecurityScreen(
                         onBackClick = {
                             navController.popBackStack()
                         }

@@ -165,14 +165,14 @@ fun NotificationContent(
                 )
         ) {
             Text(
-                text = stringResource(R.string.set_app_notification),
+                text = stringResource(R.string.set_notification),
                 style = MaterialTheme.typography.headlineSmall,
                 color = Theme.custom.textColor
             )
 
             Spacer(
                 modifier = Modifier
-                    .height(8.dp)
+                    .height(4.dp)
             )
 
             Text(
@@ -260,7 +260,8 @@ fun NotificationContent(
                     ) {
                         Text(
                             text = stringResource(R.string.daily_reminder_time),
-                            style = MaterialTheme.typography.titleLarge,
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.SemiBold,
                             color = Theme.custom.textColor,
                             modifier = Modifier
                                 .align(

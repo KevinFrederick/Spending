@@ -23,4 +23,5 @@ sealed class Screen(val route: String) {
     }
     data object EditProfile: Screen("edit_profile")
     data object Notification: Screen("notification")
+    data object PrivacySecurity: Screen("privacy_security")
 }

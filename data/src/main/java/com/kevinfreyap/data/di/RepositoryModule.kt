@@ -4,12 +4,14 @@ import com.kevinfreyap.data.repository.AuthenticationRepository
 import com.kevinfreyap.data.repository.CategoryRepository
 import com.kevinfreyap.data.repository.ConnectivityRepository
 import com.kevinfreyap.data.repository.ExchangeRatesRepository
+import com.kevinfreyap.data.repository.PrivacySecurityRepository
 import com.kevinfreyap.data.repository.TransactionRepository
 import com.kevinfreyap.data.repository.UserRepository
 import com.kevinfreyap.domain.repository.IAuthenticationRepository
 import com.kevinfreyap.domain.repository.ICategoryRepository
 import com.kevinfreyap.domain.repository.IConnectivityRepository
 import com.kevinfreyap.domain.repository.IExchangeRatesRepository
+import com.kevinfreyap.domain.repository.IPrivacySecurityRepository
 import com.kevinfreyap.domain.repository.ITransactionRepository
 import com.kevinfreyap.domain.repository.IUserRepository
 import dagger.Binds
@@ -45,4 +47,8 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun provideConnectivityRepository(connectivityRepository: ConnectivityRepository): IConnectivityRepository
+
+    @Binds
+    @Singleton
+    abstract fun providePrivacySecurityRepository(privacySecurityRepository: PrivacySecurityRepository): IPrivacySecurityRepository
 }
