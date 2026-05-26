@@ -50,6 +50,7 @@ import kotlinx.coroutines.flow.collectLatest
 fun SettingsScreen(
     navigateToOnBoarding: () -> Unit,
     navigateToEditProfile: () -> Unit,
+    navigateToNotification: () -> Unit,
     modifier: Modifier = Modifier,
     mainViewModel: MainViewModel = hiltViewModel(),
     viewModel: SettingsViewModel = hiltViewModel(),
@@ -81,7 +82,7 @@ fun SettingsScreen(
                     navigateToEditProfile()
                 }
                 SettingsOption.NOTIFICATION -> {
-
+                    navigateToNotification()
                 }
                 SettingsOption.PRIVACY_SECURITY -> {
 

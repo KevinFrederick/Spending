@@ -45,6 +45,7 @@ import com.kevinfreyap.jetspending.ui.screen.dashboard.DashboardScreen
 import com.kevinfreyap.jetspending.ui.screen.detail.DetailTransactionScreen
 import com.kevinfreyap.jetspending.ui.screen.edit_profile.EditProfileScreen
 import com.kevinfreyap.jetspending.ui.screen.list.TransactionListScreen
+import com.kevinfreyap.jetspending.ui.screen.notification.NotificationScreen
 import com.kevinfreyap.jetspending.ui.screen.onboarding.OnboardingScreen
 import com.kevinfreyap.jetspending.ui.screen.report.ReportScreen
 import com.kevinfreyap.jetspending.ui.screen.settings.SettingsScreen
@@ -193,21 +194,17 @@ fun JetSpendingApp(
                         },
                         navigateToEditProfile = {
                             navController.navigate(Screen.EditProfile.route)
+                        },
+                        navigateToNotification = {
+                            navController.navigate(Screen.Notification.route)
                         }
                     )
                 }
                 composable(Screen.Report.route) {
                     ReportScreen()
                 }
-                composable(Screen.EditProfile.route) {
-                    EditProfileScreen(
-                        onBackClick = {
-                            navController.popBackStack()
-                        }
-                    )
-                }
                 composable(
-                    route = Screen.AddTransaction.routeWithArgs,
+                    route = Screen.AddTransaction.ROUTE_WITH_ARGS,
                     arguments = listOf(
                         navArgument(
                             "transactionId"
@@ -252,6 +249,20 @@ fun JetSpendingApp(
                         navigateToUpdate = { transactionId ->
                             val id = transactionId ?: return@DetailTransactionScreen
                             navController.navigate(Screen.AddTransaction.createRoute(transactionId = id))
+                        }
+                    )
+                }
+                composable(Screen.EditProfile.route) {
+                    EditProfileScreen(
+                        onBackClick = {
+                            navController.popBackStack()
+                        }
+                    )
+                }
+                composable(Screen.Notification.route) {
+                    NotificationScreen(
+                        onBackClick = {
+                            navController.popBackStack()
                         }
                     )
                 }

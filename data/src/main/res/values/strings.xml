@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notification_daily_title">Time for a quick recap!</string>
+    <string name="notification_daily_desc">Take a minute to log today\'s spending.</string>
+
+    <string name="notification_monthly_title">Your monthly summary is ready!</string>
+    <string name="notification_monthly_desc">Tap to review your spending breakdown for last month.</string>
+</resources>

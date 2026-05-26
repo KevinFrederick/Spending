@@ -78,6 +78,11 @@
     <string name="total_spending">Total Spending</string>
     <string name="transaction_chart">Transactions Chart</string>
     <string name="reset_password">Reset Password</string>
+    <string name="set_app_notification">Set app notifications</string>
+    <string name="daily_reminder">Daily Reminder</string>
+    <string name="daily_reminder_time">Daily Reminder Time</string>
+    <string name="monthly_summary">Monthly Summary</string>
+    <string name="coming_soon">Coming Soon</string>
 
     <!-- Button -->
     <string name="cancel">Cancel</string>
@@ -181,6 +186,8 @@
     <string name="description_discard_change">You have unsaved changes. Are you sure you want to discard them?</string>
     <string name="description_reset_password">Enter your email to receive a reset link</string>
     <string name="description_email_sent">We have sent a password recover instruction to your email</string>
+    <string name="description_notification_settings">Control how and when you receive updates. Tailor your notification preferences to ensure you always stay informed.</string>
+    <string name="description_feature_coming_soon">This feature is currently under development</string>
 
     <!-- Period Option -->
     <string name="period_weekly">Weekly</string>

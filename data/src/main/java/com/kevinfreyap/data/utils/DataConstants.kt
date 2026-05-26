@@ -6,4 +6,6 @@ object DataConstants {
     const val USER_COLLECTION = "users"
     const val TRANSACTION_COLLECTION = "transactions"
     const val CATEGORY_COLLECTION = "categories"
+    const val SETTINGS_SUB_COLLECTION = "settings"
+    const val NOTIFICATION_SUB_DOCUMENT = "notification"
 }

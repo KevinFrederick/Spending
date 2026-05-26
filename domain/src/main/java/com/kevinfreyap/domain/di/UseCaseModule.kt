@@ -8,6 +8,8 @@ import com.kevinfreyap.domain.usecase.connectivity.ConnectivityInteractor
 import com.kevinfreyap.domain.usecase.connectivity.ConnectivityUseCase
 import com.kevinfreyap.domain.usecase.currency.CurrencyInteractor
 import com.kevinfreyap.domain.usecase.currency.CurrencyUseCase
+import com.kevinfreyap.domain.usecase.notification.NotificationInteractor
+import com.kevinfreyap.domain.usecase.notification.NotificationUseCase
 import com.kevinfreyap.domain.usecase.rates.ExchangeRatesInteractor
 import com.kevinfreyap.domain.usecase.rates.ExchangeRatesUseCase
 import com.kevinfreyap.domain.usecase.transaction.TransactionInteractor
@@ -51,4 +53,8 @@ abstract class UseCaseModule {
     @Binds
     @Singleton
     abstract fun provideConnectivityUseCase(connectivityInteractor: ConnectivityInteractor): ConnectivityUseCase
+
+    @Binds
+    @Singleton
+    abstract fun provideNotificationUseCase(notificationInteractor: NotificationInteractor): NotificationUseCase
 }

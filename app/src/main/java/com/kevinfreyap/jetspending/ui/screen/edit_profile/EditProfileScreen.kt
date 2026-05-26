@@ -62,6 +62,7 @@ fun EditProfileScreen(
     val showSuccessDialog by viewModel.showSuccessDialog.collectAsState()
 
     val (showConfirmationDialog, setShowConfirmationDialog) = remember { mutableStateOf(false) }
+    val (showComingSoonDialog, setShowComingSoonDialog) = remember { mutableStateOf(false) }
 
     val editAction = remember(viewModel) {
         object : EditProfileAction {
@@ -90,11 +91,15 @@ fun EditProfileScreen(
         onShowConfirmationDialog = {
             setShowConfirmationDialog(it)
         },
+        onShowComingSoonDialog = {
+            setShowComingSoonDialog(it)
+        },
         uiState = uiState,
         state = state,
         action = editAction,
         showSuccessDialog = showSuccessDialog,
         showConfirmationDialog = showConfirmationDialog,
+        showComingSoonDialog = showComingSoonDialog,
         modifier = modifier
     )
 }
@@ -104,11 +109,13 @@ fun EditProfileScreen(
 fun EditProfileContent(
     onBackClick: () -> Unit,
     onShowConfirmationDialog: (Boolean) -> Unit,
+    onShowComingSoonDialog: (Boolean) -> Unit,
     uiState: UiState<Unit>,
     state: EditProfileState,
     action: EditProfileAction,
     showSuccessDialog: Boolean,
     showConfirmationDialog: Boolean,
+    showComingSoonDialog: Boolean,
     modifier: Modifier = Modifier
 ) {
     val scope = rememberCoroutineScope()
@@ -212,6 +219,21 @@ fun EditProfileContent(
             }
         }
 
+        if (showComingSoonDialog) {
+            LaunchedEffect(Unit) {
+                delay(1000)
+                onShowComingSoonDialog(false)
+            }
+
+            ViewCustomDialog(
+                onDismissRequest = { onShowComingSoonDialog(false) },
+                icon = R.drawable.ic_construction,
+                iconColor = Grey500,
+                title = stringResource(R.string.coming_soon),
+                message = stringResource(R.string.description_feature_coming_soon)
+            )
+        }
+
         if (showSuccessDialog) {
             LaunchedEffect(Unit) {
                 delay(1500)
@@ -286,6 +308,7 @@ fun EditProfilePreview() {
         EditProfileContent(
             onBackClick = {},
             onShowConfirmationDialog = {},
+            onShowComingSoonDialog = {},
             state = EditProfileState(
                 userName = "John Doe",
                 email = "JohnDoe@gmail.com"
@@ -310,7 +333,8 @@ fun EditProfilePreview() {
             },
             showSuccessDialog = false,
             showConfirmationDialog = false,
-            uiState = UiState.Loading
+            showComingSoonDialog = false,
+            uiState = UiState.Idle
         )
     }
 }

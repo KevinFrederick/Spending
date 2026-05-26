@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.kevinfreyap.domain.model.AppCurrency
 import com.kevinfreyap.domain.model.AppTheme
+import com.kevinfreyap.domain.model.NotificationPreferences
 import com.kevinfreyap.domain.model.User
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -52,6 +53,17 @@ class UserPreferences @Inject constructor(
         }
     }
 
+    fun getNotificationPreferences(): Flow<NotificationPreferences> {
+        return dataStore.data.map { preferences ->
+            NotificationPreferences(
+                isMonthlyEnabled = preferences[MONTHLY_NOTIFICATION] ?: false,
+                isDailyEnabled = preferences[DAILY_NOTIFICATION] ?: false,
+                reminderHour = preferences[NOTIFICATION_TIME_HOUR] ?: "21",
+                reminderMinute = preferences[NOTIFICATION_TIME_MINUTE] ?: "00"
+            )
+        }
+    }
+
     suspend fun saveUser(user: User) {
         dataStore.edit { preferences ->
             with(user){
@@ -74,6 +86,17 @@ class UserPreferences @Inject constructor(
     suspend fun saveTheme(appTheme: AppTheme) {
         dataStore.edit { preferences ->
             preferences[THEME_KEY] = appTheme.name
+        }
+    }
+
+    suspend fun saveNotificationPref(notificationPref: NotificationPreferences) {
+        dataStore.edit { preferences ->
+            with(notificationPref) {
+                preferences[MONTHLY_NOTIFICATION] = isMonthlyEnabled
+                preferences[DAILY_NOTIFICATION] = isDailyEnabled
+                preferences[NOTIFICATION_TIME_HOUR] = reminderHour
+                preferences[NOTIFICATION_TIME_MINUTE] = reminderMinute
+            }
         }
     }
 
@@ -106,5 +129,9 @@ class UserPreferences @Inject constructor(
         private val IS_GOOGLE_KEY = booleanPreferencesKey("is_google")
         private val THEME_KEY = stringPreferencesKey("theme_mode")
         private val CURRENCY_KEY = stringPreferencesKey("currency")
+        private val MONTHLY_NOTIFICATION = booleanPreferencesKey("monthly_notification")
+        private val DAILY_NOTIFICATION = booleanPreferencesKey("daily_notification")
+        private val NOTIFICATION_TIME_HOUR = stringPreferencesKey("time_notification_hour")
+        private val NOTIFICATION_TIME_MINUTE = stringPreferencesKey("time_notification_minute")
     }
 }

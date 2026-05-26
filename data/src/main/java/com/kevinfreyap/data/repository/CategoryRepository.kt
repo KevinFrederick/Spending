@@ -8,11 +8,9 @@ import com.kevinfreyap.data.source.remote.firebase.TransactionCategoryFirestore
 import com.kevinfreyap.data.utils.DataConstants.CATEGORY_COLLECTION
 import com.kevinfreyap.domain.model.Category
 import com.kevinfreyap.domain.repository.ICategoryRepository
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -41,22 +39,23 @@ class CategoryRepository @Inject constructor(
     }
 
     override suspend fun syncCategoriesFromFirestore() {
-        firestore.collection(CATEGORY_COLLECTION)
-            .addSnapshotListener { snapshot, error ->
-                if (error != null || snapshot == null) {
-                    Log.e("CategoryRepository", error?.message ?: "Sync Category Error")
-                    return@addSnapshotListener
-                }
+        try {
+            val snapshot = firestore.collection(CATEGORY_COLLECTION)
+                .get()
+                .await()
 
-                val categories = snapshot.documents.mapNotNull { documentSnapshot ->
-                    documentSnapshot.toObject(TransactionCategoryFirestore::class.java)
-                }.map { categoryFirestore ->
-                    transactionCategoryMapper.mapCategoryFirestoreToEntity(categoryFirestore)
-                }
-
-                CoroutineScope(Dispatchers.IO).launch {
-                    categoryDao.upsertCategories(categories)
-                }
+            val categories = snapshot.documents.mapNotNull { documentSnapshot ->
+                documentSnapshot.toObject(TransactionCategoryFirestore::class.java)
+            }.map { categoryFirestore ->
+                transactionCategoryMapper.mapCategoryFirestoreToEntity(categoryFirestore)
             }
+
+            if (categories.isNotEmpty()) {
+                categoryDao.upsertCategories(categories)
+            }
+
+        } catch (e: Exception) {
+            Log.e("CategoryRepository", "Failed to sync admin categories: ${e.message}")
+        }
     }
 }

@@ -65,23 +65,16 @@ class MainViewModel @Inject constructor(
     )
 
     init {
-        // viewModelScope.launch runs line by line
-        startBackgroundSync()
         observeAuthState()
-    }
-
-    fun startBackgroundSync() {
-        viewModelScope.launch(Dispatchers.IO) {
-            launch { exchangeRatesUseCase.startRatesHealer() }
-            launch { exchangeRatesUseCase.syncDailyRates() }
-            launch { categoryUseCase.syncCategoriesFromFirestore() }
-        }
     }
 
     fun observeAuthState() {
         authenticationUseCase.getAuthState()
             .flatMapLatest { isLoggedIn ->
                 if (isLoggedIn) {
+                    categoryUseCase.syncCategoriesFromFirestore()
+                    exchangeRatesUseCase.syncDailyRates()
+                    viewModelScope.launch { exchangeRatesUseCase.startRatesHealer() }
                     transactionUseCase.syncTransactionsFromFirestore()
                 } else {
                     emptyFlow()

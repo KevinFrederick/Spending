@@ -8,7 +8,7 @@ sealed class Screen(val route: String) {
     data object Report: Screen("report")
     data object Settings: Screen("settings")
     data object AddTransaction: Screen("add_transaction") {
-        const val routeWithArgs = "add_transaction?transactionId={transactionId}"
+        const val ROUTE_WITH_ARGS = "add_transaction?transactionId={transactionId}"
         fun createRoute(transactionId: String? = null): String {
             return if (transactionId != null) {
                 "add_transaction?transactionId=$transactionId"
@@ -22,4 +22,5 @@ sealed class Screen(val route: String) {
         fun createRoute(transactionId: String) = "detail/$transactionId"
     }
     data object EditProfile: Screen("edit_profile")
+    data object Notification: Screen("notification")
 }
