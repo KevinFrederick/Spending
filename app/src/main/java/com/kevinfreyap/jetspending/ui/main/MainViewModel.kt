@@ -63,8 +63,9 @@ class MainViewModel @Inject constructor(
         userUseCase.getCurrentTheme(),
         isLoggedInFlow,
         privacySecurityUseCase.getAppLockPref(),
+        privacySecurityUseCase.getBlockScreenPref(),
         _isSessionUnlocked
-    ) { theme, isLoggedIn, isAppLockEnabled, isUnlocked ->
+    ) { theme, isLoggedIn, isAppLockEnabled, isSecureScreenEnabled, isUnlocked ->
         val startDestination = if (isLoggedIn) Screen.Dashboard.route else Screen.OnBoarding.route
 
         val effectiveUnlocked = !isAppLockEnabled || isUnlocked
@@ -73,6 +74,7 @@ class MainViewModel @Inject constructor(
             theme = theme,
             startDestination = startDestination,
             isAppLockEnabled = isAppLockEnabled,
+            isSecureScreenEnabled = isSecureScreenEnabled,
             isUnlocked = effectiveUnlocked
         )
     }.stateIn(

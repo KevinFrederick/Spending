@@ -1,6 +1,7 @@
 package com.kevinfreyap.jetspending.ui.main
 
 import android.os.Bundle
+import android.view.WindowManager
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -59,6 +60,17 @@ class MainActivity : FragmentActivity() {
                     LaunchedEffect(state.isUnlocked) {
                         if (!state.isUnlocked) {
                             promptBiometric()
+                        }
+                    }
+
+                    LaunchedEffect(state.isSecureScreenEnabled) {
+                        if (state.isSecureScreenEnabled) {
+                            window.setFlags(
+                                WindowManager.LayoutParams.FLAG_SECURE,
+                                WindowManager.LayoutParams.FLAG_SECURE
+                            )
+                        } else {
+                            window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
                         }
                     }
 

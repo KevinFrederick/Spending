@@ -8,6 +8,7 @@ sealed interface MainActivityState {
         val theme: AppTheme,
         val startDestination: String,
         val isAppLockEnabled: Boolean,
-        val isUnlocked: Boolean
+        val isUnlocked: Boolean,
+        val isSecureScreenEnabled: Boolean
     ) : MainActivityState
 }
