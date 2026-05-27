@@ -222,35 +222,6 @@ class AuthenticationRepository @Inject constructor(
         }
     }
 
-    // Only For Testing
-    override suspend fun removePassword(): DomainResult<Unit> {
-        return try {
-            val user = firebaseAuth.currentUser ?: throw Exception("User is not logged in.")
-
-            val currentlyHasPassword = user.providerData.any {
-                it.providerId == EmailAuthProvider.PROVIDER_ID
-            }
-
-            if (!currentlyHasPassword) {
-                updatePasswordStatus(hasPassword = false)
-                return DomainResult.Success(Unit)
-            }
-
-            user.unlink(EmailAuthProvider.PROVIDER_ID).await()
-
-            updatePasswordStatus(hasPassword = false)
-
-            DomainResult.Success(Unit)
-
-        } catch (_: FirebaseAuthRecentLoginRequiredException) {
-            DomainResult.Failure(
-                Exception("Re-Login")
-            )
-        } catch (e: Exception) {
-            DomainResult.Failure(Exception(e.localizedMessage ?: "Failed to remove password"))
-        }
-    }
-
     override suspend fun logout(): DomainResult<Unit> {
         return try {
             userPreferences.clearSession()

@@ -25,8 +25,5 @@ interface AuthenticationUseCase {
         newPassword: String
     ): DomainResult<Unit>
     suspend fun createPassword(newPassword: String): DomainResult<Unit>
-
-    // Only For Testing
-    suspend fun removePassword(): DomainResult<Unit>
     suspend fun logout() : DomainResult<Unit>
 }

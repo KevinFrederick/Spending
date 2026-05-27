@@ -101,11 +101,6 @@ class AuthenticationInteractor @Inject constructor(
         return authenticationRepository.createPassword(newPassword)
     }
 
-    // Only For Testing
-    override suspend fun removePassword(): DomainResult<Unit> {
-        return authenticationRepository.removePassword()
-    }
-
     override suspend fun logout(): DomainResult<Unit> = authenticationRepository.logout()
 
     private fun validateEmailAndPassword(

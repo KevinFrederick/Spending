@@ -145,23 +145,6 @@ class PrivacySecurityViewModel @Inject constructor(
         _showDialog.value = false
     }
 
-    // Only For Testing
-//    fun removePassword() {
-//        viewModelScope.launch {
-//            when(val result = authenticationUseCase.removePassword()) {
-//                is DomainResult.Success -> {
-//                    Log.d(VIEW_MODEL_TAG, "Success")
-//                }
-//                is DomainResult.ValidationFailed -> {
-//                    Log.d(VIEW_MODEL_TAG, result.errors[0].message.toString())
-//                }
-//                is DomainResult.Failure -> {
-//                    Log.d(VIEW_MODEL_TAG, result.throwable.message ?: "Fail")
-//                }
-//            }
-//        }
-//    }
-
     companion object {
         private const val VIEW_MODEL_TAG = "PrivacySecurityViewModel"
     }
