@@ -5,7 +5,6 @@ import com.kevinfreyap.domain.model.AppTheme
 import com.kevinfreyap.domain.model.User
 import com.kevinfreyap.domain.repository.IUserRepository
 import com.kevinfreyap.domain.resource.DomainResult
-import com.kevinfreyap.domain.resource.Resource
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 

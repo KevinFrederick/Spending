@@ -22,6 +22,7 @@ object ErrorFormatter {
             ErrorMessage.TRANSACTION_CURRENCY_NOT_VALID -> R.string.error_transaction_currency
             ErrorMessage.USERNAME_BLANK -> R.string.error_username_blank
             ErrorMessage.IMAGE_URL_BLANK -> R.string.error_img_url_blank
+            ErrorMessage.RELOGIN -> R.string.error_relogin
             else -> R.string.error_something_went_wrong
         }
     }

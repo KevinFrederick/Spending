@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -45,6 +46,9 @@ fun ViewPreferenceRow(
         shape = RoundedCornerShape(16.dp),
         modifier = modifier
             .fillMaxWidth()
+            .clip(
+                shape = RoundedCornerShape(16.dp)
+            )
             .clickable(
                 enabled = onClick != null,
                 onClick = {onClick?.invoke()}

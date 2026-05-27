@@ -48,70 +48,91 @@ fun ViewCustomDialog(
     Dialog(
         onDismissRequest = onDismissRequest
     ) {
-        Card(
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.background
-            )
+        ViewCustomDialogContent(
+            modifier = modifier,
+            title = title,
+            message = message,
+            icon = icon,
+            iconColor = iconColor,
+            positiveBtn = positiveBtn,
+            negativeBtn = negativeBtn
+        )
+    }
+}
+
+@Composable
+fun ViewCustomDialogContent(
+    modifier: Modifier = Modifier,
+    title: String? = null,
+    message: String? = null,
+    icon: Int? = null,
+    iconColor: Color? = null,
+    positiveBtn: @Composable (() -> Unit)? = null,
+    negativeBtn: @Composable (() -> Unit)? = null,
+) {
+    Card(
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.background
+        )
+    ) {
+        Column(
+            modifier = modifier
+                .fillMaxWidth()
+                .height(IntrinsicSize.Min)
+                .padding(24.dp)
         ) {
-            Column(
-                modifier = modifier
-                    .fillMaxWidth()
-                    .height(IntrinsicSize.Min)
-                    .padding(24.dp)
-            ) {
-                if (icon != null) {
-                    Icon(
-                        painter = painterResource(icon),
-                        contentDescription = "Dialog Icon",
-                        tint = iconColor ?: Theme.custom.iconColor,
-                        modifier = Modifier
-                            .size(76.dp)
-                            .align(
-                                alignment = Alignment.CenterHorizontally
-                            )
-                    )
-                }
+            if (icon != null) {
+                Icon(
+                    painter = painterResource(icon),
+                    contentDescription = "Dialog Icon",
+                    tint = iconColor ?: Theme.custom.iconColor,
+                    modifier = Modifier
+                        .size(76.dp)
+                        .align(
+                            alignment = Alignment.CenterHorizontally
+                        )
+                )
+            }
 
-                if (title != null) {
-                    Text(
-                        text = title,
-                        fontWeight = FontWeight.SemiBold,
-                        style = MaterialTheme.typography.headlineSmall,
-                        color = Theme.custom.textColor,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(
-                                top = 8.dp
-                            )
-                    )
-                }
+            if (title != null) {
+                Text(
+                    text = title,
+                    fontWeight = FontWeight.SemiBold,
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = Theme.custom.textColor,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            top = 8.dp
+                        )
+                )
+            }
 
-                if (message != null) {
-                    Text(
-                        text = message,
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = Theme.custom.textColor,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 4.dp)
-                    )
-                }
+            if (message != null) {
+                Text(
+                    text = message,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = Theme.custom.textColor,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 4.dp)
+                )
+            }
 
-                if (positiveBtn != null || negativeBtn != null){
-                    Row(
-                        horizontalArrangement = Arrangement.SpaceAround,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(
-                                top = 16.dp
-                            )
-                    ) {
-                        negativeBtn?.invoke()
-                        positiveBtn?.invoke()
-                    }
+            if (positiveBtn != null || negativeBtn != null){
+                Row(
+                    horizontalArrangement = Arrangement.SpaceAround,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            top = 16.dp
+                        )
+                ) {
+                    negativeBtn?.invoke()
+                    positiveBtn?.invoke()
                 }
             }
         }
@@ -126,8 +147,7 @@ fun ViewCustomDialog(
 @Composable
 fun ViewCustomDialogPreview() {
     JetSpendingTheme {
-        ViewCustomDialog(
-            onDismissRequest = {},
+        ViewCustomDialogContent(
             icon = R.drawable.ic_check_circle_outline_24,
             iconColor = Green500,
             title = "Success",

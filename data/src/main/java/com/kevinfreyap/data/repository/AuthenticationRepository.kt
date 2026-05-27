@@ -10,8 +10,10 @@ import androidx.credentials.exceptions.GetCredentialCancellationException
 import androidx.room.withTransaction
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
@@ -173,6 +175,82 @@ class AuthenticationRepository @Inject constructor(
         }
     }
 
+    override suspend fun changePassword(
+        oldPassword: String,
+        newPassword: String
+    ): DomainResult<Unit> {
+        return try {
+            val currentUser = firebaseAuth.currentUser ?: throw Exception("User not logged in")
+            val email = currentUser.email
+                ?: currentUser.providerData.firstNotNullOfOrNull { it.email }
+                ?: throw Exception("User email is missing")
+
+            val credential = EmailAuthProvider.getCredential(email, oldPassword)
+
+            currentUser.reauthenticate(credential).await()
+
+            currentUser.updatePassword(newPassword).await()
+
+            DomainResult.Success(Unit)
+        } catch (_: FirebaseAuthInvalidCredentialsException) {
+            DomainResult.ValidationFailed( listOf(
+                ValidationError.AuthenticationWrongPassword
+            ))
+
+        } catch (e: Exception) {
+            DomainResult.Failure(e)
+        }
+    }
+
+    override suspend fun createPassword(newPassword: String): DomainResult<Unit> {
+        return try {
+            val currentUser = firebaseAuth.currentUser ?: throw Exception("User not logged in")
+
+            currentUser.updatePassword(newPassword).await()
+
+            currentUser.reload().await()
+
+            updatePasswordStatus(true)
+
+            DomainResult.Success(Unit)
+        } catch (_: FirebaseAuthRecentLoginRequiredException) {
+            DomainResult.ValidationFailed( listOf(
+                ValidationError.AuthenticationReLogin
+            ))
+        } catch (e: Exception) {
+            DomainResult.Failure(e)
+        }
+    }
+
+    // Only For Testing
+    override suspend fun removePassword(): DomainResult<Unit> {
+        return try {
+            val user = firebaseAuth.currentUser ?: throw Exception("User is not logged in.")
+
+            val currentlyHasPassword = user.providerData.any {
+                it.providerId == EmailAuthProvider.PROVIDER_ID
+            }
+
+            if (!currentlyHasPassword) {
+                updatePasswordStatus(hasPassword = false)
+                return DomainResult.Success(Unit)
+            }
+
+            user.unlink(EmailAuthProvider.PROVIDER_ID).await()
+
+            updatePasswordStatus(hasPassword = false)
+
+            DomainResult.Success(Unit)
+
+        } catch (_: FirebaseAuthRecentLoginRequiredException) {
+            DomainResult.Failure(
+                Exception("Re-Login")
+            )
+        } catch (e: Exception) {
+            DomainResult.Failure(Exception(e.localizedMessage ?: "Failed to remove password"))
+        }
+    }
+
     override suspend fun logout(): DomainResult<Unit> {
         return try {
             userPreferences.clearSession()
@@ -226,6 +304,17 @@ class AuthenticationRepository @Inject constructor(
             userDocRef.set(restoredUser).await()
             restoredUser
         }
+    }
+
+    private suspend fun updatePasswordStatus(hasPassword: Boolean) {
+        userPreferences.updatePasswordStatus(hasPassword)
+
+        val currentUserId = firebaseAuth.currentUser?.uid ?: return
+
+        firestore.collection(USER_COLLECTION)
+            .document(currentUserId)
+            .update("hasPassword", hasPassword)
+            .await()
     }
 
     companion object {

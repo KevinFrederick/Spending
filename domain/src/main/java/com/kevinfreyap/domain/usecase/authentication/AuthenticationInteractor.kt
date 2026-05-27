@@ -71,6 +71,41 @@ class AuthenticationInteractor @Inject constructor(
         return authenticationRepository.resetPassword(email)
     }
 
+    override suspend fun changePassword(
+        oldPassword: String,
+        newPassword: String
+    ): DomainResult<Unit> {
+        val errors = mutableListOf<ValidationError>()
+
+        validatePassword(oldPassword).forEach {
+            errors.add(it)
+        }
+        validatePassword(newPassword, true).forEach {
+            errors.add(it)
+        }
+
+        if (errors.isNotEmpty()) {
+            return DomainResult.ValidationFailed(errors)
+        }
+
+        return authenticationRepository.changePassword(oldPassword, newPassword)
+    }
+
+    override suspend fun createPassword(newPassword: String): DomainResult<Unit> {
+        val validateNewPassword = validatePassword(newPassword, true)
+
+        if (validateNewPassword.isNotEmpty()) {
+            return DomainResult.ValidationFailed(validateNewPassword)
+        }
+
+        return authenticationRepository.createPassword(newPassword)
+    }
+
+    // Only For Testing
+    override suspend fun removePassword(): DomainResult<Unit> {
+        return authenticationRepository.removePassword()
+    }
+
     override suspend fun logout(): DomainResult<Unit> = authenticationRepository.logout()
 
     private fun validateEmailAndPassword(
@@ -83,13 +118,32 @@ class AuthenticationInteractor @Inject constructor(
         if (email.isBlank()) errors.add(ValidationError.AuthenticationEmailBlank)
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) errors.add(ValidationError.AuthenticationEmailWrongFormat)
 
-        if (password.isBlank()) errors.add(ValidationError.AuthenticationPasswordBlank)
-        if (password.length < 8) errors.add(ValidationError.AuthenticationPasswordTooShort)
+        validatePassword(password).forEach {
+            errors.add(it)
+        }
 
         if (password.isNotBlank() && confirmPassword != null) {
-            if (confirmPassword.isBlank()) errors.add(ValidationError.AuthenticationConfirmPasswordBlank)
-            if (confirmPassword.length < 8) errors.add(ValidationError.AuthenticationConfirmPasswordTooShort)
+            validatePassword(confirmPassword).forEach {
+                errors.add(it)
+            }
             if (password != confirmPassword) errors.add(ValidationError.AuthenticationConfirmPasswordNotMatch)
+        }
+
+        return errors
+    }
+
+    private fun validatePassword(
+        password: String,
+        isNew: Boolean = false
+    ): List<ValidationError> {
+        val errors = mutableListOf<ValidationError>()
+
+        if (isNew) {
+            if (password.isBlank()) errors.add(ValidationError.AuthenticationNewPasswordBlank)
+            if (password.length < 8) errors.add(ValidationError.AuthenticationNewPasswordTooShort)
+        } else {
+            if (password.isBlank()) errors.add(ValidationError.AuthenticationPasswordBlank)
+            if (password.length < 8) errors.add(ValidationError.AuthenticationPasswordTooShort)
         }
 
         return errors

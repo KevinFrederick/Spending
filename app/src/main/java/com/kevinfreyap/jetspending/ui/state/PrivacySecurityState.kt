@@ -2,5 +2,6 @@ package com.kevinfreyap.jetspending.ui.state
 
 data class PrivacySecurityState(
     val isAppLockEnabled: Boolean = false,
-    val isBlockScreenshotEnabled: Boolean = true
+    val isBlockScreenshotEnabled: Boolean = true,
+    val hasPassword: Boolean = true
 )

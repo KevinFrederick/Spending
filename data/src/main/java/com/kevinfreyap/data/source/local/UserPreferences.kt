@@ -30,7 +30,7 @@ class UserPreferences @Inject constructor(
                     email = preferences[EMAIL_KEY] ?: "",
                     displayName = preferences[USERNAME_KEY] ?: "",
                     photoUrl = preferences[PHOTO_URL_KEY],
-                    isGoogleAccount = preferences[IS_GOOGLE_KEY] ?: false,
+                    hasPassword = preferences[HAS_PASSWORD] ?: true,
                     currency = AppCurrency.valueOf(currency)
                 )
             } else {
@@ -84,7 +84,7 @@ class UserPreferences @Inject constructor(
                 preferences[USERNAME_KEY] = displayName
                 preferences[PHOTO_URL_KEY] = photoUrl ?: ""
                 preferences[CURRENCY_KEY] = currency.name
-                preferences[IS_GOOGLE_KEY] = isGoogleAccount
+                preferences[HAS_PASSWORD] = hasPassword
             }
         }
     }
@@ -134,6 +134,12 @@ class UserPreferences @Inject constructor(
         }
     }
 
+    suspend fun updatePasswordStatus(hasPassword: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[HAS_PASSWORD] = hasPassword
+        }
+    }
+
     suspend fun clearSession() {
         dataStore.edit { preferences ->
             val currentTheme = preferences[THEME_KEY]
@@ -150,7 +156,7 @@ class UserPreferences @Inject constructor(
         private val USERNAME_KEY = stringPreferencesKey("username")
         private val EMAIL_KEY = stringPreferencesKey("email")
         private val PHOTO_URL_KEY = stringPreferencesKey("photo_url")
-        private val IS_GOOGLE_KEY = booleanPreferencesKey("is_google")
+        private val HAS_PASSWORD = booleanPreferencesKey("has_password")
         private val THEME_KEY = stringPreferencesKey("theme_mode")
         private val CURRENCY_KEY = stringPreferencesKey("currency")
         private val MONTHLY_NOTIFICATION = booleanPreferencesKey("monthly_notification")

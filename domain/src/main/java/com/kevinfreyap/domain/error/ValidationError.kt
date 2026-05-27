@@ -81,4 +81,16 @@ sealed class ValidationError(
         Field.IMAGE_URL,
         ErrorMessage.IMAGE_URL_BLANK
     )
+    object AuthenticationReLogin: ValidationError(
+        Field.AUTHENTICATION_NEW_PASSWORD,
+        ErrorMessage.RELOGIN
+    )
+    object AuthenticationNewPasswordBlank: ValidationError(
+        Field.AUTHENTICATION_NEW_PASSWORD,
+        ErrorMessage.AUTHENTICATION_PASSWORD_BLANK
+    )
+    object AuthenticationNewPasswordTooShort: ValidationError(
+        Field.AUTHENTICATION_NEW_PASSWORD,
+        ErrorMessage.AUTHENTICATION_PASSWORD_TOO_SHORT
+    )
 }

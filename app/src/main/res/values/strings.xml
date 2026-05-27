@@ -89,6 +89,9 @@
     <string name="block_screenshot">Block Screenshot</string>
     <string name="block_screenshot_subtitle">Hide data in background previews &amp; screenshot</string>
     <string name="change_password">Change Password</string>
+    <string name="create_password">Create Password</string>
+    <string name="current_password">Current Password</string>
+    <string name="new_password">New Password</string>
     <string name="delete_account">Delete Account</string>
     <string name="app_locked">App Locked</string>
     <string name="verify_identity">Verify Your Identity</string>
@@ -157,6 +160,8 @@
     <string name="success_message_transaction_updated">Transaction updated successfully!</string>
     <string name="success_email_sent">Email Sent!</string>
     <string name="success_profile_update">Profile updated successfully!</string>
+    <string name="success_change_password">Password Changed</string>
+    <string name="success_create_password">Password Created</string>
 
     <!-- Error Message -->
     <string name="error_something_went_wrong">Something went wrong</string>
@@ -184,6 +189,8 @@
     <string name="error_no_data">No data yet</string>
     <string name="error_username_blank">Username is required</string>
     <string name="error_img_url_blank">Selected image invalid</string>
+    <string name="error_create_password">Create password failed</string>
+    <string name="error_relogin">Please Re-Login before creating a password.</string>
     <string name="error_no_biometric">Please set up a PIN or Fingerprint in your Device Settings first.</string>
 
     <!-- Description -->
@@ -201,6 +208,8 @@
     <string name="description_notification_settings">Control how and when you receive updates. Tailor your notification preferences to ensure you always stay informed.</string>
     <string name="description_secure_access">Restrict who can open the app and view your transactions.</string>
     <string name="description_account_security">Update your login credentials or permanently delete your account.</string>
+    <string name="description_change_password">Confirm password and create new one.</string>
+    <string name="description_create_password">Enter new password.</string>
     <string name="description_feature_coming_soon">This feature is currently under development</string>
 
     <!-- Period Option -->
