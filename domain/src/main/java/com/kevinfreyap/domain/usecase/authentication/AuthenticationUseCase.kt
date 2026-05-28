@@ -25,5 +25,7 @@ interface AuthenticationUseCase {
         newPassword: String
     ): DomainResult<Unit>
     suspend fun createPassword(newPassword: String): DomainResult<Unit>
+    suspend fun reauthenticateWithGoogle(activity: Activity): DomainResult<Unit>
     suspend fun logout() : DomainResult<Unit>
+    suspend fun deleteAccount(password: String?): DomainResult<Unit>
 }

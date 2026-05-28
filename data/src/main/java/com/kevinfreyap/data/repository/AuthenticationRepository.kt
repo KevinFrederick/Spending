@@ -12,6 +12,7 @@ import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
@@ -62,40 +63,19 @@ class AuthenticationRepository @Inject constructor(
 
     override suspend fun authWithGoogle(activity: Activity): DomainResult<Unit> {
         return try {
-            val googleIdOption = GetGoogleIdOption.Builder()
-                .setFilterByAuthorizedAccounts(false)
-                .setServerClientId(BuildConfig.WEB_CLIENT_ID)
-                .setAutoSelectEnabled(false)
-                .build()
+            val idToken = getGoogleIdToken(activity)
+                ?: return DomainResult.Failure(Exception("Sign In Canceled"))
 
-            val request = GetCredentialRequest.Builder()
-                .addCredentialOption(googleIdOption)
-                .build()
+            val authCredential = GoogleAuthProvider.getCredential(idToken, null)
+            val authResult = firebaseAuth.signInWithCredential(authCredential).await()
+            val user = authResult.user
 
-            val credentialManager = CredentialManager.create(context)
-            val result = credentialManager.getCredential(activity, request)
-
-            val credential = result.credential
-            if (credential is CustomCredential &&
-                credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
-            ) {
-                val googleCredentials = GoogleIdTokenCredential.createFrom(credential.data)
-
-                val authCredential = GoogleAuthProvider.getCredential(googleCredentials.idToken, null)
-                val authResult = firebaseAuth.signInWithCredential(authCredential).await()
-                val user = authResult.user
-
-                if (user != null) {
-                    val userFirestore = updateOrSaveToFirestore(user)
-                    handleAuthResult(userFirestore)
-                } else {
-                    DomainResult.Failure(Exception("User is Null"))
-                }
+            if (user != null) {
+                val userFirestore = updateOrSaveToFirestore(user)
+                handleAuthResult(userFirestore)
             } else {
-                DomainResult.Failure(Exception("Invalid Credential Type"))
+                DomainResult.Failure(Exception("User is Null"))
             }
-        }catch (_: GetCredentialCancellationException) {
-            DomainResult.Failure(Exception("Sign In Canceled"))
         } catch (e: Exception) {
             DomainResult.Failure(e)
         }
@@ -222,6 +202,29 @@ class AuthenticationRepository @Inject constructor(
         }
     }
 
+    override suspend fun reauthenticateWithGoogle(activity: Activity): DomainResult<Unit> {
+        return try {
+            val user = firebaseAuth.currentUser ?: throw Exception("User not logged in")
+
+            val idToken = getGoogleIdToken(activity)
+                ?: return DomainResult.Failure(Exception("Verification Canceled"))
+
+            val authCredential = GoogleAuthProvider.getCredential(idToken, null)
+            user.reauthenticate(authCredential).await()
+
+            DomainResult.Success(Unit)
+        } catch (e: FirebaseAuthException) {
+            if (e.errorCode == "ERROR_USER_MISMATCH") {
+                DomainResult.ValidationFailed(listOf(ValidationError.AuthenticationUserMismatch))
+            } else {
+                DomainResult.Failure(e)
+            }
+
+        }  catch (e: Exception) {
+            DomainResult.Failure(e)
+        }
+    }
+
     override suspend fun logout(): DomainResult<Unit> {
         return try {
             userPreferences.clearSession()
@@ -238,6 +241,71 @@ class AuthenticationRepository @Inject constructor(
             DomainResult.Success(Unit)
         } catch (e: Exception) {
             DomainResult.Failure(e)
+        }
+    }
+
+    override suspend fun deleteAccount(password: String?): DomainResult<Unit> {
+        return try {
+            val user = firebaseAuth.currentUser ?: throw Exception("User not Logged In")
+
+            val uid = user.uid
+
+            if (password != null) {
+                val email = user.email ?: user.providerData.firstNotNullOfOrNull { it.email } ?: throw Exception("Email missing")
+                val credential = EmailAuthProvider.getCredential(email, password)
+                user.reauthenticate(credential).await()
+            }
+            firestore.collection(USER_COLLECTION)
+                .document(uid)
+                .delete()
+                .await()
+
+            userPreferences.clearSession()
+
+            user.delete().await()
+
+            DomainResult.Success(Unit)
+        } catch (_: FirebaseAuthRecentLoginRequiredException) {
+            DomainResult.ValidationFailed(listOf(
+                ValidationError.AuthenticationReLogin
+            ))
+        } catch (_: FirebaseAuthInvalidCredentialsException) {
+            DomainResult.ValidationFailed(listOf(
+                ValidationError.AuthenticationWrongPassword
+            ))
+        } catch (e: Exception) {
+            DomainResult.Failure(e)
+        }
+    }
+
+    private suspend fun getGoogleIdToken(activity: Activity): String? {
+        return try {
+            val googleIdOption = GetGoogleIdOption.Builder()
+                .setFilterByAuthorizedAccounts(false)
+                .setServerClientId(BuildConfig.WEB_CLIENT_ID)
+                .setAutoSelectEnabled(false)
+                .build()
+
+            val request = GetCredentialRequest.Builder()
+                .addCredentialOption(googleIdOption)
+                .build()
+
+            val credentialManager = CredentialManager.create(context)
+            val result = credentialManager.getCredential(activity, request)
+
+            val credential = result.credential
+            if (credential is CustomCredential &&
+                credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
+            ) {
+                val googleCredentials = GoogleIdTokenCredential.createFrom(credential.data)
+                googleCredentials.idToken
+            } else {
+                null
+            }
+        } catch (_: GetCredentialCancellationException) {
+            null
+        } catch (_: Exception) {
+            null
         }
     }
 

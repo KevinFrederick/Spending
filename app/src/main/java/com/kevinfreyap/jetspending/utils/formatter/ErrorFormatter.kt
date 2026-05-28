@@ -23,6 +23,7 @@ object ErrorFormatter {
             ErrorMessage.USERNAME_BLANK -> R.string.error_username_blank
             ErrorMessage.IMAGE_URL_BLANK -> R.string.error_img_url_blank
             ErrorMessage.RELOGIN -> R.string.error_relogin
+            ErrorMessage.AUTHENTICATION_WRONG_GOOGLE_ACCOUNT -> R.string.error_wrong_account
             else -> R.string.error_something_went_wrong
         }
     }

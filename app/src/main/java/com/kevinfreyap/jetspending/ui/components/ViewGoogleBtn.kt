@@ -22,7 +22,8 @@ import com.kevinfreyap.jetspending.ui.theme.Theme
 @Composable
 fun ViewGoogleBtn(
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    btnText: String? = null
 ) {
     OutlinedButton(
         onClick = onClick,
@@ -49,7 +50,7 @@ fun ViewGoogleBtn(
         )
 
         Text(
-            text = stringResource(R.string.continue_with_google),
+            text = btnText ?: stringResource(R.string.continue_with_google),
             fontWeight = FontWeight.SemiBold,
             style = MaterialTheme.typography.bodyLarge
         )

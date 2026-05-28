@@ -128,6 +128,9 @@
     <string name="change_picture">Change Picture</string>
     <string name="save_changes">Save Changes</string>
     <string name="unlock">Unlock</string>
+    <string name="delete">Delete</string>
+    <string name="verify_with_google">Verify with Google</string>
+    <string name="verify_and_delete">Verify and Delete</string>
 
     <!-- Theme -->
     <string name="select_theme">Select Theme</string>
@@ -162,6 +165,7 @@
     <string name="success_profile_update">Profile updated successfully!</string>
     <string name="success_change_password">Password Changed</string>
     <string name="success_create_password">Password Created</string>
+    <string name="success_account_deleted">Account Deleted</string>
 
     <!-- Error Message -->
     <string name="error_something_went_wrong">Something went wrong</string>
@@ -190,8 +194,9 @@
     <string name="error_username_blank">Username is required</string>
     <string name="error_img_url_blank">Selected image invalid</string>
     <string name="error_create_password">Create password failed</string>
-    <string name="error_relogin">Please Re-Login before creating a password.</string>
+    <string name="error_relogin">Please authenticate before create password.</string>
     <string name="error_no_biometric">Please set up a PIN or Fingerprint in your Device Settings first.</string>
+    <string name="error_wrong_account">Wrong account selected. Please select the Google account linked to this profile.</string>
 
     <!-- Description -->
     <string name="description_sign_up">Let\'s get started with a free account</string>
@@ -210,6 +215,8 @@
     <string name="description_account_security">Update your login credentials or permanently delete your account.</string>
     <string name="description_change_password">Confirm password and create new one.</string>
     <string name="description_create_password">Enter new password.</string>
+    <string name="description_delete_account">This will permanently erase all your data.</string>
+    <string name="description_account_deleted">Your account was successfully deleted.</string>
     <string name="description_feature_coming_soon">This feature is currently under development</string>
 
     <!-- Period Option -->

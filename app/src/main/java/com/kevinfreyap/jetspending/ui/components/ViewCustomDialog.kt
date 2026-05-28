@@ -2,19 +2,23 @@ package com.kevinfreyap.jetspending.ui.components
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,10 +42,12 @@ import com.kevinfreyap.jetspending.ui.theme.Theme
 fun ViewCustomDialog(
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
+    isLoading: Boolean = false,
     title: String? = null,
     message: String? = null,
     icon: Int? = null,
     iconColor: Color? = null,
+    textField: @Composable (() -> Unit)? = null,
     positiveBtn: @Composable (() -> Unit)? = null,
     negativeBtn: @Composable (() -> Unit)? = null,
 ) {
@@ -50,10 +56,12 @@ fun ViewCustomDialog(
     ) {
         ViewCustomDialogContent(
             modifier = modifier,
+            isLoading = isLoading,
             title = title,
             message = message,
             icon = icon,
             iconColor = iconColor,
+            textField = textField,
             positiveBtn = positiveBtn,
             negativeBtn = negativeBtn
         )
@@ -63,10 +71,12 @@ fun ViewCustomDialog(
 @Composable
 fun ViewCustomDialogContent(
     modifier: Modifier = Modifier,
+    isLoading: Boolean = false,
     title: String? = null,
     message: String? = null,
     icon: Int? = null,
     iconColor: Color? = null,
+    textField: @Composable (() -> Unit)? = null,
     positiveBtn: @Composable (() -> Unit)? = null,
     negativeBtn: @Composable (() -> Unit)? = null,
 ) {
@@ -80,7 +90,7 @@ fun ViewCustomDialogContent(
             modifier = modifier
                 .fillMaxWidth()
                 .height(IntrinsicSize.Min)
-                .padding(24.dp)
+                .padding(if (icon == null) 16.dp else 24.dp)
         ) {
             if (icon != null) {
                 Icon(
@@ -101,11 +111,11 @@ fun ViewCustomDialogContent(
                     fontWeight = FontWeight.SemiBold,
                     style = MaterialTheme.typography.headlineSmall,
                     color = Theme.custom.textColor,
-                    textAlign = TextAlign.Center,
+                    textAlign = if (icon == null) TextAlign.Start else TextAlign.Center,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(
-                            top = 8.dp
+                            top = if (icon == null) 0.dp else 8.dp
                         )
                 )
             }
@@ -115,24 +125,48 @@ fun ViewCustomDialogContent(
                     text = message,
                     style = MaterialTheme.typography.bodyLarge,
                     color = Theme.custom.textColor,
-                    textAlign = TextAlign.Center,
+                    textAlign = if (icon == null) TextAlign.Start else TextAlign.Center,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 4.dp)
+                        .padding(top = if (icon == null) 0.dp else 4.dp)
                 )
             }
 
+            if (isLoading) {
+                LinearProgressIndicator(
+                    color = MaterialTheme.colorScheme.primary,
+                    trackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
+            textField?.invoke()
+
             if (positiveBtn != null || negativeBtn != null){
                 Row(
-                    horizontalArrangement = Arrangement.SpaceAround,
+                    horizontalArrangement = if (icon == null) Arrangement.spacedBy(8.dp) else Arrangement.SpaceAround,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(
-                            top = 16.dp
+                            top = if (icon == null) 8.dp else 16.dp
                         )
                 ) {
-                    negativeBtn?.invoke()
-                    positiveBtn?.invoke()
+                    if (icon == null) {
+                        if (positiveBtn != null) {
+                            Box(modifier = Modifier.weight(1f)) {
+                                positiveBtn.invoke()
+                            }
+                        }
+
+                        if (negativeBtn != null) {
+                            Box(modifier = Modifier.weight(1f)) {
+                                negativeBtn.invoke()
+                            }
+                        }
+                    } else {
+                        negativeBtn?.invoke()
+                        positiveBtn?.invoke()
+                    }
                 }
             }
         }
@@ -152,12 +186,20 @@ fun ViewCustomDialogPreview() {
             iconColor = Green500,
             title = "Success",
             message = "Transaction Saved Successfully",
+//            textField = {
+//                ViewTextField(
+//                    value = "",
+//                    onValueChange = {},
+//                    label = "",
+//                    placeholder = "Current Password"
+//                )
+//            },
             negativeBtn = {
                 Button(
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Grey500
                     ),
-                    onClick = {}
+                    onClick = {},
                 ) {
                     Text(
                         text = "Cancel"

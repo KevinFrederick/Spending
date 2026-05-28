@@ -286,7 +286,14 @@ fun JetSpendingApp(
                     PrivacySecurityScreen(
                         onBackClick = {
                             navController.popBackStack()
-                        }
+                        },
+                        navigateToOnBoarding = {
+                            navController.navigate(Screen.OnBoarding.route) {
+                                popUpTo(0) {
+                                    inclusive = true
+                                }
+                            }
+                        },
                     )
                 }
             }

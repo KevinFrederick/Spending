@@ -101,7 +101,23 @@ class AuthenticationInteractor @Inject constructor(
         return authenticationRepository.createPassword(newPassword)
     }
 
+    override suspend fun reauthenticateWithGoogle(activity: Activity): DomainResult<Unit> {
+        return authenticationRepository.reauthenticateWithGoogle(activity)
+    }
+
     override suspend fun logout(): DomainResult<Unit> = authenticationRepository.logout()
+
+    override suspend fun deleteAccount(password: String?): DomainResult<Unit> {
+        if (password != null) {
+            val validatePassword = validatePassword(password)
+
+            if (validatePassword.isNotEmpty()) {
+                return DomainResult.ValidationFailed(validatePassword)
+            }
+        }
+
+        return authenticationRepository.deleteAccount(password)
+    }
 
     private fun validateEmailAndPassword(
         email: String,

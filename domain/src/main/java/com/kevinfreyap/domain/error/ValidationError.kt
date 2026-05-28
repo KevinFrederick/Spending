@@ -93,4 +93,8 @@ sealed class ValidationError(
         Field.AUTHENTICATION_NEW_PASSWORD,
         ErrorMessage.AUTHENTICATION_PASSWORD_TOO_SHORT
     )
+    object AuthenticationUserMismatch: ValidationError(
+        Field.RE_AUTH,
+        ErrorMessage.AUTHENTICATION_WRONG_GOOGLE_ACCOUNT
+    )
 }

@@ -7,4 +7,7 @@ interface PrivacySecurityAction {
     fun onNewPasswordChange(pass: String)
     fun onConfirmPasswordDialog()
     fun onCancelPasswordDialog()
+    fun onReAuthClicked()
+    fun onConfirmDeleteDialog()
+    fun onCancelDeleteDialog()
 }

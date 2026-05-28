@@ -1,23 +1,28 @@
 package com.kevinfreyap.jetspending.ui.screen.privacy_security
 
+import android.app.Activity
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kevinfreyap.domain.error.Field
+import com.kevinfreyap.domain.error.ValidationError
 import com.kevinfreyap.domain.resource.DomainResult
 import com.kevinfreyap.domain.usecase.authentication.AuthenticationUseCase
 import com.kevinfreyap.domain.usecase.privacy_security.PrivacySecurityUseCase
 import com.kevinfreyap.domain.usecase.user.UserUseCase
+import com.kevinfreyap.jetspending.ui.model.PendingAuthAction
 import com.kevinfreyap.jetspending.ui.state.PasswordFormState
 import com.kevinfreyap.jetspending.ui.state.PrivacySecurityState
 import com.kevinfreyap.jetspending.ui.state.UiState
 import com.kevinfreyap.jetspending.utils.ErrorHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -53,6 +58,12 @@ class PrivacySecurityViewModel @Inject constructor(
 
     private val _showDialog = MutableStateFlow(false)
     val showDialog: StateFlow<Boolean> = _showDialog
+
+    private val _reAuthDialog = MutableStateFlow(false)
+    val reAuthDialog: StateFlow<Boolean> = _reAuthDialog
+
+    private val _deleteSuccessChannel = Channel<Unit>()
+    val deleteSuccessChannel = _deleteSuccessChannel.receiveAsFlow()
 
     fun toggleAppLock(isEnabled: Boolean) {
         viewModelScope.launch {
@@ -123,6 +134,59 @@ class PrivacySecurityViewModel @Inject constructor(
                     _showDialog.value = true
                 }
                 is DomainResult.ValidationFailed -> {
+                    val requireReAuth = result.errors.any{ it is ValidationError.AuthenticationReLogin }
+
+                    if (requireReAuth) {
+                        _reAuthDialog.value = true
+                    } else {
+                        _uiState.value = UiState.ValidationErrors(
+                            ErrorHelper.validationErrorsToUiError(result.errors)
+                        )
+                    }
+
+                }
+                is DomainResult.Failure -> {
+                    Log.e(VIEW_MODEL_TAG, result.throwable.message ?: "Something Wrong")
+                    _uiState.value = UiState.Failure(result.throwable)
+                }
+            }
+        }
+    }
+
+    fun triggerGoogleReAuth(activity: Activity, pendingAction: PendingAuthAction) {
+        viewModelScope.launch {
+            when(val result = authenticationUseCase.reauthenticateWithGoogle(activity)) {
+                is DomainResult.Success -> {
+                    when(pendingAction) {
+                        PendingAuthAction.NONE -> {}
+                        PendingAuthAction.CREATE_PASSWORD -> createPassword()
+                        PendingAuthAction.DELETE_ACCOUNT -> deleteAccount(hasPassword = false)
+                    }
+                }
+                is DomainResult.ValidationFailed -> {
+                    _uiState.value = UiState.ValidationErrors(
+                        ErrorHelper.validationErrorsToUiError(result.errors)
+                    )
+                }
+                is DomainResult.Failure -> {
+                    _uiState.value = UiState.Failure(result.throwable)
+                }
+            }
+        }
+    }
+
+    fun deleteAccount(hasPassword: Boolean) {
+        _uiState.value = UiState.Loading
+
+        val password = if (hasPassword) _passwordForm.value.password else null
+
+        viewModelScope.launch {
+            when(val result = authenticationUseCase.deleteAccount(password)) {
+                is DomainResult.Success -> {
+                    _uiState.value = UiState.Success(Unit)
+                    _deleteSuccessChannel.send(Unit)
+                }
+                is DomainResult.ValidationFailed -> {
                     _uiState.value = UiState.ValidationErrors(
                         ErrorHelper.validationErrorsToUiError(result.errors)
                     )
@@ -141,8 +205,18 @@ class PrivacySecurityViewModel @Inject constructor(
         _uiState.value = ErrorHelper.removeError(_uiState.value, Field.AUTHENTICATION_NEW_PASSWORD)
     }
 
-    fun onDismissDialog() {
+    fun clearErrors() {
+        if (_uiState.value is UiState.ValidationErrors || _uiState.value is UiState.Failure) {
+            _uiState.value = UiState.Idle
+        }
+    }
+
+    fun onDismissSuccessDialog() {
         _showDialog.value = false
+    }
+
+    fun onDismissReAuthDialog() {
+        _reAuthDialog.value = false
     }
 
     companion object {
