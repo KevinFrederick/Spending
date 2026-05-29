@@ -167,7 +167,9 @@ fun EditProfileContent(
             )
 
             TextButton(
-                onClick = {}
+                onClick = {
+                    onShowComingSoonDialog(true)
+                }
             ) {
                 Text(
                     text = stringResource(R.string.change_picture),
@@ -221,7 +223,7 @@ fun EditProfileContent(
 
         if (showComingSoonDialog) {
             LaunchedEffect(Unit) {
-                delay(1000)
+                delay(3000)
                 onShowComingSoonDialog(false)
             }
 
