@@ -20,11 +20,6 @@ class TransactionQuery @Inject constructor() {
         when(filter.timeFilter){
             TimeFilterOption.ALL_TIME -> {}
             TimeFilterOption.LAST_7_DAYS -> {
-                val sevenDaysAgo = System.currentTimeMillis() - (7 * 24 * 60 * 60 * 1000)
-                queryBuilder.append(" AND date >= ?")
-                args.add(sevenDaysAgo)
-            }
-            TimeFilterOption.THIS_MONTH -> {
                 val userTimeZone = ZoneId.systemDefault()
                 val today = LocalDate.now(userTimeZone)
 
@@ -36,6 +31,23 @@ class TransactionQuery @Inject constructor() {
 
                 queryBuilder.append(" AND date >= ?")
                 args.add(startMillis)
+            }
+            TimeFilterOption.THIS_MONTH -> {
+                val zoneId = ZoneId.systemDefault()
+                val today = LocalDate.now(zoneId)
+
+                val startMillis = today.withDayOfMonth(1)
+                    .atStartOfDay(zoneId)
+                    .toInstant()
+                    .toEpochMilli()
+
+                val endMillis = today.plusDays(1)
+                    .atStartOfDay(zoneId)
+                    .toInstant()
+                    .toEpochMilli() - 1L
+
+                queryBuilder.append(" createdAt >= ? ")
+                args.addAll(listOf(startMillis, endMillis))
             }
             TimeFilterOption.PICK_DATE -> {
                 val startDate = filter.customStartDate
