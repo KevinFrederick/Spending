@@ -1,63 +1,81 @@
-# 💰 Multi Currency Expense Tracker
+# JetSpending
 
-An offline-first Android application to track income and expenses across various categories and multiple currencies with intelligent, date specific exchange rates synchronization. Built using Multi-Module Clean Architecture to ensure a clear separation of concerns with Dagger Hilt for dependency injection. Built with Room for local reliability and persistence while integrating Firebase for real-time syncronization across devices. With a modern UI built entirely on Jetpack Compose, the application features dynamic data visualization through charts that turn transactions into financial insights.
+JetSpending is a modern, offline-first Android personal finance and expense tracking application. Built entirely with Kotlin and Jetpack Compose, the app helps users manage their daily expenses, visualize their spending habits, and handle multi-currency transactions seamlessly.
 
-## 🌟 Key Features
-* **User Authentication**\
-  Uses Firebase Authentication to create account using Email & Password Or Google Account, providing secure access to data across multiple devices.
-* **Data Synchronization**\
-  Offline-first design using Room for instant local data persistence, which automatically syncs with Firebase when connection is available.
-* **Intelligent Exchange Rates Sync**\
-  Fetches exchange rates based on specific date of transaction, caching them in Room for instant access and syncing them to Firebase to ensure consistent rates across devices and prevent redundant API calls.
-* **Visual Financial Insights**\
-  Uses Vico chart library to create charts and data visualizations that transform transaction history into easy to understand income and expense trends.
-* **Modern Reactive UI**\
-  Built entirely with Jetpack Compose, offering fluid and responsive user experience following Material Design 3 standards.
-* **Clean Architecture**\
-  Structured into :app, :data, and :domain modules to keep the code decoupled, testable, and organized.
-* **Dependency Injection**\
-  Implements Dagger Hilt to manage dependencies across the multi-module setup.
+The project strictly adheres to **Clean Architecture** principles, ensuring a scalable, testable, and maintainable codebase separated into Presentation, Domain, and Data layers.
+
+## ✨ Features
+
+* **Offline-First Capabilities:** Logs transactions locally using Room Database, automatically syncing with Firebase Firestore when network connectivity is restored.
+
+* **Smart Multi-Currency Support:** Pulls daily exchange rates via a remote API and caches them locally. Converts currencies instantly without requiring an API call for every transaction.
+
+* **Comprehensive Reports Screen:** Visualizes spending habits with interactive bar charts and category-based percentage breakdowns in a dedicated reporting view.
+
+* **Comprehensive Authentication:** Secure your financial data with Google Sign-In, standard Email/Password, or local device Biometric/Fingerprint authentication.
+
+* **Scheduled Reminders:** Local notification system (surviving device reboots) to remind users to log their daily expenses.
+
+* **Flexible Filtering:** Filter transactions by custom date ranges, income/expense types, and custom categories.
+
+## 🏗️ Architecture
+
+JetSpending follows the **Clean Architecture** pattern, utilizing the MVVM (Model-View-ViewModel) design pattern in the presentation layer. The project is divided into three distinct modules:
+
+* **`app` (Presentation Layer):** Contains all Jetpack Compose UI elements, ViewModels, and UI States (e.g., `UiState`, `TransactionState`).
+
+* **`domain` (Domain Layer):** The core business logic hub containing pure Kotlin models (e.g., `Transaction`, `Category`), repository interfaces, and Use Cases/Interactors.
+
+* **`data` (Data Layer):** Manages data fetching, saving, and caching. Implements the Single Source of Truth pattern using Room, DataStore, Retrofit, and Firebase.
 
 ## 🛠️ Tech Stack
-* **Language** : Kotlin
-* **Architecture** : Multi-Module Clean Architecture, MVVM
-* **UI Framework** : Jetpack Compose
-* **Data Visualization** : Vico Charts
-* **Local Storage** : Room Database
-* **Network & API** : Retrofit, OkHttp, Gson
-* **Cloud & Authentication** : Firebase Firestore, Firebase Authentication
-* **Dependency Injection** : Dagger Hilt
-* **Asynchronous** : Kotlin Coroutines & Flow
 
-## 🏗️ Project Structure
-* **:app** : UI layer (Compose Components, Screens, ViewModels, Navigation)
-* **:data** : Data layer (Repository Implementation, Room Database, Retrofit, Firebase)
-* **:domain** : Domain layer (UseCases, Domain Models, Repository Interface)
-  
-## 📱 Screenshots
-* **Onboarding**
-  
-  <img src="images/Spending_Onboarding_Light.png" width="200" />  <img src="images/Spending_Onboarding_Dark.png" width="200"/>
-* **Sign Up & Sign In**
-  
-  <img src="images/Spending_SignUp_Light.png" width="200" />  <img src="images/Spending_SignIn_Light.png" width="200"/>\
-  <img src="images/Spending_SignUp_Dark.png" width="200" />  <img src="images/Spending_SignIn_Dark.png" width="200"/>
-* **Dashboard**
+* **Language:** Kotlin
 
-  <img src="images/Spending_Home_Light.png" width="200" />  <img src="images/Spending_Home_Dark.png" width="200"/>
-* **Report**
+* **UI:** Jetpack Compose
 
-  <img src="images/Spending_Report_Light.png" width="200" />  <img src="images/Spending_Report_Dark.png" width="200"/>
-* **New Transaction**
+* **Architecture:** Clean Architecture + MVVM
 
-  <img src="images/Spending_AmountInput_Light.png" width="200" />  <img src="images/Spending_InputScreen_Light.png" width="200"/>\
-  <img src="images/Spending_AmountInput_Dark.png" width="200" />  <img src="images/Spending_InputScreen_Dark.png" width="200"/>
-* **Transactions**
+* **Local Database:** Room
 
-  <img src="images/Spending_Transactions_Light.png" width="200" />  <img src="images/Spending_Transactions_Dark.png" width="200"/>
-* **Transaction Detail**
+* **Preferences:** Preferences Datastore
 
-  <img src="images/Spending_TransactionDetail_Light.png" width="200" />  <img src="images/Spending_TransactionDetail_Dark.png" width="200"/>
-* **Settings**
+* **Networking:** Retrofit & OkHttp
 
-  <img src="images/Spending_Settings_Light.png" width="200" />  <img src="images/Spending_Settings_Dark.png" width="200"/>
+* **Backend & Sync:** Firebase Authentication & Firestore
+
+* **Asynchronous Programming:** Kotlin Coroutines & Flow
+
+* **Security:** AndroidX Biometric API
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+* Android Studio
+
+* JDK 17
+
+* A Firebase Project (for Authentication and Firestore)
+
+### Installation
+
+1. **Clone the repository:**
+
+   ```bash
+   git clone https://github.com/KevinFrederick/Spending.git
+   ```
+
+2. **Open the project** in Android Studio.
+
+3. **Configure Firebase:**
+
+   * Register your app in your Firebase console.
+
+   * Download the `google-services.json` file and place it in the `app/` directory.
+
+4. **Build and Run:**
+
+   * Sync the project with Gradle files.
+
+   * Select an emulator or physical device and click Run.
