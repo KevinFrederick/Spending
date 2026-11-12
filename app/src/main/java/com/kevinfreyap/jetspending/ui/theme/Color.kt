@@ -2,14 +2,6 @@ package com.kevinfreyap.jetspending.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
-
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
-
 val OffWhite = Color(0xFFF8F9FA)
 
 // --- Reds ---
@@ -75,3 +67,47 @@ val Grey800 = Color(0xFF424242)
 val Grey900 = Color(0xFF212121)
 val Grey950 = Color(0xFF1E1E1E)
 val Grey1000 = Color(0xFF1A1A1A)
+
+// Light
+val LightBackground = Color(0xFFFAFCFB)
+
+val LightSurface = Color(0xFFFFFFFF)
+val LightSurfaceContainer = Color(0xFFF0F4F2)
+
+val LightPrimaryText = Color(0xFF19251F)
+val LightSecondaryText = Color(0xFF64716A)
+
+val LightPrimary = Color(0xFF286B59)
+val LightOnPrimary = Color(0xFFFFFFFF)
+
+val LightSecondary = Color(0xFF4A635B)
+val LightOnSecondary = Color(0xFFFFFFFF)
+
+val LightSecondaryContainer = Color(0xFFCDE8DD)
+val LightOnSecondaryContainer = Color(0xFF062018)
+
+val LightOnSurfaceVariant = Color(0xFF64716A)
+
+val LightHighlightContainer = Color(0xFFDCEEE5)
+
+// Dark
+val DarkBackground = Color(0xFF121214)
+
+val DarkSurface = Color(0xFF1C1C1F)
+val DarkSurfaceContainer = Color(0xFF242427)
+
+val DarkPrimaryText = Color(0xFFE2EBE5)
+val DarkSecondaryText = Color(0xFFA1B2A7)
+
+val DarkPrimary = Color(0xFF9AD5B9)
+val DarkOnPrimary = Color(0xFF103828)
+
+val DarkSecondary = Color(0xFFB1CCC1)
+val DarkOnSecondary = Color(0xFF1D352D)
+
+val DarkSecondaryContainer = Color(0xFF334B43)
+val DarkOnSecondaryContainer = Color(0xFFCDE8DD)
+
+val DarkOnSurfaceVariant = Color(0xFFA1B2A7)
+
+val DarkHighlightContainer = Color(0xFF323238)

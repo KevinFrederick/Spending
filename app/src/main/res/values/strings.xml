@@ -98,6 +98,8 @@
     <string name="coming_soon">Coming Soon</string>
 
     <!-- Button -->
+    <string name="btn_get_started">Get Started</string>
+
     <string name="cancel">Cancel</string>
     <string name="confirm">Confirm</string>
     <string name="save_transaction">Save Transaction</string>
@@ -105,7 +107,6 @@
     <string name="see_all">See All</string>
     <string name="add_transaction">Add Transaction</string>
     <string name="back">Back</string>
-    <string name="get_started">Get Started</string>
     <string name="continue_with_google">Continue with Google</string>
     <string name="sign_in">Sign In</string>
     <string name="sign_up">Sign Up</string>
@@ -223,4 +224,16 @@
     <string name="period_weekly">Weekly</string>
     <string name="period_monthly">Monthly</string>
     <string name="period_yearly">Yearly</string>
+
+    <!--  Placeholder  -->
+    <string name="placeholder_transaction_name">Lunch in Paris</string>
+    <string name="placeholder_transaction_amount">18.40</string>
+    <string name="placeholder_transaction_currency_code">EUR</string>
+    <string name="placeholder_transaction_converted_amount">USD 20.24</string>
+    <string name="placeholder_transaction_conversion_rate">1 EUR = 1.10 USD</string>
+
+    <!--  Message  -->
+    <string name="title_message_onboarding">Less Clutter. \nMore Control.</string>
+
+    <string name="subtitle_message_onboarding">Track everyday spending in any currency. \nOne simple view of where your money goes.</string>
 </resources>

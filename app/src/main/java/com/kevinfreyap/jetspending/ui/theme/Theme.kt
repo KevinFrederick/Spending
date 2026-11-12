@@ -20,29 +20,31 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Blue500,
-    onPrimary = Color.White,
-    secondary = Grey400,
-    background = Grey900,
-    surface = Grey900,
+    primary = DarkPrimary,
+    onPrimary = DarkOnPrimary,
+    secondary = DarkSecondary,
+    onSecondary = DarkOnSecondary,
+    background = DarkBackground,
+    surface = DarkSurface,
 
-    secondaryContainer = Color.White.copy(alpha = 0.1f),
-    onSecondaryContainer = Blue300,
-    surfaceContainer = Grey1000,
-    onSurfaceVariant = Color.White.copy(alpha = 0.2f)
+    secondaryContainer = DarkSecondaryContainer,
+    onSecondaryContainer = DarkOnSecondaryContainer,
+    surfaceContainer = DarkSurfaceContainer,
+    onSurfaceVariant = DarkOnSurfaceVariant
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Blue500,
-    onPrimary = Color.White,
-    secondary = Grey700,
-    background = OffWhite,
-    surface = OffWhite,
+    primary = LightPrimary,
+    onPrimary = LightOnPrimary,
+    secondary = LightSecondary,
+    onSecondary = LightOnSecondary,
+    background = LightBackground,
+    surface = LightSurface,
 
-    secondaryContainer = Blue500.copy(alpha = 0.1f),
-    onSecondaryContainer = Blue700,
-    surfaceContainer = Blue100.copy(alpha = 0.3f),
-    onSurfaceVariant = Grey400
+    secondaryContainer = LightSecondaryContainer,
+    onSecondaryContainer = LightOnSecondaryContainer,
+    surfaceContainer = LightSurfaceContainer,
+    onSurfaceVariant = LightOnSurfaceVariant
 )
 
 @Immutable
@@ -52,7 +54,11 @@ data class CustomColors(
     val textColor: Color,
     val iconColor: Color,
     val hintColor: Color,
-    val onBoardCardColor: Color
+    val onBoardCardColor: Color,
+
+    val primaryTextColor: Color,
+    val secondaryTextColor: Color,
+    val highlightContainer: Color
 )
 
 // Define the default/fallback
@@ -63,7 +69,11 @@ val LocalCustomColors = staticCompositionLocalOf {
         textColor = Color.Unspecified,
         iconColor = Color.Unspecified,
         hintColor = Color.Unspecified,
-        onBoardCardColor = Color.Unspecified
+        onBoardCardColor = Color.Unspecified,
+
+        primaryTextColor = Color.Unspecified,
+        secondaryTextColor = Color.Unspecified,
+        highlightContainer = Color.Unspecified
     )
 }
 
@@ -101,7 +111,11 @@ fun JetSpendingTheme(
             textColor = OffWhite,
             iconColor = Grey400,
             hintColor = Color.White.copy(alpha = 0.2f),
-            onBoardCardColor = Blue500.copy(alpha = 0.9f)
+            onBoardCardColor = Blue500.copy(alpha = 0.9f),
+
+            primaryTextColor = DarkPrimaryText,
+            secondaryTextColor = DarkSecondaryText,
+            highlightContainer = DarkHighlightContainer
         )
     } else {
         CustomColors(
@@ -110,7 +124,11 @@ fun JetSpendingTheme(
             textColor = Grey900,
             iconColor = Grey800,
             hintColor = Grey400,
-            onBoardCardColor = Blue200.copy(alpha = 0.8f)
+            onBoardCardColor = Blue200.copy(alpha = 0.8f),
+
+            primaryTextColor = LightPrimaryText,
+            secondaryTextColor = LightSecondaryText,
+            highlightContainer = LightHighlightContainer
         )
     }
 

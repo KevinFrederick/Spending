@@ -11,7 +11,7 @@ plugins {
 
 android {
     namespace = "com.kevinfreyap.jetspending"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.kevinfreyap.jetspending"

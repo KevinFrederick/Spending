@@ -40,6 +40,7 @@ import androidx.navigation.navArgument
 import com.kevinfreyap.jetspending.R
 import com.kevinfreyap.jetspending.ui.components.OfflineBanner
 import com.kevinfreyap.jetspending.ui.navigation.NavigationItem
+import com.kevinfreyap.jetspending.ui.navigation.OnboardingNavigation
 import com.kevinfreyap.jetspending.ui.navigation.Screen
 import com.kevinfreyap.jetspending.ui.screen.add_transaction.AddTransactionScreen
 import com.kevinfreyap.jetspending.ui.screen.dashboard.DashboardScreen
@@ -119,18 +120,14 @@ fun JetSpendingApp(
             ) {
                 composable(Screen.OnBoarding.route) {
                     OnboardingScreen(
-                        onGetStartedClicked = {
-                            navController.navigate(Screen.SignUp.route)
-                        },
-                        onSignInClicked = {
-                            navController.navigate(Screen.SignIn.route)
-                        },
-                        navigateToDashboard = {
-                            navController.navigate(Screen.Dashboard.route) {
-                                popUpTo(Screen.OnBoarding.route) {
-                                    inclusive = true
+                        onNavigate = { destination ->
+                            when(destination) {
+                                OnboardingNavigation.NavigateToSignIn -> {
+                                    navController.navigate(Screen.SignIn.route)
                                 }
-                                launchSingleTop = true
+                                OnboardingNavigation.NavigateToSignUp -> {
+                                    navController.navigate(Screen.SignUp.route)
+                                }
                             }
                         }
                     )
