@@ -30,7 +30,8 @@ private val DarkColorScheme = darkColorScheme(
     secondaryContainer = DarkSecondaryContainer,
     onSecondaryContainer = DarkOnSecondaryContainer,
     surfaceContainer = DarkSurfaceContainer,
-    onSurfaceVariant = DarkOnSurfaceVariant
+    onSurfaceVariant = DarkOnSurfaceVariant,
+    outline = DarkOutline
 )
 
 private val LightColorScheme = lightColorScheme(
@@ -44,7 +45,8 @@ private val LightColorScheme = lightColorScheme(
     secondaryContainer = LightSecondaryContainer,
     onSecondaryContainer = LightOnSecondaryContainer,
     surfaceContainer = LightSurfaceContainer,
-    onSurfaceVariant = LightOnSurfaceVariant
+    onSurfaceVariant = LightOnSurfaceVariant,
+    outline = LightOutline
 )
 
 @Immutable

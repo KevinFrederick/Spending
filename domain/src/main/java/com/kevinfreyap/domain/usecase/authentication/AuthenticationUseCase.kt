@@ -1,12 +1,11 @@
 package com.kevinfreyap.domain.usecase.authentication
 
-import android.app.Activity
 import com.kevinfreyap.domain.resource.DomainResult
 import kotlinx.coroutines.flow.Flow
 
 interface AuthenticationUseCase {
     fun getAuthState(): Flow<Boolean>
-    suspend fun authWithGoogle(activity: Activity): DomainResult<Unit>
+    suspend fun authWithGoogle(idToken: String): DomainResult<Unit>
     suspend fun isUserLoggedIn(): Boolean
     suspend fun register(
         email: String,
@@ -25,7 +24,7 @@ interface AuthenticationUseCase {
         newPassword: String
     ): DomainResult<Unit>
     suspend fun createPassword(newPassword: String): DomainResult<Unit>
-    suspend fun reauthenticateWithGoogle(activity: Activity): DomainResult<Unit>
+    suspend fun reauthenticateWithGoogle(idToken: String): DomainResult<Unit>
     suspend fun logout() : DomainResult<Unit>
     suspend fun deleteAccount(password: String?): DomainResult<Unit>
 }

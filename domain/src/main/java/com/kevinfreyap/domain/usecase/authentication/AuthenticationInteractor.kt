@@ -1,6 +1,5 @@
 package com.kevinfreyap.domain.usecase.authentication
 
-import android.app.Activity
 import android.util.Patterns
 import com.kevinfreyap.domain.error.ValidationError
 import com.kevinfreyap.domain.model.AuthenticationRequest
@@ -16,8 +15,8 @@ class AuthenticationInteractor @Inject constructor(
         return authenticationRepository.getAuthState()
     }
 
-    override suspend fun authWithGoogle(activity: Activity): DomainResult<Unit> {
-        return authenticationRepository.authWithGoogle(activity)
+    override suspend fun authWithGoogle(idToken: String): DomainResult<Unit> {
+        return authenticationRepository.authWithGoogle(idToken)
     }
 
     override suspend fun isUserLoggedIn(): Boolean {
@@ -101,8 +100,8 @@ class AuthenticationInteractor @Inject constructor(
         return authenticationRepository.createPassword(newPassword)
     }
 
-    override suspend fun reauthenticateWithGoogle(activity: Activity): DomainResult<Unit> {
-        return authenticationRepository.reauthenticateWithGoogle(activity)
+    override suspend fun reauthenticateWithGoogle(idToken: String): DomainResult<Unit> {
+        return authenticationRepository.reauthenticateWithGoogle(idToken)
     }
 
     override suspend fun logout(): DomainResult<Unit> = authenticationRepository.logout()

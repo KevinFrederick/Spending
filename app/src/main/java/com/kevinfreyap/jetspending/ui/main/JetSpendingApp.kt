@@ -42,6 +42,8 @@ import com.kevinfreyap.jetspending.ui.components.OfflineBanner
 import com.kevinfreyap.jetspending.ui.navigation.NavigationItem
 import com.kevinfreyap.jetspending.ui.navigation.OnboardingNavigation
 import com.kevinfreyap.jetspending.ui.navigation.Screen
+import com.kevinfreyap.jetspending.ui.navigation.SignInNavigation
+import com.kevinfreyap.jetspending.ui.navigation.SignUpNavigation
 import com.kevinfreyap.jetspending.ui.screen.add_transaction.AddTransactionScreen
 import com.kevinfreyap.jetspending.ui.screen.dashboard.DashboardScreen
 import com.kevinfreyap.jetspending.ui.screen.detail.DetailTransactionScreen
@@ -134,44 +136,50 @@ fun JetSpendingApp(
                 }
                 composable(Screen.SignUp.route) {
                     SignUpScreen(
-                        onBackClick = {
-                            navController.popBackStack()
-                        },
-                        onSignInClicked = {
-                            navController.navigate(Screen.SignIn.route) {
-                                popUpTo(Screen.OnBoarding.route) {
-                                    inclusive = false
+                        onNavigate = { destination ->
+                            when(destination) {
+                                SignUpNavigation.NavigateUp -> {
+                                    navController.popBackStack()
                                 }
-                            }
-                        },
-                        navigateToDashboard = {
-                            navController.navigate(Screen.Dashboard.route) {
-                                popUpTo(Screen.OnBoarding.route) {
-                                    inclusive = true
+                                SignUpNavigation.NavigateToDashboard -> {
+                                    navController.navigate(Screen.Dashboard.route) {
+                                        popUpTo(Screen.OnBoarding.route) {
+                                            inclusive = true
+                                        }
+                                        launchSingleTop = true
+                                    }
                                 }
-                                launchSingleTop = true
+                                SignUpNavigation.NavigateToSignIn -> {
+                                    navController.navigate(Screen.SignIn.route) {
+                                        popUpTo(Screen.OnBoarding.route) {
+                                            inclusive = false
+                                        }
+                                    }
+                                }
                             }
                         }
                     )
                 }
                 composable(Screen.SignIn.route) {
                     SignInScreen(
-                        onBackClick = {
-                            navController.popBackStack()
-                        },
-                        onSignUpClicked = {
-                            navController.navigate(Screen.SignUp.route) {
-                                popUpTo(Screen.OnBoarding.route) {
-                                    inclusive = false
+                        onNavigate = {destination ->
+                            when(destination) {
+                                SignInNavigation.NavigateUp -> navController.popBackStack()
+                                SignInNavigation.NavigateToSignUp -> {
+                                    navController.navigate(Screen.SignUp.route) {
+                                        popUpTo (Screen.OnBoarding.route) {
+                                            inclusive = false
+                                        }
+                                    }
                                 }
-                            }
-                        },
-                        navigateToDashboard = {
-                            navController.navigate(Screen.Dashboard.route) {
-                                popUpTo(Screen.OnBoarding.route) {
-                                    inclusive = true
+                                SignInNavigation.NavigateToDashboard -> {
+                                    navController.navigate(Screen.Dashboard.route) {
+                                        popUpTo(Screen.OnBoarding.route) {
+                                            inclusive = true
+                                        }
+                                        launchSingleTop = true
+                                    }
                                 }
-                                launchSingleTop = true
                             }
                         }
                     )

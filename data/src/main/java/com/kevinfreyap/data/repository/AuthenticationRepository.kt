@@ -1,15 +1,7 @@
 package com.kevinfreyap.data.repository
 
-import android.app.Activity
-import android.content.Context
 import android.util.Log
-import androidx.credentials.CredentialManager
-import androidx.credentials.CustomCredential
-import androidx.credentials.GetCredentialRequest
-import androidx.credentials.exceptions.GetCredentialCancellationException
 import androidx.room.withTransaction
-import com.google.android.libraries.identity.googleid.GetGoogleIdOption
-import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
@@ -21,7 +13,6 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.userProfileChangeRequest
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-import com.kevinfreyap.data.BuildConfig
 import com.kevinfreyap.data.mapper.UserMapper
 import com.kevinfreyap.data.source.local.AppDatabase
 import com.kevinfreyap.data.source.local.UserPreferences
@@ -31,23 +22,19 @@ import com.kevinfreyap.domain.error.ValidationError
 import com.kevinfreyap.domain.model.AuthenticationRequest
 import com.kevinfreyap.domain.repository.IAuthenticationRepository
 import com.kevinfreyap.domain.resource.DomainResult
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import java.lang.Exception
 import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
 class AuthenticationRepository @Inject constructor(
     private val firebaseAuth: FirebaseAuth,
     private val firestore: FirebaseFirestore,
     private val userPreferences: UserPreferences,
     private val database: AppDatabase,
     private val userMapper: UserMapper,
-    @param:ApplicationContext private val context: Context
 ): IAuthenticationRepository {
     override fun getAuthState(): Flow<Boolean> = callbackFlow{
         val authListener = FirebaseAuth.AuthStateListener { auth ->
@@ -61,11 +48,8 @@ class AuthenticationRepository @Inject constructor(
         }
     }
 
-    override suspend fun authWithGoogle(activity: Activity): DomainResult<Unit> {
+    override suspend fun authWithGoogle(idToken: String): DomainResult<Unit> {
         return try {
-            val idToken = getGoogleIdToken(activity)
-                ?: return DomainResult.Failure(Exception("Sign In Canceled"))
-
             val authCredential = GoogleAuthProvider.getCredential(idToken, null)
             val authResult = firebaseAuth.signInWithCredential(authCredential).await()
             val user = authResult.user
@@ -202,12 +186,9 @@ class AuthenticationRepository @Inject constructor(
         }
     }
 
-    override suspend fun reauthenticateWithGoogle(activity: Activity): DomainResult<Unit> {
+    override suspend fun reauthenticateWithGoogle(idToken: String): DomainResult<Unit> {
         return try {
             val user = firebaseAuth.currentUser ?: throw Exception("User not logged in")
-
-            val idToken = getGoogleIdToken(activity)
-                ?: return DomainResult.Failure(Exception("Verification Canceled"))
 
             val authCredential = GoogleAuthProvider.getCredential(idToken, null)
             user.reauthenticate(authCredential).await()
@@ -275,37 +256,6 @@ class AuthenticationRepository @Inject constructor(
             ))
         } catch (e: Exception) {
             DomainResult.Failure(e)
-        }
-    }
-
-    private suspend fun getGoogleIdToken(activity: Activity): String? {
-        return try {
-            val googleIdOption = GetGoogleIdOption.Builder()
-                .setFilterByAuthorizedAccounts(false)
-                .setServerClientId(BuildConfig.WEB_CLIENT_ID)
-                .setAutoSelectEnabled(false)
-                .build()
-
-            val request = GetCredentialRequest.Builder()
-                .addCredentialOption(googleIdOption)
-                .build()
-
-            val credentialManager = CredentialManager.create(context)
-            val result = credentialManager.getCredential(activity, request)
-
-            val credential = result.credential
-            if (credential is CustomCredential &&
-                credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
-            ) {
-                val googleCredentials = GoogleIdTokenCredential.createFrom(credential.data)
-                googleCredentials.idToken
-            } else {
-                null
-            }
-        } catch (_: GetCredentialCancellationException) {
-            null
-        } catch (_: Exception) {
-            null
         }
     }
 

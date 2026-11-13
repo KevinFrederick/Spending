@@ -99,6 +99,8 @@
 
     <!-- Button -->
     <string name="btn_get_started">Get Started</string>
+    <string name="btn_sign_in">Sign In</string>
+    <string name="btn_sign_up">Sign Up</string>
 
     <string name="cancel">Cancel</string>
     <string name="confirm">Confirm</string>
@@ -108,8 +110,6 @@
     <string name="add_transaction">Add Transaction</string>
     <string name="back">Back</string>
     <string name="continue_with_google">Continue with Google</string>
-    <string name="sign_in">Sign In</string>
-    <string name="sign_up">Sign Up</string>
     <string name="logout">Log Out</string>
     <string name="edit_profile">Edit Profile</string>
     <string name="notifications">Notifications</string>
@@ -234,6 +234,10 @@
 
     <!--  Message  -->
     <string name="title_message_onboarding">Less Clutter. \nMore Control.</string>
+    <string name="title_message_sign_in">Welcome back</string>
+    <string name="title_message_sign_up">Let\'s start</string>
 
     <string name="subtitle_message_onboarding">Track everyday spending in any currency. \nOne simple view of where your money goes.</string>
+    <string name="subtitle_message_sign_in">Track your spending in one place</string>
+    <string name="subtitle_message_sign_up">Create your free account today</string>
 </resources>

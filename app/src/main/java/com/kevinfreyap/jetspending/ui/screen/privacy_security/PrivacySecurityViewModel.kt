@@ -1,6 +1,5 @@
 package com.kevinfreyap.jetspending.ui.screen.privacy_security
 
-import android.app.Activity
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -153,9 +152,9 @@ class PrivacySecurityViewModel @Inject constructor(
         }
     }
 
-    fun triggerGoogleReAuth(activity: Activity, pendingAction: PendingAuthAction) {
+    fun triggerGoogleReAuth(idToken: String, pendingAction: PendingAuthAction) {
         viewModelScope.launch {
-            when(val result = authenticationUseCase.reauthenticateWithGoogle(activity)) {
+            when(val result = authenticationUseCase.reauthenticateWithGoogle(idToken)) {
                 is DomainResult.Success -> {
                     when(pendingAction) {
                         PendingAuthAction.NONE -> {}

@@ -86,7 +86,7 @@ fun OnboardingContent(
 
                 ViewAnnotatedTextButton(
                     labelText = stringResource(R.string.have_account_already),
-                    textButton = stringResource(R.string.sign_in),
+                    textButton = stringResource(R.string.btn_sign_in),
                     onClick = {
                         onNavigate(OnboardingNavigation.NavigateToSignIn)
                     }

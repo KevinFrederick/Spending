@@ -27,6 +27,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -44,6 +45,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.kevinfreyap.domain.error.Field
 import com.kevinfreyap.jetspending.R
 import com.kevinfreyap.jetspending.ui.biometric.BiometricAuthManager
+import com.kevinfreyap.jetspending.ui.client.GoogleAuthClient
 import com.kevinfreyap.jetspending.ui.components.ViewCustomDialog
 import com.kevinfreyap.jetspending.ui.components.ViewGoogleBtn
 import com.kevinfreyap.jetspending.ui.components.ViewPasswordDialog
@@ -60,9 +62,9 @@ import com.kevinfreyap.jetspending.ui.theme.Grey500
 import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
 import com.kevinfreyap.jetspending.ui.theme.Red500
 import com.kevinfreyap.jetspending.ui.theme.Theme
-import com.kevinfreyap.jetspending.utils.findActivity
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 @Composable
 fun PrivacySecurityScreen(
@@ -78,8 +80,10 @@ fun PrivacySecurityScreen(
     val uiState by viewModel.uiState.collectAsState()
 
     val context = LocalContext.current
-    val activity = context.findActivity()
     val authManager = remember { BiometricAuthManager(context) }
+
+    val coroutineScope = rememberCoroutineScope()
+    val googleAuthClient = remember { GoogleAuthClient(context) }
 
     val (showPasswordDialog, setShowPasswordDialog) = remember { mutableStateOf(false) }
     val (showDeleteDialog, setShowDeleteDialog) = remember { mutableStateOf(false) }
@@ -184,8 +188,11 @@ fun PrivacySecurityScreen(
             override fun onReAuthClicked() {
                 viewModel.onDismissReAuthDialog()
 
-                activity?.let {
-                    viewModel.triggerGoogleReAuth(it, PendingAuthAction.CREATE_PASSWORD)
+                coroutineScope.launch {
+                    val idToken = googleAuthClient.getGoogleIdToken()
+                    if (idToken != null) {
+                        viewModel.triggerGoogleReAuth(idToken, PendingAuthAction.CREATE_PASSWORD)
+                    }
                 }
             }
 
@@ -193,8 +200,11 @@ fun PrivacySecurityScreen(
                 if (privacySecurityState.hasPassword) {
                     viewModel.deleteAccount(true)
                 } else {
-                    activity?.let {
-                        viewModel.triggerGoogleReAuth(it, PendingAuthAction.DELETE_ACCOUNT)
+                    coroutineScope.launch {
+                        val idToken = googleAuthClient.getGoogleIdToken()
+                        if (idToken != null) {
+                            viewModel.triggerGoogleReAuth(idToken, PendingAuthAction.DELETE_ACCOUNT)
+                        }
                     }
                 }
             }

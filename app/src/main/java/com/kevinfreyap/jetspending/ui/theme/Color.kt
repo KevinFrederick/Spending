@@ -88,7 +88,10 @@ val LightOnSecondaryContainer = Color(0xFF062018)
 
 val LightOnSurfaceVariant = Color(0xFF64716A)
 
+val LightOutline = Color(0xFFD8E1DC)
+
 val LightHighlightContainer = Color(0xFFDCEEE5)
+
 
 // Dark
 val DarkBackground = Color(0xFF121214)
@@ -109,5 +112,7 @@ val DarkSecondaryContainer = Color(0xFF334B43)
 val DarkOnSecondaryContainer = Color(0xFFCDE8DD)
 
 val DarkOnSurfaceVariant = Color(0xFFA1B2A7)
+
+val DarkOutline = Color(0xFF45454B)
 
 val DarkHighlightContainer = Color(0xFF323238)
