@@ -60,7 +60,12 @@ data class CustomColors(
 
     val primaryTextColor: Color,
     val secondaryTextColor: Color,
-    val highlightContainer: Color
+    val highlightContainer: Color,
+    val statusPositive: Color,
+    val statusNegative: Color,
+    val negativeContainer: Color,
+    val shimmerColor: Color,
+    val highlightShimmerColor: Color
 )
 
 // Define the default/fallback
@@ -75,7 +80,12 @@ val LocalCustomColors = staticCompositionLocalOf {
 
         primaryTextColor = Color.Unspecified,
         secondaryTextColor = Color.Unspecified,
-        highlightContainer = Color.Unspecified
+        highlightContainer = Color.Unspecified,
+        statusPositive = Color.Unspecified,
+        statusNegative = Color.Unspecified,
+        negativeContainer = Color.Unspecified,
+        shimmerColor = Color.Unspecified,
+        highlightShimmerColor = Color.Unspecified
     )
 }
 
@@ -117,7 +127,12 @@ fun JetSpendingTheme(
 
             primaryTextColor = DarkPrimaryText,
             secondaryTextColor = DarkSecondaryText,
-            highlightContainer = DarkHighlightContainer
+            highlightContainer = DarkHighlightContainer,
+            statusPositive = DarkStatusPositive,
+            statusNegative = DarkStatusNegative,
+            negativeContainer = DarkNegativeContainer,
+            shimmerColor = DarkShimmer,
+            highlightShimmerColor = DarkHighlightShimmer
         )
     } else {
         CustomColors(
@@ -130,7 +145,12 @@ fun JetSpendingTheme(
 
             primaryTextColor = LightPrimaryText,
             secondaryTextColor = LightSecondaryText,
-            highlightContainer = LightHighlightContainer
+            highlightContainer = LightHighlightContainer,
+            statusPositive = LightStatusPositive,
+            statusNegative = LightStatusNegative,
+            negativeContainer = LightNegativeContainer,
+            shimmerColor = LightShimmer,
+            highlightShimmerColor = LightHighlightShimmer
         )
     }
 

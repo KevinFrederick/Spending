@@ -1,7 +1,9 @@
 package com.kevinfreyap.jetspending.ui.components.v2
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -13,6 +15,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -21,7 +24,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kevinfreyap.jetspending.R
 import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
+import com.kevinfreyap.jetspending.ui.theme.Theme
 import com.kevinfreyap.jetspending.utils.debouncedClick
+import com.kevinfreyap.jetspending.utils.shimmerEffect
 
 @Composable
 fun ViewPrimaryButton(
@@ -45,7 +50,10 @@ fun ViewPrimaryButton(
             containerColor = containerColor,
             contentColor = contentColor
         ),
-        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+        contentPadding = PaddingValues(
+            horizontal = 16.dp,
+            vertical = 8.dp
+        ),
         modifier = modifier
     ) {
         if (icon != null) {
@@ -66,6 +74,20 @@ fun ViewPrimaryButton(
     }
 }
 
+@Composable
+fun ViewPrimaryButtonPlaceholder() {
+    Box(
+        modifier = Modifier
+            .defaultMinSize(minHeight = 50.dp)
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+            .clip(RoundedCornerShape(50))
+            .shimmerEffect(
+                shimmerColor = Theme.custom.shimmerColor
+            )
+    )
+}
+
 @Preview
 @Composable
 fun ViewPrimaryButtonPreview() {
@@ -84,5 +106,13 @@ fun ViewPrimaryButtonPreview() {
             modifier = Modifier
                 .fillMaxWidth()
         )
+    }
+}
+
+@Preview
+@Composable
+fun ViewPrimaryButtonPlaceholderPreview() {
+    JetSpendingTheme {
+        ViewPrimaryButtonPlaceholder()
     }
 }

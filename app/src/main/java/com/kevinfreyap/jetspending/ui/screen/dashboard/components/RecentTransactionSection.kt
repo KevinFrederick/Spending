@@ -1,0 +1,192 @@
+package com.kevinfreyap.jetspending.ui.screen.dashboard.components
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.LocalMinimumInteractiveComponentSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.kevinfreyap.domain.model.TransactionType
+import com.kevinfreyap.jetspending.R
+import com.kevinfreyap.jetspending.ui.components.v2.ViewTransactionItem
+import com.kevinfreyap.jetspending.ui.components.v2.ViewTransactionItemPlaceholder
+import com.kevinfreyap.jetspending.ui.state.TransactionItemState
+import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
+import com.kevinfreyap.jetspending.ui.theme.Theme
+import com.kevinfreyap.jetspending.utils.shimmerEffect
+
+@Composable
+fun RecentTransactionSection(
+    transactions: List<TransactionItemState>,
+    onTransactionClicked: (String) -> Unit,
+    onSeeAllTransactionClicked: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = modifier
+            .fillMaxWidth()
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            Text(
+                text = stringResource(R.string.recent_transaction),
+                style = MaterialTheme.typography.titleMedium,
+                color = Theme.custom.primaryTextColor
+            )
+
+            CompositionLocalProvider(
+                LocalMinimumInteractiveComponentSize provides 0.dp
+            ) {
+                TextButton(
+                    onClick = onSeeAllTransactionClicked,
+                    contentPadding = PaddingValues(
+                        horizontal = 8.dp,
+                        vertical = 4.dp
+                    ),
+                    modifier = Modifier
+                        .defaultMinSize(
+                            minWidth = 1.dp,
+                            minHeight = 1.dp
+                        )
+                ) {
+                    Text(
+                        text = stringResource(R.string.btn_txt_see_all),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                }
+            }
+        }
+
+        transactions.forEach { transaction ->
+            ViewTransactionItem(
+                state = transaction,
+                onClick = onTransactionClicked
+            )
+        }
+    }
+}
+
+@Composable
+fun RecentTransactionSectionPlaceholder() {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            Text(
+                text = "",
+                style = MaterialTheme.typography.titleMedium,
+                color = Color.Transparent,
+                modifier = Modifier
+                    .clearAndSetSemantics {}
+                    .fillMaxWidth(0.5f)
+                    .clip(RoundedCornerShape(50))
+                    .shimmerEffect(
+                        shimmerColor = Theme.custom.shimmerColor
+                    )
+            )
+
+            Text(
+                text = "",
+                style = MaterialTheme.typography.labelLarge,
+                color = Color.Transparent,
+                modifier = Modifier
+                    .clearAndSetSemantics {}
+                    .padding(
+                        horizontal = 8.dp,
+                        vertical = 4.dp
+                    )
+                    .fillMaxWidth(0.3f)
+                    .clip(RoundedCornerShape(50))
+                    .shimmerEffect(
+                        shimmerColor = Theme.custom.shimmerColor
+                    )
+            )
+        }
+
+        repeat(3) {
+            ViewTransactionItemPlaceholder()
+        }
+    }
+}
+
+@Preview (
+    showBackground = true
+)
+@Composable
+fun RecentTransactionSectionPreview() {
+    JetSpendingTheme {
+        RecentTransactionSection(
+            onTransactionClicked = {},
+            onSeeAllTransactionClicked = {},
+            transactions = listOf(
+                TransactionItemState(
+                    transactionId = "1",
+                    transactionType = TransactionType.SPENDING,
+                    transactionCategoryIcon = painterResource(R.drawable.ic_food_icon),
+                    transactionName = "Lunch",
+                    transactionDesc = "Food & Drink · 18 Sep 2026",
+                    transactionAmount = "70.00",
+                    transactionCurrency = "USD"
+                ),
+                TransactionItemState(
+                    transactionId = "2",
+                    transactionType = TransactionType.SPENDING,
+                    transactionCategoryIcon = painterResource(R.drawable.ic_food_icon),
+                    transactionName = "Lunch",
+                    transactionDesc = "Food & Drink · 18 Sep 2026",
+                    transactionAmount = "70.00",
+                    transactionCurrency = "USD"
+                ),
+                TransactionItemState(
+                    transactionId = "3",
+                    transactionType = TransactionType.SPENDING,
+                    transactionCategoryIcon = painterResource(R.drawable.ic_food_icon),
+                    transactionName = "Lunch",
+                    transactionDesc = "Food & Drink · 18 Sep 2026",
+                    transactionAmount = "70.00",
+                    transactionCurrency = "USD"
+                )
+            )
+        )
+    }
+}
+
+@Preview(
+    showBackground = true
+)
+@Composable
+fun RecentTransactionSectionPlaceholderPreview() {
+    JetSpendingTheme {
+        RecentTransactionSectionPlaceholder()
+    }
+}

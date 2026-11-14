@@ -92,6 +92,12 @@ val LightOutline = Color(0xFFD8E1DC)
 
 val LightHighlightContainer = Color(0xFFDCEEE5)
 
+val LightStatusPositive = Color(0xFF287452)
+val LightStatusNegative = Color(0xFFAC5148)
+val LightNegativeContainer = Color(0xFFF8EAE6)
+
+val LightShimmer = Color(0xFFE8EEEB)
+val LightHighlightShimmer = Color(0xFFC2DFD1)
 
 // Dark
 val DarkBackground = Color(0xFF121214)
@@ -116,3 +122,10 @@ val DarkOnSurfaceVariant = Color(0xFFA1B2A7)
 val DarkOutline = Color(0xFF45454B)
 
 val DarkHighlightContainer = Color(0xFF323238)
+
+val DarkStatusPositive = Color(0xFF9BD4B1)
+val DarkStatusNegative = Color(0xFFF2AAA0)
+val DarkNegativeContainer = Color(0xFF3C2B28)
+
+val DarkShimmer = Color(0xFF35353B)
+val DarkHighlightShimmer = Color(0xFF47474F)

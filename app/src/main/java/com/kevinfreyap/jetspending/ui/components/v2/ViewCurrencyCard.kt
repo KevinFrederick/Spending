@@ -15,13 +15,17 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kevinfreyap.jetspending.R
 import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
 import com.kevinfreyap.jetspending.ui.theme.Theme
+import com.kevinfreyap.jetspending.utils.shimmerEffect
 
 @Composable
 fun ViewCurrencyCard(
@@ -32,7 +36,7 @@ fun ViewCurrencyCard(
     modifier: Modifier = Modifier
 ) {
     Card(
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
             containerColor = containerColor,
         ),
@@ -47,6 +51,68 @@ fun ViewCurrencyCard(
             topLabel()
             centerValue()
             bottomInformation()
+        }
+    }
+}
+
+@Composable
+fun ViewCurrencyCardPlaceholder() {
+    Card(
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Theme.custom.highlightContainer,
+        ),
+    ) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp)
+        ) {
+            Text(
+                text = "",
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.Transparent,
+                modifier = Modifier
+                    .clearAndSetSemantics {}
+                    .fillMaxWidth(0.5f)
+                    .clip(RoundedCornerShape(50))
+                    .shimmerEffect(
+                        shimmerColor = Theme.custom.highlightShimmerColor
+                    )
+            )
+
+            Text(
+                text = "",
+                style = MaterialTheme.typography.displaySmall,
+                color = Color.Transparent,
+                maxLines = 1,
+                softWrap = false,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier
+                    .clearAndSetSemantics {}
+                    .fillMaxWidth(0.9f)
+                    .clip(RoundedCornerShape(50))
+                    .shimmerEffect(
+                        shimmerColor = Theme.custom.highlightShimmerColor
+                    )
+            )
+
+            Text(
+                text = "",
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.Transparent,
+                maxLines = 1,
+                softWrap = false,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier
+                    .clearAndSetSemantics {}
+                    .fillMaxWidth(0.7f)
+                    .clip(RoundedCornerShape(50))
+                    .shimmerEffect(
+                        shimmerColor = Theme.custom.highlightShimmerColor
+                    )
+            )
         }
     }
 }
@@ -166,5 +232,13 @@ fun ViewCurrencyCardPreview_DashboardScreen() {
             },
             containerColor = Theme.custom.highlightContainer
         )
+    }
+}
+
+@Preview
+@Composable
+fun ViewCurrencyCardPlaceholderPreview() {
+    JetSpendingTheme {
+        ViewCurrencyCardPlaceholder()
     }
 }

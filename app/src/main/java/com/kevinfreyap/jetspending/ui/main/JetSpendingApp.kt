@@ -39,6 +39,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.kevinfreyap.jetspending.R
 import com.kevinfreyap.jetspending.ui.components.OfflineBanner
+import com.kevinfreyap.jetspending.ui.navigation.DashboardNavigation
 import com.kevinfreyap.jetspending.ui.navigation.NavigationItem
 import com.kevinfreyap.jetspending.ui.navigation.OnboardingNavigation
 import com.kevinfreyap.jetspending.ui.navigation.Screen
@@ -186,18 +187,20 @@ fun JetSpendingApp(
                 }
                 composable(Screen.Dashboard.route) {
                     DashboardScreen(
-                        navigateToAddTransaction = {
-                            navController.navigate(Screen.AddTransaction.route)
-                        },
-                        navigateToTransactionList = {
-                            navController.navigate(Screen.TransactionList.route)
-                        },
-                        navigateToDetail = { transactionId ->
-                            navController.navigate(
-                                Screen.TransactionDetail.createRoute(
-                                    transactionId
-                                )
-                            )
+                        onNavigate = { destination ->
+                            when(destination) {
+                                is DashboardNavigation.NavigateToTransactionDetail -> {
+                                    navController.navigate(
+                                        Screen.TransactionDetail.createRoute(destination.transactionId)
+                                    )
+                                }
+                                DashboardNavigation.NavigateToAddTransaction -> {
+                                    navController.navigate(Screen.AddTransaction.route)
+                                }
+                                DashboardNavigation.NavigateToTransactionList -> {
+                                    navController.navigate(Screen.TransactionList.route)
+                                }
+                            }
                         }
                     )
                 }
