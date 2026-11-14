@@ -9,7 +9,7 @@ plugins {
 
 android {
     namespace = "com.kevinfreyap.domain"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         minSdk = 25

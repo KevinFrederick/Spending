@@ -34,7 +34,6 @@ import com.kevinfreyap.jetspending.ui.components.ViewSelectionDialog
 import com.kevinfreyap.jetspending.ui.components.ViewSelectionItem
 import com.kevinfreyap.jetspending.ui.components.ViewSettingsGroup
 import com.kevinfreyap.jetspending.ui.components.ViewTopBar
-import com.kevinfreyap.jetspending.ui.main.MainViewModel
 import com.kevinfreyap.jetspending.ui.model.SettingsGroup
 import com.kevinfreyap.jetspending.ui.model.SettingsItem
 import com.kevinfreyap.jetspending.ui.model.SettingsOption
@@ -53,10 +52,8 @@ fun SettingsScreen(
     navigateToNotification: () -> Unit,
     navigateToPrivacySecurity: () -> Unit,
     modifier: Modifier = Modifier,
-    mainViewModel: MainViewModel = hiltViewModel(),
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
-    val currencyCode by mainViewModel.selectedCurrency.collectAsState()
 
     val selectedTheme by viewModel.selectedTheme.collectAsState()
     val settingsGroup by viewModel.settingsState.collectAsState()
@@ -73,7 +70,7 @@ fun SettingsScreen(
     }
 
     SettingsContent(
-        currencyCode = currencyCode,
+        currencyCode = AppCurrency.IDR,
         selectedTheme = selectedTheme,
         user = userProfile,
         settingsGroup = settingsGroup,
@@ -103,7 +100,6 @@ fun SettingsScreen(
         showThemeDialog = showThemeDialog,
         showLogoutDialog = showLogoutDialog,
         onSelectCurrency = {
-            mainViewModel.onSelectCurrency(it)
             setShowCurrencyDialog(false)
         },
         onSelectTheme = {

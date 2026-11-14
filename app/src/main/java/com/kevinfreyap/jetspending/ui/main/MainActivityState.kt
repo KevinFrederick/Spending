@@ -1,5 +1,6 @@
 package com.kevinfreyap.jetspending.ui.main
 
+import com.kevinfreyap.domain.model.AppCurrency
 import com.kevinfreyap.domain.model.AppTheme
 
 sealed interface MainActivityState {
@@ -9,6 +10,8 @@ sealed interface MainActivityState {
         val startDestination: String,
         val isAppLockEnabled: Boolean,
         val isUnlocked: Boolean,
-        val isSecureScreenEnabled: Boolean
+        val isSecureScreenEnabled: Boolean,
+        val selectedCurrency: AppCurrency,
+        val isOnline: Boolean
     ) : MainActivityState
 }

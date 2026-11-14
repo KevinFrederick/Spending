@@ -56,7 +56,6 @@ import com.kevinfreyap.jetspending.ui.components.ViewTextField
 import com.kevinfreyap.jetspending.ui.components.ViewTopBar
 import com.kevinfreyap.jetspending.ui.components.ViewTransactionItem
 import com.kevinfreyap.jetspending.ui.components.ViewTransactionItemPlaceholder
-import com.kevinfreyap.jetspending.ui.main.MainViewModel
 import com.kevinfreyap.jetspending.ui.model.FilterBottomSheetType
 import com.kevinfreyap.jetspending.ui.model.FilterTimeOptionUI
 import com.kevinfreyap.jetspending.ui.model.TransactionItemUi
@@ -80,7 +79,6 @@ fun TransactionListScreen(
     navigateToDetail: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TransactionListViewModel = hiltViewModel(),
-    mainViewModel: MainViewModel = hiltViewModel()
 ) {
     val transactions = viewModel.transactions.collectAsLazyPagingItems()
 
@@ -185,7 +183,6 @@ fun TransactionListScreen(
         sheetState = sheetState,
         activeSheet = activeSheet,
         onSelectCurrency = {
-            mainViewModel.onSelectCurrency(it)
         },
         onQueryChange = {
             viewModel.onQueryChange(it)
@@ -198,7 +195,6 @@ fun TransactionListScreen(
             viewModel.navigateTo(sheet)
         },
         onCheckRate = {
-            mainViewModel.onRateMissing(it)
         },
         navigateToDetail = navigateToDetail,
         onBackClick = onBackClick,

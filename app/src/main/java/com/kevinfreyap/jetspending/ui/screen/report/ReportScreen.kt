@@ -36,7 +36,6 @@ import com.kevinfreyap.jetspending.ui.components.IncomeSpendingRow
 import com.kevinfreyap.jetspending.ui.components.ViewDateSelector
 import com.kevinfreyap.jetspending.ui.components.ViewPeriodSelector
 import com.kevinfreyap.jetspending.ui.components.ViewTopBar
-import com.kevinfreyap.jetspending.ui.main.MainViewModel
 import com.kevinfreyap.jetspending.ui.model.SpendingIncomeBalanceUi
 import com.kevinfreyap.jetspending.ui.state.ReportState
 import com.kevinfreyap.jetspending.ui.state.UiState
@@ -54,14 +53,12 @@ import kotlinx.coroutines.runBlocking
 @Composable
 fun ReportScreen (
     modifier: Modifier = Modifier,
-    mainViewModel: MainViewModel = hiltViewModel(),
     viewModel: ReportViewModel = hiltViewModel()
 ) {
-    val selectedCurrency by mainViewModel.selectedCurrency.collectAsState()
     val reportState by viewModel.reportState.collectAsState()
 
     val chartData = (reportState as? UiState.Success<ReportState>)?.data?.chartData ?: emptyList()
-    val marker = rememberCurrencyMarker(selectedCurrency)
+    val marker = rememberCurrencyMarker(AppCurrency.IDR)
 
     val bottomAxisFormatter = remember(chartData) {
         CartesianValueFormatter { _, value, _  ->
@@ -71,23 +68,22 @@ fun ReportScreen (
         }
     }
 
-    val startAxisFormatter = remember(selectedCurrency) {
+    val startAxisFormatter = remember(AppCurrency.IDR) {
         CartesianValueFormatter { _, value, _ ->
-            CurrencyUiFormatter.formatWithCode(value.toBigDecimal(), selectedCurrency)
+            CurrencyUiFormatter.formatWithCode(value.toBigDecimal(), AppCurrency.IDR)
         }
     }
 
     val chartProducer = viewModel.chartProducer
 
     ReportContent(
-        selectedCurrency = selectedCurrency,
+        selectedCurrency = AppCurrency.IDR,
         reportState = reportState,
         chartProducer = chartProducer,
         bottomLabel = bottomAxisFormatter,
         startLabel = startAxisFormatter,
         marker = marker,
         onSelectCurrency = {
-            mainViewModel.onSelectCurrency(it)
         },
         onSelectPeriod = {
             viewModel.onSelectPeriod(it)
