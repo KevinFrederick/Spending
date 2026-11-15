@@ -14,7 +14,7 @@ import com.google.firebase.auth.userProfileChangeRequest
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.kevinfreyap.data.mapper.UserMapper
-import com.kevinfreyap.data.source.local.AppDatabase
+import com.kevinfreyap.data.source.local.db.AppDatabase
 import com.kevinfreyap.data.source.local.UserPreferences
 import com.kevinfreyap.data.source.remote.firebase.UserFirestore
 import com.kevinfreyap.data.utils.DataConstants.USER_COLLECTION

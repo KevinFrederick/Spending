@@ -3,7 +3,7 @@
     <string name="tagline">Simple Expense Tracker</string>
 
     <!-- Screen Name -->
-    <string name="dashboard">Dashboard</string>
+    <string name="home">Home</string>
     <string name="overview">Overview</string>
     <string name="report">Report</string>
     <string name="settings">Settings</string>
@@ -24,7 +24,7 @@
     <string name="category_salary">Salary</string>
     <string name="category_education">Education</string>
     <string name="category_entertainment">Entertainment</string>
-    <string name="category_food">Food &amp; Dining</string>
+    <string name="category_food">Food &amp; Drink</string>
     <string name="category_grocery">Grocery</string>
     <string name="category_healthcare">Healthcare</string>
     <string name="category_household">Household</string>
@@ -97,6 +97,7 @@
     <string name="app_locked">App Locked</string>
     <string name="verify_identity">Verify Your Identity</string>
     <string name="coming_soon">Coming Soon</string>
+    <string name="rate_unavailable">Rate unavailable</string>
 
     <!-- Button -->
     <string name="btn_get_started">Get Started</string>
@@ -243,4 +244,12 @@
     <string name="subtitle_message_onboarding">Track everyday spending in any currency. \nOne simple view of where your money goes.</string>
     <string name="subtitle_message_sign_in">Track your spending in one place</string>
     <string name="subtitle_message_sign_up">Create your free account today</string>
+    <string name="subtitle_message_balance">All currencies synced • Balance up to date</string>
+    
+    <string name="greeting_morning">Good morning, %1$s</string>
+    <string name="greeting_afternoon">Good afternoon, %1$s</string>
+    <string name="greeting_evening">Good evening, %1$s</string>
+
+    <!--  Warning  -->
+    <string name="warning_rates_missing">Offline: Some rates unavailable • Partial balance</string>
 </resources>

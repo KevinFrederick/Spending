@@ -1,14 +1,20 @@
 package com.kevinfreyap.jetspending.ui.state
 
-import androidx.compose.ui.graphics.painter.Painter
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import com.kevinfreyap.domain.model.TransactionType
 
 data class TransactionItemState(
     val transactionId: String,
     val transactionType: TransactionType,
-    val transactionCategoryIcon: Painter,
+    @DrawableRes
+    val transactionCategoryIcon: Int,
     val transactionName: String,
-    val transactionDesc: String,
-    val transactionAmount: String,
-    val transactionCurrency: String
+    @StringRes
+    val transactionCategoryName: Int,
+    val transactionDate: String,
+    val transactionOriginalAmount: String,
+    val transactionConvertedAmount: String?,
+    val transactionSelectedCurrency: String,
+    val transactionOriginalCurrency: String
 )

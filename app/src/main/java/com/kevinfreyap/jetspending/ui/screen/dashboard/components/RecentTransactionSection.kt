@@ -18,7 +18,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.tooling.preview.Preview
@@ -152,30 +151,39 @@ fun RecentTransactionSectionPreview() {
                 TransactionItemState(
                     transactionId = "1",
                     transactionType = TransactionType.SPENDING,
-                    transactionCategoryIcon = painterResource(R.drawable.ic_food_icon),
+                    transactionCategoryIcon = R.drawable.ic_food_icon,
                     transactionName = "Lunch",
-                    transactionDesc = "Food & Drink · 18 Sep 2026",
-                    transactionAmount = "70.00",
-                    transactionCurrency = "USD"
+                    transactionCategoryName = R.string.category_food,
+                    transactionDate = "18 Sep 2026",
+                    transactionOriginalAmount = "70.00",
+                    transactionConvertedAmount = null,
+                    transactionSelectedCurrency = "USD",
+                    transactionOriginalCurrency = "IDR"
                 ),
                 TransactionItemState(
-                    transactionId = "2",
+                    transactionId = "1",
                     transactionType = TransactionType.SPENDING,
-                    transactionCategoryIcon = painterResource(R.drawable.ic_food_icon),
+                    transactionCategoryIcon = R.drawable.ic_food_icon,
                     transactionName = "Lunch",
-                    transactionDesc = "Food & Drink · 18 Sep 2026",
-                    transactionAmount = "70.00",
-                    transactionCurrency = "USD"
+                    transactionCategoryName = R.string.category_food,
+                    transactionDate = "18 Sep 2026",
+                    transactionOriginalAmount = "70.00",
+                    transactionConvertedAmount = null,
+                    transactionSelectedCurrency = "USD",
+                    transactionOriginalCurrency = "IDR"
                 ),
                 TransactionItemState(
-                    transactionId = "3",
+                    transactionId = "1",
                     transactionType = TransactionType.SPENDING,
-                    transactionCategoryIcon = painterResource(R.drawable.ic_food_icon),
+                    transactionCategoryIcon = R.drawable.ic_food_icon,
                     transactionName = "Lunch",
-                    transactionDesc = "Food & Drink · 18 Sep 2026",
-                    transactionAmount = "70.00",
-                    transactionCurrency = "USD"
-                )
+                    transactionCategoryName = R.string.category_food,
+                    transactionDate = "18 Sep 2026",
+                    transactionOriginalAmount = "70.00",
+                    transactionConvertedAmount = null,
+                    transactionSelectedCurrency = "USD",
+                    transactionOriginalCurrency = "IDR"
+                ),
             )
         )
     }

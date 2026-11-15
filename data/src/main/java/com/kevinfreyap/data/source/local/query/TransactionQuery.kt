@@ -1,4 +1,4 @@
-package com.kevinfreyap.data.utils
+package com.kevinfreyap.data.source.local.query
 
 import androidx.sqlite.db.SimpleSQLiteQuery
 import com.kevinfreyap.domain.model.TimeFilterOption
@@ -12,51 +12,55 @@ import javax.inject.Inject
 class TransactionQuery @Inject constructor() {
     fun searchTransactionQuery(query: String, filter: TransactionFilter): SimpleSQLiteQuery{
         val queryBuilder = StringBuilder(
-            "SELECT * FROM transactions WHERE name LIKE ?"
+            "SELECT * FROM transactions WHERE 1=1"
         )
-        val args = mutableListOf<Any>("%$query%")
+        val args = mutableListOf<Any>()
+
+        if (query.isNotBlank()) {
+            queryBuilder.append(" AND name LIKE ?")
+            args.add("%${query.trim()}%")
+        }
 
         // Time Filter
+        val zoneId = ZoneId.systemDefault()
         when(filter.timeFilter){
             TimeFilterOption.ALL_TIME -> {}
             TimeFilterOption.LAST_7_DAYS -> {
-                val userTimeZone = ZoneId.systemDefault()
-                val today = LocalDate.now(userTimeZone)
-
-                val sevenDaysAgoDate = today.minusDays(7)
-
-                val startOfDay = sevenDaysAgoDate.atStartOfDay(userTimeZone)
-
-                val startMillis = startOfDay.toInstant().toEpochMilli()
-
-                queryBuilder.append(" AND date >= ?")
-                args.add(startMillis)
-            }
-            TimeFilterOption.THIS_MONTH -> {
-                val zoneId = ZoneId.systemDefault()
-                val today = LocalDate.now(zoneId)
-
-                val startMillis = today.withDayOfMonth(1)
+                val sevenDaysAgoStart = LocalDate.now(zoneId)
+                    .minusDays(7)
                     .atStartOfDay(zoneId)
                     .toInstant()
                     .toEpochMilli()
 
-                val endMillis = today.plusDays(1)
+                queryBuilder.append(" AND date >= ?")
+                args.add(sevenDaysAgoStart)
+            }
+            TimeFilterOption.THIS_MONTH -> {
+                val today = LocalDate.now(zoneId)
+
+                val startOfMonth = today.withDayOfMonth(1)
+                    .atStartOfDay(zoneId)
+                    .toInstant()
+                    .toEpochMilli()
+
+                val startOfNextMonth = today.withDayOfMonth(1)
+                    .plusMonths(1)
                     .atStartOfDay(zoneId)
                     .toInstant()
                     .toEpochMilli() - 1L
 
-                queryBuilder.append(" createdAt >= ? ")
-                args.addAll(listOf(startMillis, endMillis))
+                queryBuilder.append(" AND date >= ? AND date < ? ")
+                args.add(startOfMonth)
+                args.add(startOfNextMonth)
             }
             TimeFilterOption.PICK_DATE -> {
                 val startDate = filter.customStartDate
                 val endDate = filter.customEndDate
 
                 if ((startDate != null) && (endDate == null)){
-                    queryBuilder.append(" AND date >= ? AND date < ?")
-
                     val nextDay = startDate.plus(1, ChronoUnit.DAYS)
+
+                    queryBuilder.append(" AND date >= ? AND date < ?")
 
                     args.add(startDate.toEpochMilli())
                     args.add(nextDay.toEpochMilli())
@@ -79,12 +83,12 @@ class TransactionQuery @Inject constructor() {
         // Amount Filter
         if (filter.fromAmount > BigDecimal.ZERO) {
             queryBuilder.append(" AND CAST(amount AS REAL) >= ?")
-            args.add(filter.fromAmount.toPlainString())
+            args.add(filter.fromAmount.toDouble())
         }
 
         if (filter.toAmount > BigDecimal.ZERO) {
             queryBuilder.append(" AND CAST(amount AS REAL) <= ?")
-            args.add(filter.toAmount.toPlainString())
+            args.add(filter.toAmount.toDouble())
         }
 
         // Type Filter

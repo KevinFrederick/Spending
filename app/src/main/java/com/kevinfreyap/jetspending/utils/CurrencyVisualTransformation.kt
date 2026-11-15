@@ -19,7 +19,7 @@ class CurrencyVisualTransformation (
     private val decimalChar: Char
 
     init {
-        val locale = CurrencyUiFormatter.getLocale(currencyCode)
+        val locale = currencyCode.getLocale()
 
         val symbols = DecimalFormatSymbols(locale)
         groupingChar = symbols.groupingSeparator

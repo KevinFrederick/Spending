@@ -2,10 +2,11 @@ package com.kevinfreyap.data.di
 
 import android.content.Context
 import androidx.room.Room
-import com.kevinfreyap.data.source.local.AppDatabase
+import com.kevinfreyap.data.source.local.db.AppDatabase
 import com.kevinfreyap.data.source.local.dao.CategoryDao
 import com.kevinfreyap.data.source.local.dao.ExchangeRatesDao
 import com.kevinfreyap.data.source.local.dao.TransactionDao
+import com.kevinfreyap.data.source.local.db.MIGRATION_1_2
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -23,7 +24,9 @@ class DatabaseModule {
             context,
             AppDatabase::class.java,
             "spending.db"
-        ).build()
+        )
+            .addMigrations(MIGRATION_1_2)
+            .build()
     }
 
     @Provides

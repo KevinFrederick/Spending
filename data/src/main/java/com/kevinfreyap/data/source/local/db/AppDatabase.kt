@@ -1,4 +1,4 @@
-package com.kevinfreyap.data.source.local
+package com.kevinfreyap.data.source.local.db
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
@@ -22,7 +22,7 @@ import com.kevinfreyap.data.source.local.entity.TransactionEntity
         TransactionCategoryEntity::class,
         DailyRatesEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 @TypeConverters(

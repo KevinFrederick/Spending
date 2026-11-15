@@ -19,8 +19,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kevinfreyap.domain.model.TransactionType
@@ -41,17 +45,23 @@ fun ViewTransactionItem(
     val formattedValue: String
     val amountColor: Color
 
+    val currency: String = if (state.transactionConvertedAmount != null) {
+        state.transactionSelectedCurrency
+    } else {
+        state.transactionOriginalCurrency
+    }
+
     when(state.transactionType) {
         TransactionType.INCOME -> {
             iconColor = MaterialTheme.colorScheme.primary
             iconBackground = Theme.custom.highlightContainer
-            formattedValue = "+ ${state.transactionAmount}"
+            formattedValue = "+ ${state.transactionConvertedAmount ?: state.transactionOriginalAmount}"
             amountColor = Theme.custom.statusPositive
         }
         TransactionType.SPENDING -> {
             iconColor = Theme.custom.secondaryTextColor
             iconBackground = MaterialTheme.colorScheme.surfaceContainer
-            formattedValue = "- ${state.transactionAmount}"
+            formattedValue = "- ${state.transactionConvertedAmount ?: state.transactionOriginalAmount}"
             amountColor = Theme.custom.statusNegative
         }
     }
@@ -62,7 +72,7 @@ fun ViewTransactionItem(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(8.dp))
-            .clickable{
+            .clickable {
                 onClick(state.transactionId)
             }
             .padding(
@@ -81,7 +91,7 @@ fun ViewTransactionItem(
                 )
         ) {
             Icon(
-                painter = state.transactionCategoryIcon,
+                painter = painterResource(state.transactionCategoryIcon),
                 contentDescription = null,
                 tint = iconColor,
                 modifier = Modifier
@@ -104,7 +114,7 @@ fun ViewTransactionItem(
             )
 
             Text(
-                text = state.transactionDesc,
+                text = "${stringResource(state.transactionCategoryName)} · ${state.transactionDate}",
                 style = MaterialTheme.typography.bodySmall,
                 color = Theme.custom.secondaryTextColor,
                 maxLines = 1,
@@ -113,28 +123,62 @@ fun ViewTransactionItem(
             )
         }
 
-        Column(
-            verticalArrangement = Arrangement.spacedBy(4.dp),
-            horizontalAlignment = Alignment.End
-        ) {
+        if (state.transactionSelectedCurrency == state.transactionOriginalCurrency) {
             Text(
-                text = formattedValue,
+                text = buildAnnotatedString {
+                    append(formattedValue)
+                    append(" ")
+                    withStyle(style = SpanStyle(
+                        fontSize = MaterialTheme.typography.labelSmall.fontSize,
+                        fontWeight = MaterialTheme.typography.labelSmall.fontWeight
+                    )) {
+                        append(currency)
+                    }
+                },
                 style = MaterialTheme.typography.titleSmall,
                 color = amountColor,
                 maxLines = 1,
                 softWrap = false,
                 overflow = TextOverflow.Ellipsis
             )
+        } else {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+                horizontalAlignment = Alignment.End
+            ) {
+                Text(
+                    text = buildAnnotatedString {
+                        append(formattedValue)
+                        append(" ")
+                        withStyle(style = SpanStyle(
+                            fontSize = MaterialTheme.typography.labelSmall.fontSize,
+                            fontWeight = MaterialTheme.typography.labelSmall.fontWeight
+                        )) {
+                            append(currency)
+                        }
+                    },
+                    style = MaterialTheme.typography.titleSmall,
+                    color = amountColor,
+                    maxLines = 1,
+                    softWrap = false,
+                    overflow = TextOverflow.Ellipsis
+                )
 
-            Text(
-                text = state.transactionCurrency,
-                style = MaterialTheme.typography.bodySmall,
-                color = Theme.custom.secondaryTextColor,
-                maxLines = 1,
-                softWrap = false,
-                overflow = TextOverflow.Ellipsis
-            )
+                Text(
+                    text = if (state.transactionConvertedAmount != null) {
+                        "${state.transactionOriginalAmount} ${state.transactionOriginalCurrency}"
+                    } else {
+                        stringResource(R.string.rate_unavailable)
+                    },
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Theme.custom.secondaryTextColor,
+                    maxLines = 1,
+                    softWrap = false,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
         }
+
     }
 }
 
@@ -248,11 +292,14 @@ fun ViewTransactionItemPreview() {
             state = TransactionItemState(
                 transactionId = "1",
                 transactionType = TransactionType.SPENDING,
-                transactionCategoryIcon = painterResource(R.drawable.ic_food_icon),
+                transactionCategoryIcon = R.drawable.ic_food_icon,
                 transactionName = "Lunch",
-                transactionDesc = "Food & Drink · 18 Sep 2026",
-                transactionAmount = "70.00",
-                transactionCurrency = "USD"
+                transactionCategoryName = R.string.category_food,
+                transactionDate = "18 Sep 2026",
+                transactionOriginalAmount = "1.260.000",
+                transactionConvertedAmount = null,
+                transactionSelectedCurrency = "USD",
+                transactionOriginalCurrency = "IDR"
             ),
             onClick = {}
         )

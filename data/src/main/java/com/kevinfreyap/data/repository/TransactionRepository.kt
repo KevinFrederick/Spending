@@ -15,7 +15,7 @@ import com.kevinfreyap.data.source.local.entity.TransactionEntity
 import com.kevinfreyap.data.source.remote.firebase.TransactionFirestore
 import com.kevinfreyap.data.utils.DataConstants.TRANSACTION_COLLECTION
 import com.kevinfreyap.data.utils.DataConstants.USER_COLLECTION
-import com.kevinfreyap.data.utils.TransactionQuery
+import com.kevinfreyap.data.source.local.query.TransactionQuery
 import com.kevinfreyap.domain.model.Transaction
 import com.kevinfreyap.domain.model.TransactionFilter
 import com.kevinfreyap.domain.model.TransactionMathWithRates

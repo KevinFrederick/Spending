@@ -1,56 +1,17 @@
 package com.kevinfreyap.jetspending.utils.formatter
 
 import com.kevinfreyap.domain.model.AppCurrency
+import com.kevinfreyap.jetspending.utils.getLocale
 import java.lang.Exception
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.text.NumberFormat
-import java.util.Locale
-import java.util.Locale.*
 import kotlin.text.split
 
 object CurrencyUiFormatter {
-    fun getLocale(currencyCode: AppCurrency): Locale {
-        return when(currencyCode) {
-            AppCurrency.USD -> {
-                US
-            }
-            AppCurrency.IDR -> {
-                Builder()
-                    .setLanguage("id")
-                    .setRegion("ID")
-                    .build()
-            }
-            AppCurrency.TWD -> {
-                Builder()
-                    .setLanguage("zh")
-                    .setRegion("TW")
-                    .build()
-            }
-            AppCurrency.MYR -> {
-                Builder()
-                    .setLanguage("ms")
-                    .setRegion("MY")
-                    .build()
-            }
-            AppCurrency.SGD -> {
-                Builder()
-                    .setLanguage("en")
-                    .setRegion("SG")
-                    .build()
-            }
-            AppCurrency.JPY -> {
-                Builder()
-                    .setLanguage("ja")
-                    .setRegion("JP")
-                    .build()
-            }
-        }
-    }
-
     fun getNumberFormatter(currencyCode: AppCurrency): NumberFormat {
-        val locale = getLocale(currencyCode)
+        val locale = currencyCode.getLocale()
         return (DecimalFormat.getNumberInstance(locale) as DecimalFormat).apply {
             isParseBigDecimal = true
             applyPattern("#,##0.##")

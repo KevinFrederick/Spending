@@ -1,12 +1,15 @@
 package com.kevinfreyap.jetspending.ui.screen.dashboard
 
 import android.content.res.Configuration
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -15,6 +18,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -22,6 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -33,6 +39,7 @@ import com.kevinfreyap.jetspending.ui.components.v2.ViewCurrencyCard
 import com.kevinfreyap.jetspending.ui.components.v2.ViewCurrencyCardPlaceholder
 import com.kevinfreyap.jetspending.ui.components.v2.ViewPrimaryButton
 import com.kevinfreyap.jetspending.ui.components.v2.ViewPrimaryButtonPlaceholder
+import com.kevinfreyap.jetspending.ui.helper.date.DayGreeting
 import com.kevinfreyap.jetspending.ui.navigation.DashboardNavigation
 import com.kevinfreyap.jetspending.ui.screen.dashboard.components.MonthlySummary
 import com.kevinfreyap.jetspending.ui.screen.dashboard.components.MonthlySummaryPlaceholder
@@ -53,58 +60,10 @@ fun DashboardScreen(
     modifier: Modifier = Modifier,
     viewModel: DashboardViewModel = hiltViewModel(),
 ) {
+    val state by viewModel.uiState.collectAsState()
+
     DashboardContent(
-        state = UiState.Success(
-            DashboardState(
-                greetings = "Good morning, Alex",
-                date = "September, 2026",
-                totalBalance = "3,160.00",
-                currency = "USD",
-                monthlySummary = MonthlySummaryState(
-                    incomeSummary = SummaryState(
-                        transactionType = TransactionType.INCOME,
-                        value = "1,800.00",
-                        currency = "USD",
-                        month = "This Month"
-                    ),
-                    spendingSummary = SummaryState(
-                        transactionType = TransactionType.SPENDING,
-                        value = "900.00",
-                        currency = "USD",
-                        month = "This Month"
-                    )
-                ),
-                recentTransactions = listOf(
-                    TransactionItemState(
-                        transactionId = "1",
-                        transactionType = TransactionType.SPENDING,
-                        transactionCategoryIcon = painterResource(R.drawable.ic_food_icon),
-                        transactionName = "Lunch",
-                        transactionDesc = "Food & Drink · 18 Sep 2026",
-                        transactionAmount = "70.00",
-                        transactionCurrency = "USD"
-                    ),
-                    TransactionItemState(
-                        transactionId = "2",
-                        transactionType = TransactionType.INCOME,
-                        transactionCategoryIcon = painterResource(R.drawable.ic_food_icon),
-                        transactionName = "Salary",
-                        transactionDesc = "Income · 18 Sep 2026",
-                        transactionAmount = "710.00",
-                        transactionCurrency = "USD"
-                    ),
-                    TransactionItemState(
-                        transactionId = "3",
-                        transactionType = TransactionType.SPENDING,
-                        transactionCategoryIcon = painterResource(R.drawable.ic_food_icon),
-                        transactionName = "Lunch",
-                        transactionDesc = "Food & Drink · 18 Sep 2026",
-                        transactionAmount = "70.00",
-                        transactionCurrency = "USD"
-                    )
-                )
-            )
-        ),
+        state = state,
         onNavigate = onNavigate,
         modifier = modifier
     )
@@ -162,13 +121,13 @@ fun DashboardSuccess(
             .fillMaxWidth()
     ) {
         Text(
-            text = "Good morning, Alex",
+            text = stringResource(state.greetings.greetingRes, state.userName),
             style = MaterialTheme.typography.bodyMedium,
             color = Theme.custom.secondaryTextColor
         )
 
         Text(
-            text = "September, 2026",
+            text = state.date,
             style = MaterialTheme.typography.bodySmall,
             color = Theme.custom.secondaryTextColor
         )
@@ -187,14 +146,14 @@ fun DashboardSuccess(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Text(
-                    text = "3,160.00",
+                    text = state.totalBalance,
                     style = MaterialTheme.typography.displaySmall,
                     color = Theme.custom.primaryTextColor,
                     modifier = Modifier.alignByBaseline()
                 )
 
                 Text(
-                    text = "USD",
+                    text = state.currency,
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.alignByBaseline()
@@ -202,11 +161,41 @@ fun DashboardSuccess(
             }
         },
         bottomInformation = {
-            Text(
-                text = "All currencies, one clear balance",
-                style = MaterialTheme.typography.bodySmall,
-                color = Theme.custom.secondaryTextColor,
-            )
+            AnimatedContent(
+                targetState = state.isRatesMissing,
+                label = "BalanceSubtitleTransition"
+            ) { missingRates ->
+                if (missingRates) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_warning_amber_24),
+                            contentDescription = null,
+                            tint = Theme.custom.warning,
+                            modifier = Modifier
+                                .size(16.dp)
+                                .offset(y = -(1).dp)
+                        )
+                        Text(
+                            text = stringResource(R.string.warning_rates_missing),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Theme.custom.warning,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
+                } else {
+                    Text(
+                        text = stringResource(R.string.subtitle_message_balance),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Theme.custom.secondaryTextColor,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            }
         },
         containerColor = Theme.custom.highlightContainer
     )
@@ -293,9 +282,11 @@ fun DashboardContentPreview(){
         DashboardContent(
             state = UiState.Success(
                 DashboardState(
-                    greetings = "Good morning, Alex",
+                    userName = "Alex",
+                    greetings = DayGreeting.MORNING,
                     date = "September, 2026",
                     totalBalance = "3,160.00",
+                    isRatesMissing = false,
                     currency = "USD",
                     monthlySummary = MonthlySummaryState(
                         incomeSummary = SummaryState(
@@ -315,30 +306,39 @@ fun DashboardContentPreview(){
                         TransactionItemState(
                             transactionId = "1",
                             transactionType = TransactionType.SPENDING,
-                            transactionCategoryIcon = painterResource(R.drawable.ic_food_icon),
+                            transactionCategoryIcon = R.drawable.ic_food_icon,
                             transactionName = "Lunch",
-                            transactionDesc = "Food & Drink · 18 Sep 2026",
-                            transactionAmount = "70.00",
-                            transactionCurrency = "USD"
+                            transactionCategoryName = R.string.category_food,
+                            transactionDate = "18 Sep 2026",
+                            transactionOriginalAmount = "70.00",
+                            transactionConvertedAmount = null,
+                            transactionSelectedCurrency = "USD",
+                            transactionOriginalCurrency = "IDR"
                         ),
                         TransactionItemState(
                             transactionId = "2",
                             transactionType = TransactionType.INCOME,
-                            transactionCategoryIcon = painterResource(R.drawable.ic_food_icon),
+                            transactionCategoryIcon = R.drawable.ic_food_icon,
                             transactionName = "Salary",
-                            transactionDesc = "Income · 18 Sep 2026",
-                            transactionAmount = "710.00",
-                            transactionCurrency = "USD"
+                            transactionCategoryName = R.string.category_incoming,
+                            transactionDate = "18 Sep 2026",
+                            transactionOriginalAmount = "710.00",
+                            transactionConvertedAmount = null,
+                            transactionSelectedCurrency = "USD",
+                            transactionOriginalCurrency = "IDR"
                         ),
                         TransactionItemState(
-                            transactionId = "3",
+                            transactionId = "1",
                             transactionType = TransactionType.SPENDING,
-                            transactionCategoryIcon = painterResource(R.drawable.ic_food_icon),
+                            transactionCategoryIcon = R.drawable.ic_food_icon,
                             transactionName = "Lunch",
-                            transactionDesc = "Food & Drink · 18 Sep 2026",
-                            transactionAmount = "70.00",
-                            transactionCurrency = "USD"
-                        )
+                            transactionCategoryName = R.string.category_food,
+                            transactionDate = "18 Sep 2026",
+                            transactionOriginalAmount = "70.00",
+                            transactionConvertedAmount = null,
+                            transactionSelectedCurrency = "USD",
+                            transactionOriginalCurrency = "IDR"
+                        ),
                     )
                 )
             ),
