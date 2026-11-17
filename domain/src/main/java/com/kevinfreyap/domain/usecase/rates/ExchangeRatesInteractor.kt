@@ -16,10 +16,6 @@ class ExchangeRatesInteractor @Inject constructor(
     private val exchangeRatesRepository: IExchangeRatesRepository,
     private val connectivityRepository: IConnectivityRepository
 ): ExchangeRatesUseCase {
-    override fun getRatesFlow(dateKey: String): Flow<ExchangeRates?> {
-        return exchangeRatesRepository.getRatesFlow(dateKey)
-    }
-
     override suspend fun ensureRatesExist(dateKey: String) {
         exchangeRatesRepository.ensureRatesExist(dateKey)
     }

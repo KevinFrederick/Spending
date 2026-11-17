@@ -64,7 +64,8 @@ data class CustomColors(
     val statusPositive: Color,
     val statusNegative: Color,
     val negativeContainer: Color,
-    val warning: Color,
+    val statusWarning: Color,
+    val statusOnWarning: Color,
     val shimmerColor: Color,
     val highlightShimmerColor: Color
 )
@@ -85,7 +86,8 @@ val LocalCustomColors = staticCompositionLocalOf {
         statusPositive = Color.Unspecified,
         statusNegative = Color.Unspecified,
         negativeContainer = Color.Unspecified,
-        warning = Color.Unspecified,
+        statusWarning = Color.Unspecified,
+        statusOnWarning = Color.Unspecified,
         shimmerColor = Color.Unspecified,
         highlightShimmerColor = Color.Unspecified
     )
@@ -133,7 +135,8 @@ fun JetSpendingTheme(
             statusPositive = DarkStatusPositive,
             statusNegative = DarkStatusNegative,
             negativeContainer = DarkNegativeContainer,
-            warning = DarkWarning,
+            statusWarning = DarkStatusWarning,
+            statusOnWarning = DarkStatusOnWarning,
             shimmerColor = DarkShimmer,
             highlightShimmerColor = DarkHighlightShimmer
         )
@@ -152,7 +155,8 @@ fun JetSpendingTheme(
             statusPositive = LightStatusPositive,
             statusNegative = LightStatusNegative,
             negativeContainer = LightNegativeContainer,
-            warning = LightWarning,
+            statusWarning = LightStatusWarning,
+            statusOnWarning = LightStatusOnWarning,
             shimmerColor = LightShimmer,
             highlightShimmerColor = LightHighlightShimmer
         )

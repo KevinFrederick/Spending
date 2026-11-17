@@ -71,7 +71,7 @@
     <string name="select_currency">Select Currency</string>
     <string name="transaction_type">Transaction Type</string>
     <string name="transaction_notes">Transaction Notes</string>
-    <string name="transaction_notes_optional">Transaction Notes (Optional)</string>
+    <string name="transaction_notes_optional">Notes (Optional)</string>
     <string name="notes">Notes</string>
     <string name="transaction_deleted">Transaction Deleted</string>
     <string name="discard_changes">Discard Changes?</string>
@@ -105,6 +105,7 @@
     <string name="btn_sign_up">Sign Up</string>
 
     <string name="btn_txt_see_all">See all</string>
+    <string name="btn_keep_editing">Keep editing</string>
 
     <string name="cancel">Cancel</string>
     <string name="confirm">Confirm</string>
@@ -212,7 +213,7 @@
     <string name="description_delete_transaction">This action cannot be undone. Do you want to delete this transaction?</string>
     <string name="description_transaction_missing">This transaction may have been deleted or is unavailable</string>
     <string name="description_delete_transaction_success">Transaction deleted successfully</string>
-    <string name="description_discard_change">You have unsaved changes. Are you sure you want to discard them?</string>
+    <string name="description_discard_change">Your unsaved transaction details will be lost.</string>
     <string name="description_reset_password">Enter your email to receive a reset link</string>
     <string name="description_email_sent">We have sent a password recover instruction to your email</string>
     <string name="description_notification_settings">Control how and when you receive updates. Tailor your notification preferences to ensure you always stay informed.</string>
@@ -235,6 +236,7 @@
     <string name="placeholder_transaction_currency_code">EUR</string>
     <string name="placeholder_transaction_converted_amount">USD 20.24</string>
     <string name="placeholder_transaction_conversion_rate">1 EUR = 1.10 USD</string>
+    <string name="placeholder_select_a_category">Select a category</string>
 
     <!--  Message  -->
     <string name="title_message_onboarding">Less Clutter. \nMore Control.</string>

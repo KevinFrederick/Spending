@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kevinfreyap.domain.model.TransactionType
-import com.kevinfreyap.jetspending.ui.state.MonthlySummaryState
+import com.kevinfreyap.jetspending.ui.screen.dashboard.state.MonthlySummaryState
 import com.kevinfreyap.jetspending.ui.state.SummaryState
 import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
 

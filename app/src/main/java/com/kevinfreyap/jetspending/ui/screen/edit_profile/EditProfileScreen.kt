@@ -36,7 +36,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.kevinfreyap.domain.error.Field
 import com.kevinfreyap.jetspending.R
 import com.kevinfreyap.jetspending.ui.components.ViewCustomDialog
-import com.kevinfreyap.jetspending.ui.components.ViewTextField
+import com.kevinfreyap.jetspending.ui.components.v2.ViewTextField
 import com.kevinfreyap.jetspending.ui.components.ViewTopBar
 import com.kevinfreyap.jetspending.ui.components.ViewUserProfile
 import com.kevinfreyap.jetspending.ui.state.EditProfileAction

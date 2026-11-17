@@ -1,13 +1,13 @@
-package com.kevinfreyap.jetspending.ui.components
+package com.kevinfreyap.jetspending.ui.components.v2
 
 import android.content.res.Configuration
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -18,12 +18,14 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.kevinfreyap.jetspending.ui.components.ViewErrorTooltip
 import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
 import com.kevinfreyap.jetspending.ui.theme.Theme
 
@@ -117,6 +119,7 @@ fun ViewTextInputField(
     isError: Boolean = false,
     errorMessage: String? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
+    onClick: (() -> Unit)? = null,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
@@ -131,51 +134,68 @@ fun ViewTextInputField(
             .fillMaxWidth()
             .animateContentSize()
     ) {
-        TextField(
-            value = value,
-            onValueChange = onValueChange,
-            label = {
-                Text(
-                    text = label,
-                    style = MaterialTheme.typography.labelMedium,
-                    color = Theme.custom.secondaryTextColor
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            TextField(
+                value = value,
+                onValueChange = onValueChange,
+                label = {
+                    Text(
+                        text = label,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = Theme.custom.secondaryTextColor
+                    )
+                },
+                isError = isError,
+                readOnly = readOnly,
+                enabled = enabled,
+                trailingIcon = trailingIcon,
+                visualTransformation = visualTransformation,
+                keyboardOptions = keyboardOptions,
+                keyboardActions = keyboardActions,
+                singleLine = singleLine,
+                minLines = minLines,
+                maxLines = if (singleLine) 1 else maxLines,
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.fillMaxWidth(),
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                    disabledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                    errorContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    disabledIndicatorColor = Color.Transparent,
+                    errorIndicatorColor = Color.Transparent,
+
+                    focusedLabelColor = Theme.custom.secondaryTextColor,
+                    unfocusedLabelColor = Theme.custom.secondaryTextColor,
+                    focusedTextColor = Theme.custom.primaryTextColor,
+                    unfocusedTextColor = Theme.custom.primaryTextColor
                 )
-            },
-            isError = isError,
-            readOnly = readOnly,
-            enabled = enabled,
-            trailingIcon = trailingIcon,
-            visualTransformation = visualTransformation,
-            keyboardOptions = keyboardOptions,
-            keyboardActions = keyboardActions,
-            singleLine = singleLine,
-            minLines = minLines,
-            maxLines = if (singleLine) 1 else maxLines,
-            shape = RoundedCornerShape(12.dp),
-            modifier = Modifier.fillMaxWidth(),
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-                disabledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-                errorContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                disabledIndicatorColor = Color.Transparent,
-                errorIndicatorColor = Color.Transparent,
-
-                focusedLabelColor = Theme.custom.secondaryTextColor,
-                unfocusedLabelColor = Theme.custom.secondaryTextColor,
-                focusedTextColor = Theme.custom.primaryTextColor,
-                unfocusedTextColor = Theme.custom.primaryTextColor
             )
-        )
+
+            if (onClick != null && enabled) {
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .clip(RoundedCornerShape(12.dp))
+                        .clickable {
+                            onClick()
+                        }
+                )
+            }
+        }
+
 
         if (isError && errorMessage != null) {
             Text(
                 text = errorMessage,
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodySmall
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.error
             )
         }
     }

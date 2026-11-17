@@ -23,7 +23,7 @@ import com.kevinfreyap.jetspending.ui.state.AmountInputState
 import com.kevinfreyap.jetspending.ui.state.FilterDraftState
 import com.kevinfreyap.jetspending.ui.state.TransactionFilterState
 import com.kevinfreyap.jetspending.ui.state.UiState
-import com.kevinfreyap.jetspending.utils.ErrorHelper
+import com.kevinfreyap.jetspending.ui.helper.error.ErrorHelper
 import com.kevinfreyap.jetspending.utils.formatter.CategoryUiFormatter
 import com.kevinfreyap.jetspending.utils.formatter.CurrencyUiFormatter
 import com.kevinfreyap.jetspending.utils.formatter.DateFormatter

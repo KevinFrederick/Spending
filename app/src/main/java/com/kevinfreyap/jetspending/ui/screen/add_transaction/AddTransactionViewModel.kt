@@ -15,7 +15,7 @@ import com.kevinfreyap.domain.usecase.transaction.TransactionUseCase
 import com.kevinfreyap.jetspending.ui.state.TransactionDraft
 import com.kevinfreyap.jetspending.ui.state.TransactionState
 import com.kevinfreyap.jetspending.ui.state.UiState
-import com.kevinfreyap.jetspending.utils.ErrorHelper
+import com.kevinfreyap.jetspending.ui.helper.error.ErrorHelper
 import com.kevinfreyap.jetspending.utils.combine
 import com.kevinfreyap.jetspending.utils.formatter.CategoryUiFormatter
 import com.kevinfreyap.jetspending.utils.formatter.CurrencyUiFormatter

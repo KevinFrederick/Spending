@@ -8,7 +8,7 @@ import com.kevinfreyap.domain.resource.DomainResult
 import com.kevinfreyap.domain.usecase.user.UserUseCase
 import com.kevinfreyap.jetspending.ui.state.EditProfileState
 import com.kevinfreyap.jetspending.ui.state.UiState
-import com.kevinfreyap.jetspending.utils.ErrorHelper
+import com.kevinfreyap.jetspending.ui.helper.error.ErrorHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

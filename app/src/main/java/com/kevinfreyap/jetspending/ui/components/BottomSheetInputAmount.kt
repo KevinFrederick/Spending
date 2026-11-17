@@ -42,6 +42,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kevinfreyap.domain.model.AppCurrency
 import com.kevinfreyap.jetspending.R
+import com.kevinfreyap.jetspending.ui.components.v2.ViewTextField
 import com.kevinfreyap.jetspending.ui.theme.Blue500
 import com.kevinfreyap.jetspending.ui.theme.Grey500
 import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
@@ -241,7 +242,7 @@ fun BottomSheetInputAmountPreview(){
             amountInputSlot = {
                 ViewTextField(
                     value = "100.000",
-                    onValueChange = {  },
+                    onValueChange = { },
                     label = stringResource(R.string.amount),
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Number,

@@ -13,7 +13,7 @@ import com.kevinfreyap.jetspending.ui.model.PendingAuthAction
 import com.kevinfreyap.jetspending.ui.state.PasswordFormState
 import com.kevinfreyap.jetspending.ui.state.PrivacySecurityState
 import com.kevinfreyap.jetspending.ui.state.UiState
-import com.kevinfreyap.jetspending.utils.ErrorHelper
+import com.kevinfreyap.jetspending.ui.helper.error.ErrorHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow

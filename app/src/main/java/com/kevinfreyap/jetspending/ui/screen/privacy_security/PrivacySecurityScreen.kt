@@ -50,7 +50,7 @@ import com.kevinfreyap.jetspending.ui.components.ViewCustomDialog
 import com.kevinfreyap.jetspending.ui.components.ViewGoogleBtn
 import com.kevinfreyap.jetspending.ui.components.ViewPasswordDialog
 import com.kevinfreyap.jetspending.ui.components.ViewPreferenceRow
-import com.kevinfreyap.jetspending.ui.components.ViewTextField
+import com.kevinfreyap.jetspending.ui.components.v2.ViewTextField
 import com.kevinfreyap.jetspending.ui.components.ViewTopBar
 import com.kevinfreyap.jetspending.ui.model.PendingAuthAction
 import com.kevinfreyap.jetspending.ui.state.PasswordFormState

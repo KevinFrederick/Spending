@@ -50,7 +50,7 @@ import com.kevinfreyap.jetspending.ui.components.ViewCustomDialog
 import com.kevinfreyap.jetspending.ui.components.ViewDatePickerField
 import com.kevinfreyap.jetspending.ui.components.ViewErrorTooltip
 import com.kevinfreyap.jetspending.ui.components.ViewNotesInput
-import com.kevinfreyap.jetspending.ui.components.ViewTextField
+import com.kevinfreyap.jetspending.ui.components.v2.ViewTextField
 import com.kevinfreyap.jetspending.ui.components.ViewTopBar
 import com.kevinfreyap.jetspending.ui.components.ViewTypeSelector
 import com.kevinfreyap.jetspending.ui.model.CategoryUI

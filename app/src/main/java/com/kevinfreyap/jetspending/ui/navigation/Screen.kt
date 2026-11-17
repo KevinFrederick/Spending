@@ -7,13 +7,13 @@ sealed class Screen(val route: String) {
     data object Dashboard: Screen("dashboard")
     data object Report: Screen("report")
     data object Settings: Screen("settings")
-    data object AddTransaction: Screen("add_transaction") {
-        const val ROUTE_WITH_ARGS = "add_transaction?transactionId={transactionId}"
+    data object TransactionForm: Screen("transaction_form") {
+        const val ROUTE_WITH_ARGS = "transaction_form?transactionId={transactionId}"
         fun createRoute(transactionId: String? = null): String {
             return if (transactionId != null) {
-                "add_transaction?transactionId=$transactionId"
+                "transaction_form?transactionId=$transactionId"
             } else {
-                "add_transaction"
+                "transaction_form"
             }
         }
     }

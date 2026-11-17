@@ -5,7 +5,7 @@ import com.kevinfreyap.domain.model.SpendingIncomeStatus
 import com.kevinfreyap.domain.model.TransactionType
 import com.kevinfreyap.jetspending.ui.helper.currency.toCurrencyString
 import com.kevinfreyap.jetspending.ui.helper.date.toMonth
-import com.kevinfreyap.jetspending.ui.state.MonthlySummaryState
+import com.kevinfreyap.jetspending.ui.screen.dashboard.state.MonthlySummaryState
 import com.kevinfreyap.jetspending.ui.state.SummaryState
 import java.time.Instant
 

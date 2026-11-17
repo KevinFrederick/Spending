@@ -21,6 +21,38 @@ fun BigDecimal.toCurrencyString(currency: AppCurrency): String {
     return formattedAmount
 }
 
+fun String.cleanStringAmount(currency: AppCurrency): String? {
+    var cleanAmount = this.replace(',', '.')
+
+    if (currency == AppCurrency.IDR) {
+        if (cleanAmount.contains('.')) return null
+    }
+
+    val decimalIndex = cleanAmount.indexOf('.')
+    if (decimalIndex >= 0) {
+        val decimalsAfterDot = cleanAmount.substring(decimalIndex + 1)
+        if (decimalsAfterDot == "00") return null
+        if (decimalsAfterDot.length > 2) return null
+    }
+
+    if (cleanAmount.count { it == '.' } > 1) return null
+    cleanAmount = cleanAmount.filter { it.isDigit() || it == '.' }
+
+    if (cleanAmount.isEmpty()) return ""
+
+    val parts = cleanAmount.split('.')
+    var intPart = parts[0].trimStart('0')
+    if (intPart.isEmpty()) {
+        intPart = "0"
+    }
+
+    return if (parts.size > 1) {
+        "$intPart.${parts[1]}"
+    } else {
+        intPart
+    }
+}
+
 private fun formatNumber(raw: String, currencyCode: AppCurrency): String {
     val numberFormat = getNumberFormatter(currencyCode)
 

@@ -1,4 +1,4 @@
-package com.kevinfreyap.jetspending.utils
+package com.kevinfreyap.jetspending.ui.helper.error
 
 import com.kevinfreyap.domain.error.Field
 import com.kevinfreyap.domain.error.ValidationError

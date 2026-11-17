@@ -12,7 +12,8 @@ import com.kevinfreyap.jetspending.ui.navigation.SignInNavigation
 import com.kevinfreyap.jetspending.ui.state.SignInState
 import com.kevinfreyap.jetspending.ui.state.UiState
 import com.kevinfreyap.jetspending.utils.AuthUiValidation
-import com.kevinfreyap.jetspending.utils.ErrorHelper
+import com.kevinfreyap.jetspending.ui.helper.error.removeError
+import com.kevinfreyap.jetspending.ui.helper.error.toUIError
 import com.kevinfreyap.jetspending.utils.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -48,7 +49,7 @@ class SignInViewModel @Inject constructor(
         _state.update { currentState ->
             currentState.copy(
                 emailInput = newEmail,
-                authStatus = ErrorHelper.removeError(currentState.authStatus, Field.AUTHENTICATION_EMAIL)
+                authStatus = currentState.authStatus.removeError(Field.AUTHENTICATION_EMAIL)
             )
         }
     }
@@ -57,7 +58,7 @@ class SignInViewModel @Inject constructor(
         _state.update { currentState ->
             currentState.copy(
                 passwordInput = newPass,
-                authStatus = ErrorHelper.removeError(currentState.authStatus, Field.AUTHENTICATION_PASSWORD)
+                authStatus = currentState.authStatus.removeError(Field.AUTHENTICATION_PASSWORD)
             )
         }
     }
@@ -66,7 +67,7 @@ class SignInViewModel @Inject constructor(
         _state.update { currentState ->
             currentState.copy(
                 resetPasswordEmailInput = email,
-                authStatus = ErrorHelper.removeError(currentState.authStatus, Field.AUTHENTICATION_CHANGE_PASSWORD_EMAIL)
+                authStatus = currentState.authStatus.removeError(Field.AUTHENTICATION_CHANGE_PASSWORD_EMAIL)
             )
         }
     }
@@ -88,7 +89,7 @@ class SignInViewModel @Inject constructor(
         if (validationRes.isNotEmpty()) {
             _state.update { currentStatus ->
                 currentStatus.copy(
-                    authStatus = UiState.ValidationErrors(ErrorHelper.validationErrorsToUiError(validationRes))
+                    authStatus = UiState.ValidationErrors(validationRes.toUIError())
                 )
             }
             return
@@ -116,7 +117,7 @@ class SignInViewModel @Inject constructor(
                 is DomainResult.ValidationFailed -> {
                     _state.update { currentState ->
                         currentState.copy(
-                            authStatus = UiState.ValidationErrors(ErrorHelper.validationErrorsToUiError(result.errors))
+                            authStatus = UiState.ValidationErrors(result.errors.toUIError())
                         )
                     }
                 }
@@ -160,7 +161,7 @@ class SignInViewModel @Inject constructor(
                 is DomainResult.ValidationFailed -> {
                     _state.update { currentState ->
                         currentState.copy(
-                            authStatus = UiState.ValidationErrors(ErrorHelper.validationErrorsToUiError(result.errors))
+                            authStatus = UiState.ValidationErrors(result.errors.toUIError())
                         )
                     }
                 }
@@ -184,7 +185,7 @@ class SignInViewModel @Inject constructor(
         if (validationRes.isNotEmpty()) {
             _state.update { currentState ->
                 currentState.copy(
-                    authStatus = UiState.ValidationErrors(ErrorHelper.validationErrorsToUiError(validationRes))
+                    authStatus = UiState.ValidationErrors(validationRes.toUIError())
                 )
             }
             return
@@ -206,7 +207,7 @@ class SignInViewModel @Inject constructor(
                 is DomainResult.ValidationFailed -> {
                     _state.update { currentState ->
                         currentState.copy(
-                            authStatus = UiState.ValidationErrors(ErrorHelper.validationErrorsToUiError(result.errors))
+                            authStatus = UiState.ValidationErrors(result.errors.toUIError())
                         )
                     }
                 }

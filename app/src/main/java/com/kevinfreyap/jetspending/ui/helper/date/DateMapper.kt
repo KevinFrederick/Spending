@@ -13,11 +13,19 @@ fun Instant.toFullMonthYear(
     return this.atZone(zoneId).format(formatter)
 }
 
-fun Instant.toFullDate(
+fun Instant.toFullDateShortMonth(
     zoneId: ZoneId = ZoneId.systemDefault(),
     locale: Locale = Locale.getDefault()
 ): String {
     val formatter = DateTimeFormatter.ofPattern("dd MMM yyyy", locale)
+    return this.atZone(zoneId).format(formatter)
+}
+
+fun Instant.toFullDateLongMonth(
+    zoneId: ZoneId = ZoneId.systemDefault(),
+    locale: Locale = Locale.getDefault()
+): String {
+    val formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy", locale)
     return this.atZone(zoneId).format(formatter)
 }
 
@@ -26,5 +34,13 @@ fun Instant.toMonth(
     locale: Locale = Locale.getDefault()
 ): String {
     val formatter = DateTimeFormatter.ofPattern("MMMM", locale)
+    return this.atZone(zoneId).format(formatter)
+}
+
+// e.g. "2025-12-31"
+fun Instant.toDateKey(
+    zoneId: ZoneId = ZoneId.systemDefault(),
+): String {
+    val formatter = DateTimeFormatter.ISO_LOCAL_DATE
     return this.atZone(zoneId).format(formatter)
 }

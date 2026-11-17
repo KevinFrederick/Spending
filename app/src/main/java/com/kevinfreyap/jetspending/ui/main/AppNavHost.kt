@@ -12,7 +12,7 @@ import com.kevinfreyap.jetspending.ui.navigation.OnboardingNavigation
 import com.kevinfreyap.jetspending.ui.navigation.Screen
 import com.kevinfreyap.jetspending.ui.navigation.SignInNavigation
 import com.kevinfreyap.jetspending.ui.navigation.SignUpNavigation
-import com.kevinfreyap.jetspending.ui.screen.add_transaction.AddTransactionScreen
+import com.kevinfreyap.jetspending.ui.navigation.TransactionFormNavigation
 import com.kevinfreyap.jetspending.ui.screen.dashboard.DashboardScreen
 import com.kevinfreyap.jetspending.ui.screen.detail.DetailTransactionScreen
 import com.kevinfreyap.jetspending.ui.screen.edit_profile.EditProfileScreen
@@ -24,6 +24,7 @@ import com.kevinfreyap.jetspending.ui.screen.report.ReportScreen
 import com.kevinfreyap.jetspending.ui.screen.settings.SettingsScreen
 import com.kevinfreyap.jetspending.ui.screen.signin.SignInScreen
 import com.kevinfreyap.jetspending.ui.screen.signup.SignUpScreen
+import com.kevinfreyap.jetspending.ui.screen.transaction_form.TransactionFormScreen
 
 @Composable
 fun AppNavHost(
@@ -110,7 +111,7 @@ fun AppNavHost(
                             )
                         }
                         DashboardNavigation.NavigateToAddTransaction -> {
-                            navController.navigate(Screen.AddTransaction.route)
+                            navController.navigate(Screen.TransactionForm.route)
                         }
                         DashboardNavigation.NavigateToTransactionList -> {
                             navController.navigate(Screen.TransactionList.route)
@@ -139,11 +140,13 @@ fun AppNavHost(
                 }
             )
         }
+
         composable(Screen.Report.route) {
             ReportScreen()
         }
+
         composable(
-            route = Screen.AddTransaction.ROUTE_WITH_ARGS,
+            route = Screen.TransactionForm.ROUTE_WITH_ARGS,
             arguments = listOf(
                 navArgument(
                     "transactionId"
@@ -154,9 +157,11 @@ fun AppNavHost(
                 }
             )
         ) { _ ->
-            AddTransactionScreen(
-                onBackClick = {
-                    navController.popBackStack()
+            TransactionFormScreen(
+                onNavigate = { destination ->
+                    when(destination) {
+                        TransactionFormNavigation.NavigateUp -> navController.popBackStack()
+                    }
                 }
             )
         }
@@ -187,7 +192,7 @@ fun AppNavHost(
                 },
                 navigateToUpdate = { transactionId ->
                     val id = transactionId ?: return@DetailTransactionScreen
-                    navController.navigate(Screen.AddTransaction.createRoute(transactionId = id))
+                    navController.navigate(Screen.TransactionForm.createRoute(transactionId = id))
                 }
             )
         }

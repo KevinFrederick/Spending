@@ -14,8 +14,6 @@ import com.kevinfreyap.domain.model.ExchangeRates
 import com.kevinfreyap.domain.repository.IExchangeRatesRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
@@ -30,10 +28,8 @@ class ExchangeRatesRepository @Inject constructor(
     private val firestore: FirebaseFirestore,
     private val exchangeRatesMapper: ExchangeRatesMapper
 ): IExchangeRatesRepository {
-    override fun getRatesFlow(dateKey: String): Flow<ExchangeRates?> {
-        return exchangeRatesDao.getExchangeRatesByDate(dateKey).map { entity ->
-            entity?.let { exchangeRatesMapper.mapRatesEntityToDomain(it) }
-        }
+    override suspend fun getRates(dateKey: String): ExchangeRates? {
+        return exchangeRatesDao.getExchangeRatesByDate(dateKey)?.let { exchangeRatesMapper.mapRatesEntityToDomain(it) }
     }
 
     override suspend fun ensureRatesExist(dateKey: String) = withContext(Dispatchers.IO) {

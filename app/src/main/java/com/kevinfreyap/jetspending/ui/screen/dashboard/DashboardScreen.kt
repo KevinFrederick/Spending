@@ -46,7 +46,7 @@ import com.kevinfreyap.jetspending.ui.screen.dashboard.components.MonthlySummary
 import com.kevinfreyap.jetspending.ui.screen.dashboard.components.RecentTransactionSection
 import com.kevinfreyap.jetspending.ui.screen.dashboard.components.RecentTransactionSectionPlaceholder
 import com.kevinfreyap.jetspending.ui.state.DashboardState
-import com.kevinfreyap.jetspending.ui.state.MonthlySummaryState
+import com.kevinfreyap.jetspending.ui.screen.dashboard.state.MonthlySummaryState
 import com.kevinfreyap.jetspending.ui.state.SummaryState
 import com.kevinfreyap.jetspending.ui.state.TransactionItemState
 import com.kevinfreyap.jetspending.ui.state.UiState
@@ -173,7 +173,7 @@ fun DashboardSuccess(
                         Icon(
                             painter = painterResource(R.drawable.ic_warning_amber_24),
                             contentDescription = null,
-                            tint = Theme.custom.warning,
+                            tint = Theme.custom.statusWarning,
                             modifier = Modifier
                                 .size(16.dp)
                                 .offset(y = -(1).dp)
@@ -181,7 +181,7 @@ fun DashboardSuccess(
                         Text(
                             text = stringResource(R.string.warning_rates_missing),
                             style = MaterialTheme.typography.bodySmall,
-                            color = Theme.custom.warning,
+                            color = Theme.custom.statusWarning,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                         )

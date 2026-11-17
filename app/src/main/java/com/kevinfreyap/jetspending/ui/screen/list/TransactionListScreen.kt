@@ -52,7 +52,7 @@ import com.kevinfreyap.jetspending.ui.components.BottomSheetFilter
 import com.kevinfreyap.jetspending.ui.components.BottomSheetInputAmount
 import com.kevinfreyap.jetspending.ui.components.SearchBarWithFilter
 import com.kevinfreyap.jetspending.ui.components.ViewPageError
-import com.kevinfreyap.jetspending.ui.components.ViewTextField
+import com.kevinfreyap.jetspending.ui.components.v2.ViewTextField
 import com.kevinfreyap.jetspending.ui.components.ViewTopBar
 import com.kevinfreyap.jetspending.ui.components.ViewTransactionItem
 import com.kevinfreyap.jetspending.ui.components.ViewTransactionItemPlaceholder
