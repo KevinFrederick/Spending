@@ -6,12 +6,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -123,7 +125,11 @@ fun <T> ViewDropdownSelection(
                             Text(
                                 text = optionLabel(option),
                                 style = MaterialTheme.typography.labelLarge,
-                                color = Theme.custom.primaryTextColor,
+                                color = if (selected) {
+                                    MaterialTheme.colorScheme.primary
+                                } else {
+                                    Theme.custom.primaryTextColor
+                                },
                                 fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
                                 maxLines = 1,
                                 softWrap = false,
@@ -131,11 +137,15 @@ fun <T> ViewDropdownSelection(
                                 modifier = Modifier.weight(1f)
                             )
 
+                            Spacer(
+                                modifier = Modifier.width(16.dp)
+                            )
+
                             if (selected) {
                                 Icon(
                                     painter = painterResource(R.drawable.ic_check_24),
                                     contentDescription = null,
-                                    tint = Theme.custom.primaryTextColor,
+                                    tint = MaterialTheme.colorScheme.primary,
                                     modifier = Modifier
                                         .size(16.dp)
                                         .offset(y = (-1).dp)
@@ -171,7 +181,7 @@ fun ViewDropdownSelectionPreview() {
                 selectedOption = selected,
                 onSelectOption = {selected = it},
                 optionLabel = {
-                    it.name
+                    it.displayCodeName
                 }
             )
         }

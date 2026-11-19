@@ -28,6 +28,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.kevinfreyap.domain.model.TransactionType
 import com.kevinfreyap.jetspending.R
 import com.kevinfreyap.jetspending.ui.model.CategoryUI
 import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
@@ -118,7 +119,8 @@ fun CategoryOptionCardPreview_Selected() {
                 id = "1",
                 sortOrder = 1,
                 name = R.string.category_food,
-                iconRes = R.drawable.ic_food_icon
+                iconRes = R.drawable.ic_food_icon,
+                types = listOf(TransactionType.SPENDING)
             ),
             isSelected = true,
             onClick = {  },
@@ -137,7 +139,8 @@ fun CategoryOptionCardPreview_NotSelected() {
                 id = "1",
                 sortOrder = 1,
                 name = R.string.category_food,
-                iconRes = R.drawable.ic_food_icon
+                iconRes = R.drawable.ic_food_icon,
+                types = listOf(TransactionType.SPENDING)
             ),
             isSelected = false,
             onClick = {  },

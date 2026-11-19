@@ -3,10 +3,9 @@ package com.kevinfreyap.data.source.local.query
 import androidx.sqlite.db.SimpleSQLiteQuery
 import com.kevinfreyap.domain.model.TimeFilterOption
 import com.kevinfreyap.domain.model.TransactionFilter
-import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.ZoneId
-import java.time.temporal.ChronoUnit
+import java.time.ZoneOffset
 import javax.inject.Inject
 
 class TransactionQuery @Inject constructor() {
@@ -54,41 +53,33 @@ class TransactionQuery @Inject constructor() {
                 args.add(startOfNextMonth)
             }
             TimeFilterOption.PICK_DATE -> {
-                val startDate = filter.customStartDate
-                val endDate = filter.customEndDate
+                filter.customStartDate?.let { startDate ->
+                    val startMillis = startDate.atZone(ZoneOffset.UTC).toLocalDate()
+                        .atStartOfDay(zoneId)
+                        .toInstant()
+                        .toEpochMilli()
 
-                if ((startDate != null) && (endDate == null)){
-                    val nextDay = startDate.plus(1, ChronoUnit.DAYS)
+                    queryBuilder.append(" AND date >= ?")
+                    args.add(startMillis)
+                }
 
-                    queryBuilder.append(" AND date >= ? AND date < ?")
+                filter.customEndDate?.let { endDate ->
+                    val nextDayMillis = endDate.atZone(ZoneOffset.UTC).toLocalDate()
+                        .plusDays(1)
+                        .atStartOfDay(zoneId)
+                        .toInstant()
+                        .toEpochMilli()
 
-                    args.add(startDate.toEpochMilli())
-                    args.add(nextDay.toEpochMilli())
-                } else {
-                    if (startDate != null) {
-                        queryBuilder.append(" AND date >= ?")
-                        args.add(startDate.toEpochMilli())
-                    }
-
-                    if (endDate != null) {
-                        val nextDay = endDate.plus(1, ChronoUnit.DAYS)
-
-                        queryBuilder.append(" AND date < ?")
-                        args.add(nextDay.toEpochMilli())
-                    }
+                    queryBuilder.append(" AND date < ?")
+                    args.add(nextDayMillis)
                 }
             }
         }
 
-        // Amount Filter
-        if (filter.fromAmount > BigDecimal.ZERO) {
-            queryBuilder.append(" AND CAST(amount AS REAL) >= ?")
-            args.add(filter.fromAmount.toDouble())
-        }
-
-        if (filter.toAmount > BigDecimal.ZERO) {
-            queryBuilder.append(" AND CAST(amount AS REAL) <= ?")
-            args.add(filter.toAmount.toDouble())
+        // Currency Filter
+        filter.currency?.let {
+            queryBuilder.append(" AND currency = ?")
+            args.add(it.name)
         }
 
         // Type Filter

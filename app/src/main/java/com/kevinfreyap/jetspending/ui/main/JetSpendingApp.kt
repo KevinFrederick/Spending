@@ -25,7 +25,6 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -98,7 +97,7 @@ fun JetSpendingApp(
                         onNavigate = { route ->
                             if (currentRoute != route) {
                                 navController.navigate(route) {
-                                    popUpTo(navController.graph.findStartDestination().id) {
+                                    popUpTo(Screen.Dashboard.route) {
                                         saveState = true
                                     }
                                     restoreState = true

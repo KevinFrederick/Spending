@@ -22,6 +22,8 @@ import com.kevinfreyap.jetspending.R
 import com.kevinfreyap.jetspending.ui.theme.Grey500
 import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
 import com.kevinfreyap.jetspending.ui.theme.Theme
+import java.time.Instant
+import java.time.ZoneOffset
 
 @Composable
 fun ViewCustomDateDialog(
@@ -29,19 +31,40 @@ fun ViewCustomDateDialog(
     onDateSelected: (Long) -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
+    minDateMillis: Long? = null,
     maxDateMillis: Long = System.currentTimeMillis(),
     yearRange: IntRange = DatePickerDefaults.YearRange
 ) {
-    val selectableDates = remember(maxDateMillis) {
+    val selectableDates = remember(minDateMillis, maxDateMillis) {
+        val minDate = minDateMillis?.let {
+            Instant.ofEpochMilli(it).atZone(ZoneOffset.UTC).toLocalDate()
+        }
+        val maxDate = Instant.ofEpochMilli(maxDateMillis).atZone(ZoneOffset.UTC).toLocalDate()
         object : SelectableDates {
             override fun isSelectableDate(utcTimeMillis: Long): Boolean {
-                return utcTimeMillis <= maxDateMillis
+                val date = Instant.ofEpochMilli(utcTimeMillis).atZone(ZoneOffset.UTC).toLocalDate()
+                val afterMin = minDate == null || !date.isBefore(minDate)
+                val beforeMax = !date.isAfter(maxDate)
+                return afterMin && beforeMax
+            }
+
+            override fun isSelectableYear(year: Int): Boolean {
+                val afterMinYear = minDate == null || year >= minDate.year
+                val beforeMaxYear = year <= maxDate.year
+                return afterMinYear && beforeMaxYear
             }
         }
     }
 
+    val defaultInitialMillis = remember(initialDateMillis, minDateMillis, maxDateMillis) {
+        (initialDateMillis ?: System.currentTimeMillis()).coerceIn(
+            minimumValue = minDateMillis ?: Long.MIN_VALUE,
+            maximumValue = maxDateMillis
+        )
+    }
+
     val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = initialDateMillis ?: System.currentTimeMillis(),
+        initialSelectedDateMillis = defaultInitialMillis,
         selectableDates = selectableDates,
         yearRange = yearRange
     )

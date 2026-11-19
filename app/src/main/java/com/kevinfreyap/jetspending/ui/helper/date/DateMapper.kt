@@ -9,7 +9,7 @@ fun Instant.toFullMonthYear(
     zoneId: ZoneId = ZoneId.systemDefault(),
     locale: Locale = Locale.getDefault()
 ): String {
-    val formatter = DateTimeFormatter.ofPattern("MMMM, yyyy", locale)
+    val formatter = DateTimeFormatter.ofPattern("MMMM yyyy", locale)
     return this.atZone(zoneId).format(formatter)
 }
 

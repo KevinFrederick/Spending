@@ -476,7 +476,8 @@ fun DetailTransactionPreview() {
                     id = "CAT-SALARY",
                     sortOrder = 1,
                     name = R.string.category_salary,
-                    iconRes = R.drawable.ic_salary_icon
+                    iconRes = R.drawable.ic_salary_icon,
+                    types = listOf(TransactionType.SPENDING)
                 ),
                 transactionColor = Green500,
                 transactionCurrency = AppCurrency.IDR

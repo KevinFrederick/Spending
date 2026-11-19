@@ -13,6 +13,7 @@ data class TransactionItemState(
     @StringRes
     val transactionCategoryName: Int,
     val transactionDate: String,
+    val transactionMonthYear: String,
     val transactionOriginalAmount: String,
     val transactionConvertedAmount: String?,
     val transactionSelectedCurrency: String,

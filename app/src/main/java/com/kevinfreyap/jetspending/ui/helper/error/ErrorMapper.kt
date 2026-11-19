@@ -1,5 +1,6 @@
 package com.kevinfreyap.jetspending.ui.helper.error
 
+import androidx.annotation.StringRes
 import com.kevinfreyap.domain.error.ErrorMessage
 import com.kevinfreyap.domain.error.Field
 import com.kevinfreyap.domain.error.ValidationError
@@ -23,6 +24,7 @@ fun <T> UiState<T>.removeError(field: Field): UiState<T> {
     }
 }
 
+@StringRes
 private fun getErrorMessage(messageCode: ErrorMessage): Int {
     return when(messageCode) {
         ErrorMessage.TRANSACTION_NAME_REQUIRED ->R.string.error_required_transaction_name

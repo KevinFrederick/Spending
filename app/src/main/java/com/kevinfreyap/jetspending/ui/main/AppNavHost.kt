@@ -2,6 +2,7 @@ package com.kevinfreyap.jetspending.ui.main
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -13,6 +14,7 @@ import com.kevinfreyap.jetspending.ui.navigation.Screen
 import com.kevinfreyap.jetspending.ui.navigation.SignInNavigation
 import com.kevinfreyap.jetspending.ui.navigation.SignUpNavigation
 import com.kevinfreyap.jetspending.ui.navigation.TransactionFormNavigation
+import com.kevinfreyap.jetspending.ui.navigation.TransactionListNavigation
 import com.kevinfreyap.jetspending.ui.screen.dashboard.DashboardScreen
 import com.kevinfreyap.jetspending.ui.screen.detail.DetailTransactionScreen
 import com.kevinfreyap.jetspending.ui.screen.edit_profile.EditProfileScreen
@@ -114,7 +116,12 @@ fun AppNavHost(
                             navController.navigate(Screen.TransactionForm.route)
                         }
                         DashboardNavigation.NavigateToTransactionList -> {
-                            navController.navigate(Screen.TransactionList.route)
+                            navController.navigate(Screen.TransactionList.route) {
+                                popUpTo (navController.graph.findStartDestination().id) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                            }
                         }
                     }
                 }
@@ -167,16 +174,20 @@ fun AppNavHost(
         }
         composable(Screen.TransactionList.route) {
             TransactionListScreen(
-                onBackClick = {
-                    navController.popBackStack()
+                onNavigate = {destination ->
+                    when(destination) {
+                        is TransactionListNavigation.NavigateToTransactionDetail -> {
+                            navController.navigate(
+                                Screen.TransactionDetail.createRoute(destination.transactionId)
+                            )
+                        }
+                        is TransactionListNavigation.NavigateToAddTransaction -> {
+                            navController.navigate(
+                                Screen.TransactionForm.route
+                            )
+                        }
+                    }
                 },
-                navigateToDetail = { transactionId ->
-                    navController.navigate(
-                        Screen.TransactionDetail.createRoute(
-                            transactionId
-                        )
-                    )
-                }
             )
         }
         composable(

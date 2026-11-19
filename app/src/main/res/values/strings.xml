@@ -34,6 +34,9 @@
     <string name="category_others">Others</string>
 
     <!-- Label -->
+    <string name="label_transaction">transaction</string>
+    <string name="label_transactions">transactions</string>
+
     <string name="total_balance">Total Balance</string>
     <string name="income">Income</string>
     <string name="spending">Spending</string>
@@ -56,16 +59,13 @@
     <string name="general">General</string>
     <string name="preference">Preferences</string>
     <string name="support">Support</string>
-    <string name="search_transactions">Search Transactions</string>
     <string name="transaction_filter">Transaction Filter</string>
+    <string name="filter_transaction">Filter Transaction</string>
     <string name="date_range">Date Range</string>
     <string name="by_time">By Time</string>
     <string name="by_amount">By Amount</string>
     <string name="by_type">By Type</string>
     <string name="by_category">By Category</string>
-    <string name="last_7_days">Last 7 days</string>
-    <string name="this_month">This Month</string>
-    <string name="pick_date">Pick Date</string>
     <string name="from">From</string>
     <string name="to">To</string>
     <string name="select_currency">Select Currency</string>
@@ -99,6 +99,20 @@
     <string name="coming_soon">Coming Soon</string>
     <string name="rate_unavailable">Rate unavailable</string>
 
+    <string name="search_transactions">Search transactions</string>
+
+    <string name="clear_search">Clear search query</string>
+    <string name="clear_date">Clear selected date</string>
+
+    <string name="filter_date_range">Date range</string>
+    <string name="filter_type">Transaction type</string>
+
+    <!--  Time Filter Option  -->
+    <string name="all_time">All</string>
+    <string name="last_7_days">Last 7 days</string>
+    <string name="this_month">This Month</string>
+    <string name="pick_date">Custom</string>
+
     <!-- Button -->
     <string name="btn_get_started">Get Started</string>
     <string name="btn_sign_in">Sign In</string>
@@ -106,7 +120,13 @@
 
     <string name="btn_txt_see_all">See all</string>
     <string name="btn_keep_editing">Keep editing</string>
+    <string name="btn_apply_filters">Apply filters</string>
+    <string name="btn_retry">Retry</string>
+    <string name="btn_clear_query">Clear query</string>
+    <string name="btn_clear_filter">Clear filter</string>
+    <string name="btn_add_transaction">Add transaction</string>
 
+    <string name="all">All</string>
     <string name="cancel">Cancel</string>
     <string name="confirm">Confirm</string>
     <string name="save_transaction">Save Transaction</string>
@@ -175,6 +195,7 @@
 
     <!-- Error Message -->
     <string name="error_something_went_wrong">Something went wrong</string>
+    <string name="error_failed_to_load_transactions">Failed to load transactions</string>
     <string name="error_required_transaction_name">Please enter a name for this transaction</string>
     <string name="error_required_transaction_amount">Please enter a valid amount.</string>
     <string name="error_transaction_from_greater_than_to">Please enter a valid amount range</string>
@@ -237,6 +258,9 @@
     <string name="placeholder_transaction_converted_amount">USD 20.24</string>
     <string name="placeholder_transaction_conversion_rate">1 EUR = 1.10 USD</string>
     <string name="placeholder_select_a_category">Select a category</string>
+    <string name="placeholder_select_date">Select date</string>
+    <string name="placeholder_all_currency">All currency</string>
+    <string name="placeholder_all_category">All category</string>
 
     <!--  Message  -->
     <string name="title_message_onboarding">Less Clutter. \nMore Control.</string>
@@ -251,7 +275,17 @@
     <string name="greeting_morning">Good morning, %1$s</string>
     <string name="greeting_afternoon">Good afternoon, %1$s</string>
     <string name="greeting_evening">Good evening, %1$s</string>
+    
+    <string name="hint_custom_date_filter">Leave either date empty for an open-ended range</string>
+
+    <string name="search_no_result">No matching transactions</string>
+    <string name="search_message_query_no_match">No transactions match. Clear query to see transactions</string>
+    <string name="search_message_filter_no_match">No transactions match applied filters. Clear filters to see transactions</string>
+
+    <string name="empty_transactions">No transactions recorded</string>
+    <string name="empty_transactions_message">Let\'s start keeping track of your spending and income.</string>
 
     <!--  Warning  -->
     <string name="warning_rates_missing">Offline: Some rates unavailable • Partial balance</string>
+    <string name="warning_custom_date_range_invalid">Invalid date range</string>
 </resources>

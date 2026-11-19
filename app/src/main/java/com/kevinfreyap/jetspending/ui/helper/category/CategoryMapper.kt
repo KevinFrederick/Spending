@@ -11,7 +11,8 @@ fun Category.toCategoryUI(): CategoryUI {
                 id = this.id,
                 sortOrder = this.sortOrder,
                 name = R.string.category_gift,
-                iconRes = R.drawable.ic_gift_icon
+                iconRes = R.drawable.ic_gift_icon,
+                types = this.types
             )
         }
         "CAT_INCOMING" -> {
@@ -19,7 +20,8 @@ fun Category.toCategoryUI(): CategoryUI {
                 id = this.id,
                 sortOrder = this.sortOrder,
                 name = R.string.category_incoming,
-                iconRes = R.drawable.ic_incoming_icon
+                iconRes = R.drawable.ic_incoming_icon,
+                types = this.types
             )
         }
         "CAT_INVESTMENT" -> {
@@ -27,7 +29,8 @@ fun Category.toCategoryUI(): CategoryUI {
                 id = this.id,
                 sortOrder = this.sortOrder,
                 name = R.string.category_investment,
-                iconRes = R.drawable.ic_investment_icon
+                iconRes = R.drawable.ic_investment_icon,
+                types = this.types
             )
         }
         "CAT_SALARY" -> {
@@ -35,7 +38,8 @@ fun Category.toCategoryUI(): CategoryUI {
                 id = this.id,
                 sortOrder = this.sortOrder,
                 name = R.string.category_salary,
-                iconRes = R.drawable.ic_salary_icon
+                iconRes = R.drawable.ic_salary_icon,
+                types = this.types
             )
         }
         "CAT_EDUCATION" -> {
@@ -43,7 +47,8 @@ fun Category.toCategoryUI(): CategoryUI {
                 id = this.id,
                 sortOrder = this.sortOrder,
                 name = R.string.category_education,
-                iconRes = R.drawable.ic_school_icon
+                iconRes = R.drawable.ic_school_icon,
+                types = this.types
             )
         }
         "CAT_ENTERTAINMENT" -> {
@@ -51,7 +56,8 @@ fun Category.toCategoryUI(): CategoryUI {
                 id = this.id,
                 sortOrder = this.sortOrder,
                 name = R.string.category_entertainment,
-                iconRes = R.drawable.ic_entertainment_icon
+                iconRes = R.drawable.ic_entertainment_icon,
+                types = this.types
             )
         }
         "CAT_FOOD" -> {
@@ -59,7 +65,8 @@ fun Category.toCategoryUI(): CategoryUI {
                 id = this.id,
                 sortOrder = this.sortOrder,
                 name = R.string.category_food,
-                iconRes = R.drawable.ic_food_icon
+                iconRes = R.drawable.ic_food_icon,
+                types = this.types
             )
         }
         "CAT_GROCERY" -> {
@@ -67,7 +74,8 @@ fun Category.toCategoryUI(): CategoryUI {
                 id = this.id,
                 sortOrder = this.sortOrder,
                 name = R.string.category_grocery,
-                iconRes = R.drawable.ic_grocery_icon
+                iconRes = R.drawable.ic_grocery_icon,
+                types = this.types
             )
         }
         "CAT_HEALTHCARE" -> {
@@ -75,7 +83,8 @@ fun Category.toCategoryUI(): CategoryUI {
                 id = this.id,
                 sortOrder = this.sortOrder,
                 name = R.string.category_healthcare,
-                iconRes = R.drawable.ic_healthcare_icon
+                iconRes = R.drawable.ic_healthcare_icon,
+                types = this.types
             )
         }
         "CAT_HOUSEHOLD" -> {
@@ -83,7 +92,8 @@ fun Category.toCategoryUI(): CategoryUI {
                 id = this.id,
                 sortOrder = this.sortOrder,
                 name = R.string.category_household,
-                iconRes = R.drawable.ic_home_24
+                iconRes = R.drawable.ic_home_24,
+                types = this.types
             )
         }
         "CAT_PAYMENT_TRANSFER" -> {
@@ -91,7 +101,8 @@ fun Category.toCategoryUI(): CategoryUI {
                 id = this.id,
                 sortOrder = this.sortOrder,
                 name = R.string.category_payment_transfer,
-                iconRes = R.drawable.ic_payment_icon
+                iconRes = R.drawable.ic_payment_icon,
+                types = this.types
             )
         }
         "CAT_SHOPPING" -> {
@@ -99,7 +110,8 @@ fun Category.toCategoryUI(): CategoryUI {
                 id = this.id,
                 sortOrder = this.sortOrder,
                 name = R.string.category_shopping,
-                iconRes = R.drawable.ic_shopping_icon
+                iconRes = R.drawable.ic_shopping_icon,
+                types = this.types
             )
         }
         "CAT_TRANSPORTATION" -> {
@@ -107,7 +119,8 @@ fun Category.toCategoryUI(): CategoryUI {
                 id = this.id,
                 sortOrder = this.sortOrder,
                 name = R.string.category_transportation,
-                iconRes = R.drawable.ic_transportation_icon
+                iconRes = R.drawable.ic_transportation_icon,
+                types = this.types
             )
         }
         "CAT_OTHER" -> {
@@ -115,7 +128,8 @@ fun Category.toCategoryUI(): CategoryUI {
                 id = this.id,
                 sortOrder = this.sortOrder,
                 name = R.string.category_others,
-                iconRes = R.drawable.ic_others_icon
+                iconRes = R.drawable.ic_others_icon,
+                types = this.types
             )
         }
         else -> {
@@ -123,7 +137,8 @@ fun Category.toCategoryUI(): CategoryUI {
                 id = this.id,
                 sortOrder = this.sortOrder,
                 name = R.string.category_others,
-                iconRes = R.drawable.ic_others_icon
+                iconRes = R.drawable.ic_others_icon,
+                types = this.types
             )
         }
     }

@@ -14,7 +14,8 @@ object CategoryUiFormatter {
             id = domain.id,
             name = mapCategoryNameToString(domain.id),
             sortOrder = domain.sortOrder,
-            iconRes = mapIconIdToDrawable(domain.iconId)
+            iconRes = mapIconIdToDrawable(domain.iconId),
+            types = domain.types
         )
     }
 

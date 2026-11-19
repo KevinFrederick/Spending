@@ -7,6 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -17,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -125,10 +127,17 @@ fun ViewTextInputField(
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     readOnly: Boolean = false,
     enabled: Boolean = true,
+    isPlaceholder: Boolean = false,
     singleLine: Boolean = true,
     minLines: Int = 1,
     maxLines: Int = Int.MAX_VALUE
 ) {
+    val textColor = if (isPlaceholder) {
+        Theme.custom.secondaryTextColor.copy(alpha = 0.6f)
+    } else {
+        Theme.custom.primaryTextColor
+    }
+
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -151,7 +160,7 @@ fun ViewTextInputField(
                 isError = isError,
                 readOnly = readOnly,
                 enabled = enabled,
-                trailingIcon = trailingIcon,
+                trailingIcon = if (onClick != null) null else trailingIcon,
                 visualTransformation = visualTransformation,
                 keyboardOptions = keyboardOptions,
                 keyboardActions = keyboardActions,
@@ -173,8 +182,8 @@ fun ViewTextInputField(
 
                     focusedLabelColor = Theme.custom.secondaryTextColor,
                     unfocusedLabelColor = Theme.custom.secondaryTextColor,
-                    focusedTextColor = Theme.custom.primaryTextColor,
-                    unfocusedTextColor = Theme.custom.primaryTextColor
+                    focusedTextColor = textColor,
+                    unfocusedTextColor = textColor
                 )
             )
 
@@ -187,6 +196,17 @@ fun ViewTextInputField(
                             onClick()
                         }
                 )
+
+                if (trailingIcon != null) {
+                    Box(
+                        contentAlignment = Alignment.CenterEnd,
+                        modifier = Modifier
+                            .matchParentSize()
+                            .padding(end = 8.dp)
+                    ) {
+                        trailingIcon()
+                    }
+                }
             }
         }
 

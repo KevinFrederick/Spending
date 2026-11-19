@@ -296,6 +296,7 @@ fun ViewTransactionItemPreview() {
                 transactionName = "Lunch",
                 transactionCategoryName = R.string.category_food,
                 transactionDate = "18 Sep 2026",
+                transactionMonthYear = "September 2026",
                 transactionOriginalAmount = "1.260.000",
                 transactionConvertedAmount = null,
                 transactionSelectedCurrency = "USD",

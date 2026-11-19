@@ -21,6 +21,7 @@ import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.kevinfreyap.domain.model.TransactionType
 import com.kevinfreyap.jetspending.R
 import com.kevinfreyap.jetspending.ui.model.CategoryUI
 import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
@@ -116,32 +117,37 @@ fun CategoryBottomSheetPreview() {
                     id = "1",
                     sortOrder = 1,
                     name = R.string.category_food,
-                    iconRes = R.drawable.ic_food_icon
+                    iconRes = R.drawable.ic_food_icon,
+                    types = listOf(TransactionType.SPENDING)
                 ),
                 CategoryUI(
                     id = "2",
                     sortOrder = 2,
                     name = R.string.category_food,
-                    iconRes = R.drawable.ic_food_icon
+                    iconRes = R.drawable.ic_food_icon,
+                    types = listOf(TransactionType.SPENDING)
                 ),
                 CategoryUI(
                     id = "3",
                     sortOrder = 3,
                     name = R.string.category_payment_transfer,
-                    iconRes = R.drawable.ic_food_icon
+                    iconRes = R.drawable.ic_food_icon,
+                    types = listOf(TransactionType.SPENDING)
                 ),
                 CategoryUI(
                     id = "4",
                     sortOrder = 4,
                     name = R.string.category_food,
-                    iconRes = R.drawable.ic_food_icon
+                    iconRes = R.drawable.ic_food_icon,
+                    types = listOf(TransactionType.SPENDING)
                 )
             ),
             selectedCategory = CategoryUI(
                 id = "1",
                 sortOrder = 1,
                 name = R.string.category_food,
-                iconRes = R.drawable.ic_food_icon
+                iconRes = R.drawable.ic_food_icon,
+                types = listOf(TransactionType.SPENDING)
             ),
             onSelectCategory = {  },
         )
