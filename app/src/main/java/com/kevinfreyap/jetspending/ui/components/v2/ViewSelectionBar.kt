@@ -132,7 +132,7 @@ fun ViewSelectionBarPreview() {
             optionLabel = {
                 stringResource(
                     when(it) {
-                        TransactionType.SPENDING -> R.string.spending
+                        TransactionType.SPENDING -> R.string.expense
                         TransactionType.INCOME -> R.string.income
                     }
                 )

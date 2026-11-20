@@ -41,7 +41,6 @@ fun ViewTransactionItem(
     modifier: Modifier = Modifier
 ) {
     val iconColor: Color
-    val iconBackground: Color
     val formattedValue: String
     val amountColor: Color
 
@@ -54,13 +53,11 @@ fun ViewTransactionItem(
     when(state.transactionType) {
         TransactionType.INCOME -> {
             iconColor = MaterialTheme.colorScheme.primary
-            iconBackground = Theme.custom.highlightContainer
             formattedValue = "+ ${state.transactionConvertedAmount ?: state.transactionOriginalAmount}"
             amountColor = Theme.custom.statusPositive
         }
         TransactionType.SPENDING -> {
             iconColor = Theme.custom.secondaryTextColor
-            iconBackground = MaterialTheme.colorScheme.surfaceContainer
             formattedValue = "- ${state.transactionConvertedAmount ?: state.transactionOriginalAmount}"
             amountColor = Theme.custom.statusNegative
         }
@@ -87,7 +84,7 @@ fun ViewTransactionItem(
                     shape = RoundedCornerShape(12.dp)
                 )
                 .background(
-                    iconBackground
+                    MaterialTheme.colorScheme.surfaceContainer
                 )
         ) {
             Icon(

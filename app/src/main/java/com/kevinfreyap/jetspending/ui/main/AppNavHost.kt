@@ -13,10 +13,11 @@ import com.kevinfreyap.jetspending.ui.navigation.OnboardingNavigation
 import com.kevinfreyap.jetspending.ui.navigation.Screen
 import com.kevinfreyap.jetspending.ui.navigation.SignInNavigation
 import com.kevinfreyap.jetspending.ui.navigation.SignUpNavigation
+import com.kevinfreyap.jetspending.ui.navigation.TransactionDetailNavigation
 import com.kevinfreyap.jetspending.ui.navigation.TransactionFormNavigation
 import com.kevinfreyap.jetspending.ui.navigation.TransactionListNavigation
 import com.kevinfreyap.jetspending.ui.screen.dashboard.DashboardScreen
-import com.kevinfreyap.jetspending.ui.screen.detail.DetailTransactionScreen
+import com.kevinfreyap.jetspending.ui.screen.detail.TransactionDetailScreen
 import com.kevinfreyap.jetspending.ui.screen.edit_profile.EditProfileScreen
 import com.kevinfreyap.jetspending.ui.screen.list.TransactionListScreen
 import com.kevinfreyap.jetspending.ui.screen.notification.NotificationScreen
@@ -163,7 +164,7 @@ fun AppNavHost(
                     defaultValue = null
                 }
             )
-        ) { _ ->
+        ) {
             TransactionFormScreen(
                 onNavigate = { destination ->
                     when(destination) {
@@ -193,17 +194,21 @@ fun AppNavHost(
         composable(
             route = Screen.TransactionDetail.route,
             arguments = listOf(navArgument("transactionId") { type = NavType.StringType })
-        ) { backStackEntry ->
-            val transactionId = backStackEntry.arguments?.getString("transactionId")
+        ) {
+            TransactionDetailScreen(
+                onNavigate = { destination ->
+                    when(destination) {
+                        is TransactionDetailNavigation.NavigateUp -> navController.popBackStack()
+                        is TransactionDetailNavigation.NavigateToEditTransaction -> {
+                            navController.navigate(
+                                Screen.TransactionForm.createRoute(
+                                    transactionId = destination.transactionId
+                                )
+                            )
 
-            DetailTransactionScreen(
-                transactionId = transactionId,
-                onBackClick = {
-                    navController.popBackStack()
-                },
-                navigateToUpdate = { transactionId ->
-                    val id = transactionId ?: return@DetailTransactionScreen
-                    navController.navigate(Screen.TransactionForm.createRoute(transactionId = id))
+                        }
+                    }
+
                 }
             )
         }

@@ -19,6 +19,7 @@ import com.kevinfreyap.jetspending.R
 import com.kevinfreyap.jetspending.ui.action.TransactionFormAction
 import com.kevinfreyap.jetspending.ui.helper.category.toCategoryUI
 import com.kevinfreyap.jetspending.ui.helper.currency.cleanStringAmount
+import com.kevinfreyap.jetspending.ui.helper.currency.toCurrencyString
 import com.kevinfreyap.jetspending.ui.helper.date.toDateKey
 import com.kevinfreyap.jetspending.ui.helper.error.removeError
 import com.kevinfreyap.jetspending.ui.helper.error.toUIError
@@ -95,7 +96,8 @@ class TransactionFormViewModel @Inject constructor(
                         AmountEntryState(
                             originalAmount = transaction.amount.toPlainString(),
                             originalCurrency = transaction.currency,
-                            convertedCurrency = currency
+                            convertedCurrency = currency,
+                            rateDate = transaction.date
                         )
                     )
 
@@ -198,10 +200,14 @@ class TransactionFormViewModel @Inject constructor(
 
         val rateText = unitRate?.let { rate ->
             val rateScale = if (rate < BigDecimal.ONE) 6 else targetScale
-            val formattedRate = rate
-                .setScale(rateScale, RoundingMode.HALF_UP)
-                .stripTrailingZeros()
-                .toPlainString()
+            val formattedRate = if (rate < BigDecimal.ONE) {
+                rate
+                    .setScale(rateScale, RoundingMode.HALF_UP)
+                    .stripTrailingZeros()
+                    .toPlainString()
+            } else {
+                rate.toCurrencyString(entry.convertedCurrency)
+            }
 
             "1 ${entry.originalCurrency.name} = $formattedRate ${entry.convertedCurrency.name}"
         }

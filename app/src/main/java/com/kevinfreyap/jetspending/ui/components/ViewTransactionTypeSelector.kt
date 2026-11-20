@@ -49,7 +49,7 @@ fun ViewTransactionTypeSelector(
                 val selected = option == selectedOption
                 val optionDisplayRes = when (option) {
                     TransactionType.INCOME -> R.string.income
-                    TransactionType.SPENDING -> R.string.spending
+                    TransactionType.SPENDING -> R.string.expense
                 }
 
                 Text(

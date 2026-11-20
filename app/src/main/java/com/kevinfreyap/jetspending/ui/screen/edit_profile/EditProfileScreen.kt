@@ -258,7 +258,7 @@ fun EditProfileContent(
                 },
                 icon = R.drawable.ic_error_outline_24,
                 iconColor = Orange700,
-                title = stringResource(R.string.discard_changes),
+                title = stringResource(R.string.dialog_discard_changes),
                 message = stringResource(R.string.description_discard_change),
                 positiveBtn = {
                     Button(

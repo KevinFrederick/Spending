@@ -578,7 +578,7 @@ fun PrivacySecurityContent(
                                 .fillMaxWidth()
                         ) {
                             Text(
-                                text = stringResource(R.string.delete),
+                                text = stringResource(R.string.btn_delete),
                                 style = MaterialTheme.typography.bodyMedium
                             )
                         }

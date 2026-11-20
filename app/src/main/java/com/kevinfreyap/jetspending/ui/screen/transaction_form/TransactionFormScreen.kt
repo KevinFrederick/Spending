@@ -205,7 +205,7 @@ fun TransactionFormContent(
                 optionLabel = {
                     stringResource(
                         when(it) {
-                            TransactionType.SPENDING -> R.string.spending
+                            TransactionType.SPENDING -> R.string.expense
                             TransactionType.INCOME -> R.string.income
                         }
                     )
@@ -357,7 +357,7 @@ fun TransactionFormContent(
     if (state.overlayState.isDiscardDialogVisible) {
         ViewAppDialog(
             dialogType = DialogType.WARNING,
-            title = stringResource(R.string.discard_changes),
+            title = stringResource(R.string.dialog_discard_changes),
             message = stringResource(R.string.description_discard_change),
             confirmText = stringResource(R.string.discard),
             onConfirm = {

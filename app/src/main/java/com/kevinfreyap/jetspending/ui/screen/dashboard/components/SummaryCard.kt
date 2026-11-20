@@ -50,7 +50,7 @@ fun SummaryCard(
         }
         TransactionType.SPENDING -> {
             icon = painterResource(R.drawable.ic_spending_24)
-            typeText = stringResource(R.string.spending)
+            typeText = stringResource(R.string.expense)
             formattedValue = "- ${state.value}"
             color = Theme.custom.statusNegative
         }

@@ -64,7 +64,7 @@ fun ViewTypeSelector(
         TransactionType.entries.forEach { type ->
             val text = when (type) {
                 TransactionType.INCOME -> stringResource(R.string.income)
-                TransactionType.SPENDING -> stringResource(R.string.spending)
+                TransactionType.SPENDING -> stringResource(R.string.expense)
             }
 
             PillRadioButton(
