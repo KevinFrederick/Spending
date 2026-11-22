@@ -13,7 +13,11 @@ plugins {
 
 android {
     namespace = "com.kevinfreyap.jetspending"
-    compileSdk = 37
+    compileSdk {
+        version = release(37) {
+            minorApiLevel = 1
+        }
+    }
 
     defaultConfig {
         applicationId = "com.kevinfreyap.jetspending"
@@ -85,9 +89,6 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
     ksp(libs.kotlinx.metadata.jvm)
-
-    implementation(libs.vico.compose)
-    implementation(libs.vico.compose.m3)
 
     implementation(libs.googleid)
 

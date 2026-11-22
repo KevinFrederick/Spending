@@ -1,5 +1,6 @@
 package com.kevinfreyap.jetspending.ui.helper.currency
 
+import android.icu.text.CompactDecimalFormat
 import com.kevinfreyap.domain.model.AppCurrency
 import com.kevinfreyap.jetspending.utils.getLocale
 import java.lang.Exception
@@ -7,6 +8,7 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.text.NumberFormat
+import java.util.Locale
 
 fun BigDecimal.toCurrencyString(currency: AppCurrency): String {
     val fraction = if (currency.isFraction) 2 else 0
@@ -19,6 +21,38 @@ fun BigDecimal.toCurrencyString(currency: AppCurrency): String {
     )
 
     return formattedAmount
+}
+
+fun BigDecimal.toCompactChartAmount(
+    currency: AppCurrency,
+    locale: Locale = Locale.getDefault()
+): String {
+    if (this.compareTo(BigDecimal.ZERO) == 0) return "0"
+
+    val absAmount = this.abs()
+    val fractionDigits = when {
+        // 100,000 to 999,999 -> 0 decimals
+        absAmount >= BigDecimal("100000") && absAmount < BigDecimal("1000000") -> 0
+
+        // Everything else >= 1,000 (1K–99.9K, 1M+, 1B+) OR fractional currencies < 1,000 -> 1 decimal
+        absAmount >= BigDecimal("1000") -> 1
+
+        // Non-fractional currencies (IDR, JPY) under 1,000 -> 0 decimals
+        else -> currency.decimalPlaces
+    }
+
+    val formatter = CompactDecimalFormat.getInstance(
+        locale,
+        CompactDecimalFormat.CompactStyle.SHORT
+    ).apply {
+        maximumFractionDigits = fractionDigits
+        minimumFractionDigits = 0
+        roundingMode = RoundingMode.HALF_UP.ordinal
+    }
+
+    return formatter.format(this)
+        .replace("\u00A0", "")
+        .replace(" ", "")
 }
 
 fun String.cleanStringAmount(currency: AppCurrency): String? {

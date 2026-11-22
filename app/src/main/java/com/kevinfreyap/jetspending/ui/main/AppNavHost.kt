@@ -23,7 +23,7 @@ import com.kevinfreyap.jetspending.ui.screen.list.TransactionListScreen
 import com.kevinfreyap.jetspending.ui.screen.notification.NotificationScreen
 import com.kevinfreyap.jetspending.ui.screen.onboarding.OnboardingScreen
 import com.kevinfreyap.jetspending.ui.screen.privacy_security.PrivacySecurityScreen
-import com.kevinfreyap.jetspending.ui.screen.report.ReportScreen
+import com.kevinfreyap.jetspending.ui.screen.report.ReportsScreen
 import com.kevinfreyap.jetspending.ui.screen.settings.SettingsScreen
 import com.kevinfreyap.jetspending.ui.screen.signin.SignInScreen
 import com.kevinfreyap.jetspending.ui.screen.signup.SignUpScreen
@@ -150,7 +150,7 @@ fun AppNavHost(
         }
 
         composable(Screen.Report.route) {
-            ReportScreen()
+            ReportsScreen()
         }
 
         composable(

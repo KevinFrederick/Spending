@@ -25,6 +25,7 @@ import com.kevinfreyap.jetspending.utils.UiEvent
 import com.kevinfreyap.jetspending.utils.UiEvent.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -35,6 +36,7 @@ import kotlinx.coroutines.launch
 import java.math.BigDecimal
 import java.math.RoundingMode
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 
 @HiltViewModel
 class TransactionDetailViewModel @Inject constructor(
@@ -83,6 +85,14 @@ class TransactionDetailViewModel @Inject constructor(
                 viewModelScope.launch {
                     try {
                         deleteTransaction(transactionId)
+
+                        _state.update { currentState ->
+                            currentState.copy(
+                                isDeleteDialogVisible = false
+                            )
+                        }
+
+                        delay(300.milliseconds)
 
                         _uiEvent.send(ShowToast(R.string.success_message_transaction_deleted))
                         _uiEvent.send(Navigate(TransactionDetailNavigation.NavigateUp))

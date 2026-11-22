@@ -6,9 +6,9 @@ coreKtx = "1.19.1"
 junit = "4.13.2"
 junitVersion = "1.3.0"
 espressoCore = "3.7.0"
-lifecycleRuntimeKtx = "2.11.0"
+lifecycleRuntimeKtx = "2.11.1"
 activityCompose = "1.13.0"
-composeBom = "2026.09.00"
+composeBom = "2026.11.01"
 navigationCompose = "2.10.2"
 coroutineAndroid = "1.11.0"
 coroutinePlayService = "1.11.0"
@@ -32,7 +32,6 @@ loggingInterceptor = "5.5.1"
 mockk = "1.14.12"
 coroutineTest = "1.11.0"
 metadata = "2.3.21"
-vico = "2.3.6"
 biometricKtx = "1.4.0-alpha02"
 
 [libraries]
@@ -93,9 +92,6 @@ mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 kotlin-coroutine-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutineTest" }
 # Metadata
 kotlinx-metadata-jvm = { module = "org.jetbrains.kotlin:kotlin-metadata-jvm", version.ref = "metadata" }
-# Vico Chart
-vico-compose = { group = "com.patrykandpatrick.vico", name = "compose", version.ref = "vico"}
-vico-compose-m3 = { group = "com.patrykandpatrick.vico", name = "compose-m3", version.ref = "vico" }
 # Biometric
 androidx-biometric-ktx = { group = "androidx.biometric", name = "biometric-ktx", version.ref = "biometricKtx" }
 

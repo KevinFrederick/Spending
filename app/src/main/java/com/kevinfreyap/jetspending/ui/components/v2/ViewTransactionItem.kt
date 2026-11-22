@@ -40,7 +40,6 @@ fun ViewTransactionItem(
     onClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val iconColor: Color
     val formattedValue: String
     val amountColor: Color
 
@@ -52,12 +51,10 @@ fun ViewTransactionItem(
 
     when(state.transactionType) {
         TransactionType.INCOME -> {
-            iconColor = MaterialTheme.colorScheme.primary
             formattedValue = "+ ${state.transactionConvertedAmount ?: state.transactionOriginalAmount}"
             amountColor = Theme.custom.statusPositive
         }
         TransactionType.SPENDING -> {
-            iconColor = Theme.custom.secondaryTextColor
             formattedValue = "- ${state.transactionConvertedAmount ?: state.transactionOriginalAmount}"
             amountColor = Theme.custom.statusNegative
         }
@@ -90,7 +87,7 @@ fun ViewTransactionItem(
             Icon(
                 painter = painterResource(state.transactionCategoryIcon),
                 contentDescription = null,
-                tint = iconColor,
+                tint = Theme.custom.secondaryTextColor,
                 modifier = Modifier
                     .size(18.dp)
             )
@@ -191,7 +188,6 @@ fun ViewTransactionItemPlaceholder() {
             )
     ) {
         Box(
-            contentAlignment = Alignment.Center,
             modifier = Modifier
                 .size(40.dp)
                 .clip(
@@ -200,7 +196,7 @@ fun ViewTransactionItemPlaceholder() {
                 .shimmerEffect(
                     shimmerColor = Theme.custom.shimmerColor
                 )
-        ) {}
+        )
 
         Column(
             verticalArrangement = Arrangement.spacedBy(4.dp),

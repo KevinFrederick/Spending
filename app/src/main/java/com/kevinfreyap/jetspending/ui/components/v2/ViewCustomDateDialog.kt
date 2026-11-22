@@ -19,7 +19,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import com.kevinfreyap.jetspending.R
-import com.kevinfreyap.jetspending.ui.theme.Grey500
 import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
 import com.kevinfreyap.jetspending.ui.theme.Theme
 import java.time.Instant
@@ -114,7 +113,8 @@ fun ViewCustomDateDialog(
                 )
             ) {
                 Text(
-                    text = stringResource(R.string.confirm)
+                    text = stringResource(R.string.confirm),
+                    style = MaterialTheme.typography.labelLarge,
                 )
             }
         },
@@ -122,11 +122,12 @@ fun ViewCustomDateDialog(
             TextButton(
                 onClick = onDismiss,
                 colors = ButtonDefaults.textButtonColors(
-                    contentColor = Grey500
+                    contentColor = Theme.custom.secondaryTextColor
                 )
             ) {
                 Text(
-                    text = stringResource(R.string.cancel)
+                    text = stringResource(R.string.cancel),
+                    style = MaterialTheme.typography.labelLarge,
                 )
             }
         },

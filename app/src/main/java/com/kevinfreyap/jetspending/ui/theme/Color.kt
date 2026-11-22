@@ -125,7 +125,7 @@ val DarkOnSurfaceVariant = Color(0xFFA1B2A7)
 
 val DarkOutline = Color(0xFF45454B)
 
-val DarkHighlightContainer = Color(0xFF323238)
+val DarkHighlightContainer = Color(0xFF223A31)
 
 val DarkStatusPositive = Color(0xFF9BD4B1)
 val DarkStatusNegative = Color(0xFFF2AAA0)
@@ -135,4 +135,4 @@ val DarkStatusWarning = Color(0xFFFBBF24)
 val DarkStatusOnWarning = Color(0xFF3B2307)
 
 val DarkShimmer = Color(0xFF35353B)
-val DarkHighlightShimmer = Color(0xFF47474F)
+val DarkHighlightShimmer = Color(0xFF325246)

@@ -5,7 +5,7 @@
     <!-- Screen Name -->
     <string name="home">Home</string>
     <string name="overview">Overview</string>
-    <string name="report">Report</string>
+    <string name="report">Reports</string>
     <string name="settings">Settings</string>
     <string name="transactions">Transactions</string>
     <string name="transaction_detail">Transaction Detail</string>
@@ -13,7 +13,7 @@
     <!-- Section Header -->
     <string name="balance_info">Balance Information</string>
     <string name="recent_transaction">Recent Transactions</string>
-    <string name="spending_report">Spending Report</string>
+    <string name="spending_report">Expense Report</string>
     <string name="categories_percentage">Categories Percentage</string>
     <string name="category_detail">Category Detail</string>
 
@@ -36,9 +36,26 @@
     <!-- Label -->
     <string name="label_transaction">transaction</string>
     <string name="label_transactions">transactions</string>
+    <string name="label_total_expense">Total expense</string>
+    <string name="label_total_income">Total income</string>
+    <string name="label_net">Net</string>
+    <string name="label_income">Income</string>
+    <string name="label_expense">Expense</string>
+
+    <string name="label_chart_max">Max %1$s</string>
+    <string name="label_chart_title_weekly_expense">Weekly expense</string>
+    <string name="label_chart_title_monthly_expense">Monthly expense</string>
+    <string name="label_chart_title_yearly_expense">Yearly expense</string>
+
+    <string name="label_chart_title_weekly_income">Weekly income</string>
+    <string name="label_chart_title_monthly_income">Monthly income</string>
+    <string name="label_chart_title_yearly_income">Yearly income</string>
 
     <string name="dialog_discard_changes">Discard changes?</string>
     <string name="dialog_delete_transaction">Delete transaction?</string>
+
+    <string name="dialog_title_select_month">Select month</string>
+    <string name="dialog_title_select_year">Select year</string>
 
     <string name="total_balance">Total Balance</string>
     <string name="income">Income</string>
@@ -81,7 +98,7 @@
     <string name="notes">Notes</string>
     <string name="transaction_deleted">Transaction Deleted</string>
     <string name="total_income">Total Income</string>
-    <string name="total_spending">Total Spending</string>
+    <string name="total_spending">Total Expense</string>
     <string name="transaction_chart">Transactions Chart</string>
     <string name="reset_password">Reset Password</string>
     <string name="set_notification">Set notifications</string>
@@ -134,6 +151,8 @@
     <string name="btn_delete_transaction">Delete transaction</string>
     <string name="btn_delete">Delete</string>
     <string name="btn_back">Go back</string>
+    <string name="btn_previous">Previous</string>
+    <string name="btn_next">Next</string>
 
     <string name="all">All</string>
     <string name="cancel">Cancel</string>
@@ -205,6 +224,7 @@
     <!-- Error Message -->
     <string name="error_something_went_wrong">Something went wrong</string>
     <string name="error_failed_to_load_transactions">Failed to load transactions</string>
+    <string name="error_failed_to_load_reports">Couldn’t load your reports. Please try again.</string>
     <string name="error_required_transaction_name">Please enter a name for this transaction</string>
     <string name="error_required_transaction_amount">Please enter a valid amount.</string>
     <string name="error_transaction_from_greater_than_to">Please enter a valid amount range</string>
@@ -276,8 +296,8 @@
     <string name="title_message_sign_in">Welcome back</string>
     <string name="title_message_sign_up">Let\'s start</string>
 
-    <string name="subtitle_message_onboarding">Track everyday spending in any currency. \nOne simple view of where your money goes.</string>
-    <string name="subtitle_message_sign_in">Track your spending in one place</string>
+    <string name="subtitle_message_onboarding">Track everyday expense in any currency. \nOne simple view of where your money goes.</string>
+    <string name="subtitle_message_sign_in">Track your expenses in one place</string>
     <string name="subtitle_message_sign_up">Create your free account today</string>
     <string name="subtitle_message_balance">All currencies synced • Balance up to date</string>
     
@@ -292,7 +312,7 @@
     <string name="search_message_filter_no_match">No transactions match applied filters. Clear filters to see transactions</string>
 
     <string name="empty_transactions">No transactions recorded</string>
-    <string name="empty_transactions_message">Let\'s start keeping track of your spending and income.</string>
+    <string name="empty_transactions_message">Let\'s start keeping track of your expense and income.</string>
 
     <!--  Warning  -->
     <string name="warning_rates_missing">Offline: Some rates unavailable • Partial balance</string>

@@ -31,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -47,7 +48,8 @@ fun <T> ViewDropdownSelection(
     selectedOption: T,
     onSelectOption: (T) -> Unit,
     optionLabel: @Composable (T) -> String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    containerColor: Color = MaterialTheme.colorScheme.surfaceContainer
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -62,7 +64,7 @@ fun <T> ViewDropdownSelection(
         Card(
             shape = RoundedCornerShape(100),
             colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainer
+                containerColor = containerColor
             ),
             modifier = Modifier
                 .clip(
