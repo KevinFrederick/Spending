@@ -40,7 +40,7 @@ import com.kevinfreyap.domain.model.TransactionType
 import com.kevinfreyap.jetspending.R
 import com.kevinfreyap.jetspending.ui.action.TransactionFormAction
 import com.kevinfreyap.jetspending.ui.components.v2.ViewCustomDateDialog
-import com.kevinfreyap.jetspending.ui.components.ViewTopBar
+import com.kevinfreyap.jetspending.ui.components.v2.ViewTopBar
 import com.kevinfreyap.jetspending.ui.components.v2.ViewAppDialog
 import com.kevinfreyap.jetspending.ui.components.v2.ViewPrimaryButton
 import com.kevinfreyap.jetspending.ui.components.v2.ViewSelectionBar

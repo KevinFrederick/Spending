@@ -117,7 +117,7 @@ fun ViewWeekPickerContent(
     modifier: Modifier = Modifier
 ) {
     val colors = DatePickerDefaults.colors(
-        containerColor = MaterialTheme.colorScheme.background,
+        containerColor = MaterialTheme.colorScheme.surface,
         weekdayContentColor = Theme.custom.primaryTextColor,
         navigationContentColor = Theme.custom.primaryTextColor,
 

@@ -11,6 +11,7 @@ import androidx.navigation.navArgument
 import com.kevinfreyap.jetspending.ui.navigation.DashboardNavigation
 import com.kevinfreyap.jetspending.ui.navigation.OnboardingNavigation
 import com.kevinfreyap.jetspending.ui.navigation.Screen
+import com.kevinfreyap.jetspending.ui.navigation.SettingsNavigation
 import com.kevinfreyap.jetspending.ui.navigation.SignInNavigation
 import com.kevinfreyap.jetspending.ui.navigation.SignUpNavigation
 import com.kevinfreyap.jetspending.ui.navigation.TransactionDetailNavigation
@@ -130,21 +131,25 @@ fun AppNavHost(
         }
         composable(Screen.Settings.route) {
             SettingsScreen(
-                navigateToOnBoarding = {
-                    navController.navigate(Screen.OnBoarding.route) {
-                        popUpTo(0) {
-                            inclusive = true
+                onNavigate = { destination ->
+                    when(destination) {
+                        SettingsNavigation.NavigateToEditProfile -> {
+                            navController.navigate(Screen.EditProfile.route)
+                        }
+                        SettingsNavigation.NavigateToNotification -> {
+                            navController.navigate(Screen.Notification.route)
+                        }
+                        SettingsNavigation.NavigateToOnBoard -> {
+                            navController.navigate(Screen.OnBoarding.route) {
+                                popUpTo(0) {
+                                    inclusive = true
+                                }
+                            }
+                        }
+                        SettingsNavigation.NavigateToSecurity -> {
+                            navController.navigate(Screen.PrivacySecurity.route)
                         }
                     }
-                },
-                navigateToEditProfile = {
-                    navController.navigate(Screen.EditProfile.route)
-                },
-                navigateToNotification = {
-                    navController.navigate(Screen.Notification.route)
-                },
-                navigateToPrivacySecurity = {
-                    navController.navigate(Screen.PrivacySecurity.route)
                 }
             )
         }

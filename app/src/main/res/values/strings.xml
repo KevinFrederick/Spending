@@ -51,11 +51,23 @@
     <string name="label_chart_title_monthly_income">Monthly income</string>
     <string name="label_chart_title_yearly_income">Yearly income</string>
 
+    <string name="label_version">Version %1$s</string>
+
+    <string name="settings_header_preferences">PREFERENCES</string>
+    <string name="settings_header_app_settings">APP SETTINGS</string>
+
+    <string name="settings_base_currency">Base currency</string>
+    <string name="settings_appearance">Appearance</string>
+    <string name="settings_notification">Notifications</string>
+    <string name="settings_security">Privacy &amp; security</string>
+
     <string name="dialog_discard_changes">Discard changes?</string>
     <string name="dialog_delete_transaction">Delete transaction?</string>
 
     <string name="dialog_title_select_month">Select month</string>
     <string name="dialog_title_select_year">Select year</string>
+    <string name="dialog_title_select_currency">Select currency</string>
+    <string name="dialog_title_select_theme">Select theme</string>
 
     <string name="total_balance">Total Balance</string>
     <string name="income">Income</string>
@@ -141,6 +153,8 @@
     <string name="btn_sign_up">Sign Up</string>
 
     <string name="btn_txt_see_all">See all</string>
+    <string name="btn_txt_edit_profile">Edit profile</string>
+
     <string name="btn_keep_editing">Keep editing</string>
     <string name="btn_apply_filters">Apply filters</string>
     <string name="btn_retry">Retry</string>
@@ -153,6 +167,8 @@
     <string name="btn_back">Go back</string>
     <string name="btn_previous">Previous</string>
     <string name="btn_next">Next</string>
+    <string name="btn_sign_out">Sign out</string>
+    <string name="btn_close">Close</string>
 
     <string name="all">All</string>
     <string name="cancel">Cancel</string>
@@ -189,9 +205,12 @@
     <string name="select_theme">Select Theme</string>
     <string name="select_theme_subtitle">Choose your preferred appearance</string>
     <string name="theme">Theme</string>
-    <string name="follow_system">Follow System</string>
-    <string name="light_mode">Light Mode</string>
-    <string name="dark_mode">Dark Mode</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="theme_system">System</string>
+    <string name="theme_follow_system">Follow System</string>
+    <string name="theme_light_mode">Light Mode</string>
+    <string name="theme_dark_mode">Dark Mode</string>
 
     <!-- Currency & Country Name -->
     <string name="currency_idr">Indonesia (Rupiah | Rp)</string>
@@ -207,8 +226,8 @@
 
     <!-- Success Message -->
     <string name="success">Success</string>
-    <string name="success_login_success">Sign In Success</string>
-    <string name="success_register_success">Sign Up Success</string>
+    <string name="success_login_success">Sign in success</string>
+    <string name="success_register_success">Sign up success</string>
     <string name="success_message_transaction_saved">Transaction saved successfully!</string>
     <string name="success_message_register_success">Account created successfully</string>
     <string name="success_message_transaction_deleted">Transaction deleted!</string>
@@ -220,6 +239,7 @@
     <string name="success_change_password">Password Changed</string>
     <string name="success_create_password">Password Created</string>
     <string name="success_account_deleted">Account Deleted</string>
+    <string name="success_logout">Signed out</string>
 
     <!-- Error Message -->
     <string name="error_something_went_wrong">Something went wrong</string>
@@ -274,6 +294,11 @@
     <string name="description_delete_account">This will permanently erase all your data.</string>
     <string name="description_account_deleted">Your account was successfully deleted.</string>
     <string name="description_feature_coming_soon">This feature is currently under development</string>
+    
+    <string name="description_settings_base_currency">Used for totals and conversions</string>
+    <string name="description_settings_appearance">Choose your preferred theme</string>
+    <string name="description_settings_notification">Choose your preferences</string>
+    <string name="description_settings_security">App lock and data preferences</string>
 
     <!-- Period Option -->
     <string name="period_weekly">Weekly</string>

@@ -15,9 +15,9 @@ class ThemeUiMapper @Inject constructor (
     @StringRes
     fun mapThemeToNameRes(appTheme: AppTheme): Int {
         return when(appTheme) {
-            AppTheme.LIGHT -> R.string.light_mode
-            AppTheme.DARK -> R.string.dark_mode
-            AppTheme.SYSTEM -> R.string.follow_system
+            AppTheme.LIGHT -> R.string.theme_light_mode
+            AppTheme.DARK -> R.string.theme_dark_mode
+            AppTheme.SYSTEM -> R.string.theme_follow_system
         }
     }
 

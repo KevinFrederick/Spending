@@ -1,270 +1,316 @@
 package com.kevinfreyap.jetspending.ui.screen.settings
 
 import android.content.res.Configuration
-import androidx.compose.foundation.clickable
+import android.widget.Toast
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import com.kevinfreyap.domain.model.AppCurrency
 import com.kevinfreyap.domain.model.AppTheme
+import com.kevinfreyap.jetspending.BuildConfig
 import com.kevinfreyap.jetspending.R
-import com.kevinfreyap.jetspending.ui.components.ProfileCard
-import com.kevinfreyap.jetspending.ui.components.ViewCustomDialog
+import com.kevinfreyap.jetspending.ui.action.SettingsAction
 import com.kevinfreyap.jetspending.ui.components.ViewSelectionDialog
 import com.kevinfreyap.jetspending.ui.components.ViewSelectionItem
-import com.kevinfreyap.jetspending.ui.components.ViewSettingsGroup
-import com.kevinfreyap.jetspending.ui.components.ViewTopBar
-import com.kevinfreyap.jetspending.ui.model.SettingsGroup
-import com.kevinfreyap.jetspending.ui.model.SettingsItem
-import com.kevinfreyap.jetspending.ui.model.SettingsOption
-import com.kevinfreyap.jetspending.ui.model.UserProfileUi
-import com.kevinfreyap.jetspending.ui.theme.Grey500
+import com.kevinfreyap.jetspending.ui.components.v2.ViewPrimaryButton
+import com.kevinfreyap.jetspending.ui.components.v2.ViewTopBar
+import com.kevinfreyap.jetspending.ui.navigation.SettingsNavigation
+import com.kevinfreyap.jetspending.ui.screen.settings.components.ProfileCard
+import com.kevinfreyap.jetspending.ui.screen.settings.components.ProfileCardPlaceholder
+import com.kevinfreyap.jetspending.ui.screen.settings.components.SettingsSection
+import com.kevinfreyap.jetspending.ui.screen.settings.state.ProfileCardState
+import com.kevinfreyap.jetspending.ui.screen.settings.state.SettingsDialogType
+import com.kevinfreyap.jetspending.ui.screen.settings.state.SettingsItemState
+import com.kevinfreyap.jetspending.ui.screen.settings.state.SettingsItemType
+import com.kevinfreyap.jetspending.ui.state.SettingsState
+import com.kevinfreyap.jetspending.ui.state.UiState
 import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
-import com.kevinfreyap.jetspending.ui.theme.Orange700
-import com.kevinfreyap.jetspending.ui.theme.Red500
 import com.kevinfreyap.jetspending.ui.theme.Theme
-import kotlinx.coroutines.flow.collectLatest
+import com.kevinfreyap.jetspending.utils.UiEvent
 
 @Composable
 fun SettingsScreen(
-    navigateToOnBoarding: () -> Unit,
-    navigateToEditProfile: () -> Unit,
-    navigateToNotification: () -> Unit,
-    navigateToPrivacySecurity: () -> Unit,
     modifier: Modifier = Modifier,
+    onNavigate: (SettingsNavigation) -> Unit,
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
+    val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
 
-    val selectedTheme by viewModel.selectedTheme.collectAsState()
-    val settingsGroup by viewModel.settingsState.collectAsState()
-    val userProfile by viewModel.userProfile.collectAsState()
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
-    val (showCurrencyDialog, setShowCurrencyDialog) = rememberSaveable { mutableStateOf(false) }
-    val (showThemeDialog, setShowThemeDialog) = rememberSaveable { mutableStateOf(false) }
-    val (showLogoutDialog, setShowLogoutDialog) = rememberSaveable { mutableStateOf(false) }
-
-    LaunchedEffect(Unit) {
-        viewModel.navigationChannel.collectLatest {
-            navigateToOnBoarding()
+    LaunchedEffect(viewModel.uiEvent, lifecycleOwner) {
+        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewModel.uiEvent.collect { event ->
+                when(event) {
+                    is UiEvent.Navigate -> {
+                        onNavigate(event.destination)
+                    }
+                    is UiEvent.ShowToast -> {
+                        Toast.makeText(
+                            context,
+                            event.asString(context),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            }
         }
     }
 
     SettingsContent(
-        currencyCode = AppCurrency.IDR,
-        selectedTheme = selectedTheme,
-        user = userProfile,
-        settingsGroup = settingsGroup,
-        onSettingsClicked = { settingsOption ->
-            when(settingsOption) {
-                SettingsOption.EDIT_PROFILE -> {
-                    navigateToEditProfile()
-                }
-                SettingsOption.NOTIFICATION -> {
-                    navigateToNotification()
-                }
-                SettingsOption.PRIVACY_SECURITY -> {
-                    navigateToPrivacySecurity()
-                }
-                SettingsOption.CURRENCY -> {
-                    setShowCurrencyDialog(true)
-                }
-                SettingsOption.THEME -> {
-                    setShowThemeDialog(true)
-                }
-                SettingsOption.LOG_OUT -> {
-                    setShowLogoutDialog(true)
-                }
-            }
-        },
-        showCurrencyDialog = showCurrencyDialog,
-        showThemeDialog = showThemeDialog,
-        showLogoutDialog = showLogoutDialog,
-        onSelectCurrency = {
-            setShowCurrencyDialog(false)
-        },
-        onSelectTheme = {
-            viewModel.onThemeSelected(it)
-            setShowThemeDialog(false)
-        },
-        onDismissCurrencyDialog = {
-            setShowCurrencyDialog(false)
-        },
-        onDismissThemeDialog = {
-            setShowThemeDialog(false)
-        },
-        onLogoutDialogPositiveBtn = {
-            setShowLogoutDialog(false)
-            viewModel.logout()
-        },
-        onLogoutDialogNegativeBtn = {
-            setShowLogoutDialog(false)
-        },
+        state = state,
+        onAction = viewModel::onAction,
+        onNavigate = onNavigate,
         modifier = modifier
     )
 }
 
 @Composable
 fun SettingsContent(
-    currencyCode: AppCurrency,
-    selectedTheme: AppTheme,
-    user: UserProfileUi,
-    settingsGroup: List<SettingsGroup>,
-    showCurrencyDialog: Boolean,
-    showThemeDialog: Boolean,
-    showLogoutDialog: Boolean,
-    onSettingsClicked: (SettingsOption) -> Unit,
-    onSelectCurrency: (AppCurrency) -> Unit,
-    onSelectTheme: (AppTheme) -> Unit,
-    onDismissCurrencyDialog: () -> Unit,
-    onDismissThemeDialog: () -> Unit,
-    onLogoutDialogPositiveBtn: () -> Unit,
-    onLogoutDialogNegativeBtn: () -> Unit,
+    state: SettingsState,
+    onAction: (SettingsAction) -> Unit,
+    onNavigate: (SettingsNavigation) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
         topBar = {
             ViewTopBar(
                 title = stringResource(R.string.settings),
-                onSelectCurrency = {}
             )
-        }
+        },
     ) { innerPadding ->
         Column(
+            verticalArrangement = Arrangement.spacedBy(28.dp),
             modifier = modifier
                 .padding(innerPadding)
                 .padding(
                     top = 8.dp,
-                    bottom = 16.dp,
-                    start = 16.dp,
-                    end = 16.dp
+                    bottom = 24.dp,
+                    start = 24.dp,
+                    end = 24.dp
                 )
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
         ) {
-            ProfileCard(
-                imageUrl = user.imageUrl,
-                name = user.displayName,
-                email = user.displayEmail,
+            if (state.uiState is UiState.Loading) {
+                ProfileCardPlaceholder()
+            } else {
+                ProfileCard(
+                    state = ProfileCardState(
+                        imageUrl = null,
+                        name = "John Doe",
+                        email = "John.Doe@email.com",
+                    ),
+                    onClick = {
+                        onNavigate(
+                            SettingsNavigation.NavigateToEditProfile
+                        )
+                    }
+                )
+            }
+
+            SettingsSection(
+                header = R.string.settings_header_preferences,
+                settings = listOf(
+                    SettingsItemState(
+                        type = SettingsItemType.BASE_CURRENCY,
+                        iconRes = R.drawable.ic_currency_exchange_24,
+                        name = R.string.settings_base_currency,
+                        description = R.string.description_settings_base_currency,
+                        selectedItem = state.selectedCurrency.name,
+                    ),
+                    SettingsItemState(
+                        type = SettingsItemType.APPEARANCE,
+                        iconRes = R.drawable.ic_light_mode_24,
+                        name = R.string.settings_appearance,
+                        description = R.string.description_settings_appearance,
+                        selectedItem = stringResource(state.selectedAppearanceRes)
+                    ),
+                ),
+                onItemClick = {settingsItem ->
+                    when(settingsItem) {
+                        SettingsItemType.BASE_CURRENCY -> onAction(
+                            SettingsAction.OnShowDialog(SettingsDialogType.CURRENCY)
+                        )
+                        SettingsItemType.APPEARANCE -> onAction(
+                            SettingsAction.OnShowDialog(SettingsDialogType.APPEARANCE)
+                        )
+                        else -> Unit
+                    }
+                },
+                isLoading = state.uiState is UiState.Loading
             )
 
-            settingsGroup.forEach { group ->
-                ViewSettingsGroup(
-                    groupTitle = group.groupTitle,
-                    onSettingsClicked = onSettingsClicked,
-                    settings = group.settings
+            SettingsSection(
+                header = R.string.settings_header_app_settings,
+                settings = listOf(
+                    SettingsItemState(
+                        type = SettingsItemType.NOTIFICATION,
+                        iconRes = R.drawable.ic_notifications_24,
+                        name = R.string.settings_notification,
+                        description = R.string.description_settings_notification,
+                    ),
+                    SettingsItemState(
+                        type = SettingsItemType.SECURITY,
+                        iconRes = R.drawable.ic_shield_check,
+                        name = R.string.settings_security,
+                        description = R.string.description_settings_security,
+                    ),
+                ),
+                onItemClick = {settingsItem ->
+                    when(settingsItem) {
+                        SettingsItemType.NOTIFICATION -> {
+                            onNavigate(
+                                SettingsNavigation.NavigateToNotification
+                            )
+                        }
+                        SettingsItemType.SECURITY -> {
+                            onNavigate(
+                                SettingsNavigation.NavigateToSecurity
+                            )
+                        }
+                        else -> Unit
+                    }
+                }
+            )
+
+            Spacer(Modifier.weight(1f))
+
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                ViewPrimaryButton(
+                    text = stringResource(R.string.btn_sign_out),
+                    containerColor = Theme.custom.negativeContainer,
+                    contentColor = Theme.custom.statusNegative,
+                    onClick = {
+                        onAction(
+                            SettingsAction.OnLogout
+                        )
+                    },
+                    icon = {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_logout_24),
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                )
+
+                Text(
+                    text = "${stringResource(R.string.app_name)} • ${stringResource(R.string.label_version, BuildConfig.VERSION_NAME)}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Theme.custom.secondaryTextColor.copy(0.6f)
                 )
             }
         }
+    }
 
-        if (showCurrencyDialog) {
+    when (state.activeDialog) {
+        SettingsDialogType.NONE -> Unit
+        SettingsDialogType.CURRENCY -> {
             ViewSelectionDialog(
-                title = stringResource(R.string.select_currency),
-                subtitle = stringResource(R.string.description_select_currency),
-                onDismissRequest = onDismissCurrencyDialog,
+                titleRes = R.string.dialog_title_select_currency,
                 options = {
-                    AppCurrency.entries.forEachIndexed { index, currency ->
+                    AppCurrency.entries.forEach { currency ->
                         ViewSelectionItem(
-                            title = currency.countryName,
-                            subtitle = currency.displayCurrencyName,
-                            selected = currency == currencyCode,
-                            modifier = Modifier
-                                .clickable(
-                                    onClick = { onSelectCurrency(currency) }
+                            title = currency.name,
+                            subtitle = currency.displayName,
+                            isSelected = currency == state.selectedCurrency,
+                            onClick = {
+                                onAction(
+                                    SettingsAction.OnSelectCurrency(
+                                        currency = currency
+                                    )
                                 )
-                        )
 
-                        if (index < AppCurrency.entries.lastIndex) {
-                            HorizontalDivider(
-                                thickness = 1.dp,
-                                color = Theme.custom.hintColor,
-                                modifier = Modifier
-                                    .padding(horizontal = 16.dp)
-                            )
-                        }
-                    }
-                }
-            )
-        }
-
-        if (showThemeDialog) {
-            ViewSelectionDialog(
-                title = stringResource(R.string.select_theme),
-                subtitle = stringResource(R.string.select_theme_subtitle),
-                onDismissRequest = onDismissThemeDialog,
-                options = {
-                    AppTheme.entries.forEachIndexed { _, theme ->
-                        val displayName = when(theme) {
-                            AppTheme.LIGHT -> R.string.light_mode
-                            AppTheme.DARK -> R.string.dark_mode
-                            AppTheme.SYSTEM -> R.string.follow_system
-                        }
-
-                        ViewSelectionItem(
-                            title = stringResource(displayName),
-                            selected = selectedTheme == theme,
-                            modifier = Modifier
-                                .clickable(
-                                    onClick = { onSelectTheme(theme) }
+                                onAction(
+                                    SettingsAction.OnShowDialog(
+                                        SettingsDialogType.NONE
+                                    )
                                 )
-                        )
-                    }
-                }
-            )
-        }
-
-        if (showLogoutDialog) {
-            ViewCustomDialog(
-                onDismissRequest = onLogoutDialogNegativeBtn,
-                icon = R.drawable.ic_error_outline_24,
-                iconColor = Orange700,
-                title = stringResource(R.string.logout),
-                message = stringResource(R.string.description_log_out),
-                positiveBtn = {
-                    Button(
-                        onClick = onLogoutDialogPositiveBtn,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Red500
-                        )
-                    ) {
-                        Text(
-                            text = stringResource(R.string.confirm),
-                            style = MaterialTheme.typography.titleMedium
+                            }
                         )
                     }
                 },
-                negativeBtn = {
-                    Button(
-                        onClick = onLogoutDialogNegativeBtn,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Grey500
+                onDismissRequest = {
+                    onAction(
+                        SettingsAction.OnShowDialog(
+                            SettingsDialogType.NONE
                         )
-                    ) {
-                        Text(
-                            text = stringResource(R.string.cancel),
-                            style = MaterialTheme.typography.titleMedium
+                    )
+                },
+                subtitle = stringResource(R.string.description_settings_base_currency)
+            )
+        }
+        SettingsDialogType.APPEARANCE -> {
+            ViewSelectionDialog(
+                titleRes = R.string.dialog_title_select_theme,
+                options = {
+                    AppTheme.entries.forEach { theme ->
+                        ViewSelectionItem(
+                            title = stringResource(
+                                when(theme) {
+                                    AppTheme.LIGHT -> R.string.theme_light_mode
+                                    AppTheme.DARK -> R.string.theme_dark_mode
+                                    AppTheme.SYSTEM -> R.string.theme_follow_system
+                                }
+                            ),
+                            isSelected = theme == state.selectedAppearance,
+                            onClick = {
+                                onAction(
+                                    SettingsAction.OnSelectTheme(
+                                        theme = theme
+                                    )
+                                )
+
+                                onAction(
+                                    SettingsAction.OnShowDialog(
+                                        SettingsDialogType.NONE
+                                    )
+                                )
+                            }
                         )
                     }
-                }
+                },
+                onDismissRequest = {
+                    onAction(
+                        SettingsAction.OnShowDialog(
+                            SettingsDialogType.NONE
+                        )
+                    )
+                },
+                subtitle = stringResource(R.string.description_settings_appearance)
             )
         }
     }
@@ -273,79 +319,27 @@ fun SettingsContent(
 @Preview(
     showBackground = true,
     device = Devices.PIXEL_9_PRO,
+    uiMode = Configuration.UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    device = Devices.PIXEL_9_PRO,
     uiMode = Configuration.UI_MODE_NIGHT_YES
 )
 @Composable
 fun SettingsContentPreview() {
-    val generalList = listOf(
-        SettingsItem(
-            id = SettingsOption.EDIT_PROFILE,
-            title = R.string.edit_profile,
-            icon = R.drawable.ic_mode_edit_24,
-        ),
-        SettingsItem(
-            id = SettingsOption.NOTIFICATION,
-            title = R.string.notifications,
-            icon = R.drawable.ic_notifications_24,
-        ),
-        SettingsItem(
-            id = SettingsOption.PRIVACY_SECURITY,
-            title = R.string.security,
-            icon = R.drawable.ic_lock_24,
-        ),
-    )
-
-    val preferencesList = listOf(
-        SettingsItem(
-            id = SettingsOption.CURRENCY,
-            title = R.string.currency,
-            icon = R.drawable.ic_currency_exchange_24,
-            subtitle = "Indonesia (Rupiah | Rp)"
-        ),
-        SettingsItem(
-            id = SettingsOption.THEME,
-            title = R.string.theme,
-            icon = R.drawable.ic_light_mode_24,
-            subtitle = "Dark Mode"
-        ),
-    )
-
-    val supportList = listOf(
-        SettingsItem(
-            id = SettingsOption.LOG_OUT,
-            title = R.string.logout,
-            icon = R.drawable.ic_logout_24,
-            contentColor = Red500,
-            showChevron = false
-        ),
-    )
-
-    val settingsGroup = listOf(
-        SettingsGroup(R.string.general, generalList),
-        SettingsGroup(R.string.preference, preferencesList),
-        SettingsGroup(R.string.support, supportList),
-    )
-
     JetSpendingTheme {
         SettingsContent(
-            user = UserProfileUi(
-                imageUrl = "",
-                displayName = "John Doe",
-                displayEmail = "JohnDow@email.com"
+            state = SettingsState(
+                profile = ProfileCardState(
+                    imageUrl = null,
+                    name = "John Doe",
+                    email = "JohnDoe@email.com",
+                ),
+                selectedCurrency = AppCurrency.IDR,
             ),
-            settingsGroup = settingsGroup,
-            onSettingsClicked = {},
-            showCurrencyDialog = false,
-            showLogoutDialog = false,
-            showThemeDialog = false,
-            onLogoutDialogPositiveBtn = {},
-            onLogoutDialogNegativeBtn = {},
-            currencyCode = AppCurrency.IDR,
-            onDismissCurrencyDialog = {},
-            onSelectCurrency = {},
-            selectedTheme = AppTheme.SYSTEM,
-            onSelectTheme = {},
-            onDismissThemeDialog = {},
+            onAction = {},
+            onNavigate = {}
         )
     }
 }

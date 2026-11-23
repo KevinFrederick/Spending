@@ -50,7 +50,7 @@ import com.kevinfreyap.jetspending.ui.action.SignUpAction
 import com.kevinfreyap.jetspending.ui.client.GoogleAuthClient
 import com.kevinfreyap.jetspending.ui.components.ViewGoogleBtn
 import com.kevinfreyap.jetspending.ui.components.v2.ViewTextInputField
-import com.kevinfreyap.jetspending.ui.components.ViewTopBar
+import com.kevinfreyap.jetspending.ui.components.v2.ViewTopBar
 import com.kevinfreyap.jetspending.ui.components.v2.ViewAnnotatedTextButton
 import com.kevinfreyap.jetspending.ui.components.v2.ViewPrimaryButton
 import com.kevinfreyap.jetspending.ui.navigation.SignUpNavigation

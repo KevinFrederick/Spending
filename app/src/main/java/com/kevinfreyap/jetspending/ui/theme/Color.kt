@@ -129,7 +129,7 @@ val DarkHighlightContainer = Color(0xFF223A31)
 
 val DarkStatusPositive = Color(0xFF9BD4B1)
 val DarkStatusNegative = Color(0xFFF2AAA0)
-val DarkNegativeContainer = Color(0xFF3C2B28)
+val DarkNegativeContainer = Color(0xFF3D161C)
 
 val DarkStatusWarning = Color(0xFFFBBF24)
 val DarkStatusOnWarning = Color(0xFF3B2307)

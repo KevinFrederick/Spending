@@ -49,7 +49,7 @@ import com.kevinfreyap.domain.model.NotificationPreferences
 import com.kevinfreyap.jetspending.R
 import com.kevinfreyap.jetspending.ui.components.ViewCustomTimeInput
 import com.kevinfreyap.jetspending.ui.components.ViewPreferenceRow
-import com.kevinfreyap.jetspending.ui.components.ViewTopBar
+import com.kevinfreyap.jetspending.ui.components.v2.ViewTopBar
 import com.kevinfreyap.jetspending.ui.state.NotificationAction
 import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
 import com.kevinfreyap.jetspending.ui.theme.Theme
@@ -149,7 +149,6 @@ fun NotificationContent(
             ViewTopBar(
                 title = stringResource(R.string.notifications),
                 onBackClick = onBackClick,
-                onSelectCurrency = {}
             )
         }
     ) { innerPadding ->

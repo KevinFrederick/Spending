@@ -34,7 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.kevinfreyap.domain.model.TransactionType
 import com.kevinfreyap.jetspending.R
-import com.kevinfreyap.jetspending.ui.components.ViewTopBar
+import com.kevinfreyap.jetspending.ui.components.v2.ViewTopBar
 import com.kevinfreyap.jetspending.ui.components.v2.ViewCurrencyCard
 import com.kevinfreyap.jetspending.ui.components.v2.ViewCurrencyCardPlaceholder
 import com.kevinfreyap.jetspending.ui.components.v2.ViewPrimaryButton

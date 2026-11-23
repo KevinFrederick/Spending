@@ -33,7 +33,7 @@ import com.kevinfreyap.domain.model.PeriodSelectorOption
 import com.kevinfreyap.domain.model.TransactionType
 import com.kevinfreyap.jetspending.R
 import com.kevinfreyap.jetspending.ui.action.ReportsAction
-import com.kevinfreyap.jetspending.ui.components.ViewTopBar
+import com.kevinfreyap.jetspending.ui.components.v2.ViewTopBar
 import com.kevinfreyap.jetspending.ui.components.v2.ViewDropdownSelection
 import com.kevinfreyap.jetspending.ui.components.v2.ViewMonthYearPickerDialog
 import com.kevinfreyap.jetspending.ui.components.v2.ViewPageStatus

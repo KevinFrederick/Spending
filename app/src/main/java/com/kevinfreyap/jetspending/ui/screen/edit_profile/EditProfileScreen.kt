@@ -37,8 +37,8 @@ import com.kevinfreyap.domain.error.Field
 import com.kevinfreyap.jetspending.R
 import com.kevinfreyap.jetspending.ui.components.ViewCustomDialog
 import com.kevinfreyap.jetspending.ui.components.v2.ViewTextField
-import com.kevinfreyap.jetspending.ui.components.ViewTopBar
-import com.kevinfreyap.jetspending.ui.components.ViewUserProfile
+import com.kevinfreyap.jetspending.ui.components.v2.ViewTopBar
+import com.kevinfreyap.jetspending.ui.components.v2.ViewUserProfile
 import com.kevinfreyap.jetspending.ui.state.EditProfileAction
 import com.kevinfreyap.jetspending.ui.state.EditProfileState
 import com.kevinfreyap.jetspending.ui.state.UiState
@@ -141,7 +141,6 @@ fun EditProfileContent(
                         onShowConfirmationDialog(true)
                     }
                 },
-                onSelectCurrency = {},
                 isLoading = uiState is UiState.Loading
             )
         }

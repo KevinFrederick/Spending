@@ -47,7 +47,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.kevinfreyap.domain.model.TransactionType
 import com.kevinfreyap.jetspending.R
 import com.kevinfreyap.jetspending.ui.action.TransactionListAction
-import com.kevinfreyap.jetspending.ui.components.ViewTopBar
+import com.kevinfreyap.jetspending.ui.components.v2.ViewTopBar
 import com.kevinfreyap.jetspending.ui.components.v2.ViewPageStatus
 import com.kevinfreyap.jetspending.ui.components.v2.ViewPrimaryButton
 import com.kevinfreyap.jetspending.ui.components.v2.ViewSearchBar
