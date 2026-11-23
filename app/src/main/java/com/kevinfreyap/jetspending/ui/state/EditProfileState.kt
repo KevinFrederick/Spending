@@ -6,8 +6,9 @@ data class EditProfileState(
     val email: String = "",
     val imageUrl: String? = null,
     val originalUsername: String = "",
-    val originalImageUrl: String? = null
+    val isDiscardDialogVisible: Boolean = false,
+    val uiState: UiState<Unit> = UiState.Idle
 ) {
     val hasChanges: Boolean
-        get() = originalUsername != userName || originalImageUrl != imageUrl
+        get() = originalUsername != userName
 }

@@ -9,6 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.kevinfreyap.jetspending.ui.navigation.DashboardNavigation
+import com.kevinfreyap.jetspending.ui.navigation.EditProfileNavigation
 import com.kevinfreyap.jetspending.ui.navigation.OnboardingNavigation
 import com.kevinfreyap.jetspending.ui.navigation.Screen
 import com.kevinfreyap.jetspending.ui.navigation.SettingsNavigation
@@ -219,9 +220,13 @@ fun AppNavHost(
         }
         composable(Screen.EditProfile.route) {
             EditProfileScreen(
-                onBackClick = {
-                    navController.popBackStack()
-                }
+                onNavigate = { destination ->
+                    when(destination) {
+                        EditProfileNavigation.NavigateUp -> {
+                            navController.popBackStack()
+                        }
+                    }
+                },
             )
         }
         composable(Screen.Notification.route) {

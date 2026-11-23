@@ -126,11 +126,9 @@ class UserPreferences @Inject constructor(
 
     suspend fun updateUser(
         newUsername: String?,
-        newImageUrl: String?
     ) {
         dataStore.edit { preferences ->
             if (!newUsername.isNullOrBlank()) preferences[USERNAME_KEY] = newUsername
-            if (!newImageUrl.isNullOrBlank()) preferences[PHOTO_URL_KEY] = newImageUrl
         }
     }
 

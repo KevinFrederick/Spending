@@ -37,13 +37,11 @@ class UserRepository @Inject constructor(
     override suspend fun updateUserProfile(
         userId: String,
         newUsername: String?,
-        newImageUrl: String?
     ): DomainResult<Unit> {
         return try {
             val updates = mutableMapOf<String, Any>()
 
             if (!newUsername.isNullOrBlank()) updates["name"] = newUsername
-            if (!newImageUrl.isNullOrBlank()) updates["photoUrl"] = newImageUrl
 
             if (updates.isNotEmpty()) {
                 firestore.collection(USER_COLLECTION)
@@ -53,7 +51,6 @@ class UserRepository @Inject constructor(
 
                 userPreferences.updateUser(
                     newUsername = newUsername,
-                    newImageUrl = newImageUrl
                 )
             }
 

@@ -36,7 +36,6 @@ class UserInteractor @Inject constructor(
             userRepository.updateUserProfile(
                 userId = userId,
                 newUsername = newUsername,
-                newImageUrl = newImageUrl
             )
             DomainResult.Success(Unit)
         } catch (e: Exception) {

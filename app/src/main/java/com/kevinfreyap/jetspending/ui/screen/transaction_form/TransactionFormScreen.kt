@@ -358,7 +358,7 @@ fun TransactionFormContent(
         ViewAppDialog(
             dialogType = DialogType.WARNING,
             title = stringResource(R.string.dialog_discard_changes),
-            message = stringResource(R.string.description_discard_change),
+            message = stringResource(R.string.description_discard_change_transaction),
             confirmText = stringResource(R.string.discard),
             onConfirm = {
                 onAction(

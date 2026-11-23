@@ -5,96 +5,124 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kevinfreyap.domain.error.Field
 import com.kevinfreyap.domain.resource.DomainResult
-import com.kevinfreyap.domain.usecase.user.UserUseCase
+import com.kevinfreyap.domain.usecase.user.GetUserUseCase
+import com.kevinfreyap.domain.usecase.user.UpdateUserUseCase
+import com.kevinfreyap.jetspending.R
+import com.kevinfreyap.jetspending.ui.action.EditProfileAction
 import com.kevinfreyap.jetspending.ui.state.EditProfileState
 import com.kevinfreyap.jetspending.ui.state.UiState
-import com.kevinfreyap.jetspending.ui.helper.error.ErrorHelper
+import com.kevinfreyap.jetspending.ui.helper.error.removeError
+import com.kevinfreyap.jetspending.ui.helper.error.toUIError
+import com.kevinfreyap.jetspending.ui.navigation.EditProfileNavigation
+import com.kevinfreyap.jetspending.utils.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class EditProfileViewModel @Inject constructor (
-    private val userUseCase: UserUseCase,
+    private val getUser: GetUserUseCase,
+    private val updateUser: UpdateUserUseCase
 ): ViewModel() {
+    private val _uiEvent = Channel<UiEvent<EditProfileNavigation>>()
+    val uiEvent = _uiEvent.receiveAsFlow()
 
     private val _state = MutableStateFlow(EditProfileState())
     val state = _state.asStateFlow()
 
-    // UiState
-    private val _uiState = MutableStateFlow<UiState<Unit>>(UiState.Idle)
-    val uiState = _uiState.asStateFlow()
-
-    // Success
-    private val _showSuccessDialog = MutableStateFlow(false)
-    val showSuccessDialog = _showSuccessDialog.asStateFlow()
-
-    // Failure
-    private val _showFailureDialog = MutableStateFlow(false)
-    val showFailureDialog = _showFailureDialog.asStateFlow()
-
     init {
-        loadUserData()
+        loadInitialData()
     }
 
-    fun onUsernameChange(newUsername: String) {
-        _state.update { it.copy(userName = newUsername) }
-        _uiState.value = ErrorHelper.removeError(_uiState.value, Field.USERNAME)
+    fun onAction(action: EditProfileAction) {
+        when(action) {
+            is EditProfileAction.OnShowDiscardDialog -> {
+                _state.update { currentState ->
+                    currentState.copy(
+                        isDiscardDialogVisible = action.isVisible
+                    )
+                }
+            }
+            is EditProfileAction.OnUsernameChange -> {
+                _state.update { currentState ->
+                    currentState.copy(
+                        userName = action.name,
+                        uiState = currentState.uiState.removeError(Field.USERNAME)
+                    )
+                }
+            }
+            EditProfileAction.OnConfirmDiscard -> {
+                viewModelScope.launch {
+                    _uiEvent.send(UiEvent.Navigate(EditProfileNavigation.NavigateUp))
+                }
+            }
+            EditProfileAction.OnSaveChanges -> onSaveChanges()
+        }
     }
 
-    fun onImageSelected(newImageUrl: String) {
-        _state.update { it.copy(imageUrl = newImageUrl) }
-    }
-
-    fun saveProfile() {
-        _uiState.value = UiState.Loading
-
-        val currentUserId = _state.value.userId
-
-        if (currentUserId.isBlank()) return
-
+    private fun loadInitialData() {
         viewModelScope.launch {
-            val result = userUseCase.updateUserProfile(
-                userId = _state.value.userId,
-                newUsername = _state.value.userName,
-                newImageUrl = _state.value.imageUrl
-            )
+            val user = getUser().firstOrNull()
 
-            when(result) {
-                is DomainResult.Success -> {
-                    _uiState.value = UiState.Success(Unit)
-                    _showSuccessDialog.value = true
+            if (user != null) {
+                _state.update { currentState ->
+                    currentState.copy(
+                        userName = user.displayName,
+                        originalUsername = user.displayName,
+                        email = user.email,
+                        imageUrl = user.photoUrl
+                    )
                 }
-                is DomainResult.ValidationFailed -> {
-                    _uiState.value = UiState.ValidationErrors(ErrorHelper.validationErrorsToUiError(result.errors))
-                }
-                is DomainResult.Failure -> {
-                    Log.e(VIEWMODEL_TAG, result.throwable.message ?: "Something Wrong")
-                    _uiState.value = UiState.Failure(result.throwable)
-                }
+            } else {
+                _uiEvent.send(UiEvent.ShowToast(R.string.error_user_not_found))
+                _uiEvent.send(UiEvent.Navigate(EditProfileNavigation.NavigateUp))
             }
         }
     }
 
-    fun onDismissSuccessDialog() {
-        _showSuccessDialog.value = false
-    }
+    private fun onSaveChanges() {
+        _state.update { currentState ->
+            currentState.copy(
+                uiState = UiState.Loading
+            )
+        }
 
-    private fun loadUserData() {
         viewModelScope.launch {
-            userUseCase.getUserProfile().collect { currentUser ->
-                if (currentUser != null) {
-                    _state.update { it.copy(
-                        userId = currentUser.uid,
-                        userName = currentUser.displayName,
-                        email = currentUser.email,
-                        imageUrl = currentUser.photoUrl,
-                        originalUsername = currentUser.displayName,
-                        originalImageUrl = currentUser.photoUrl
-                    ) }
+            when(
+                val result = updateUser(
+                    userName = _state.value.userName
+                )
+            ) {
+                is DomainResult.Success -> {
+                    _state.update { currentState ->
+                        currentState.copy(
+                            uiState = UiState.Success(Unit)
+                        )
+                    }
+
+                    _uiEvent.send(UiEvent.ShowToast(R.string.success_profile_update))
+                    _uiEvent.send(UiEvent.Navigate(EditProfileNavigation.NavigateUp))
+                }
+                is DomainResult.ValidationFailed -> {
+                    _state.update { currentState ->
+                        currentState.copy(
+                            uiState = UiState.ValidationErrors(result.errors.toUIError())
+                        )
+                    }
+                }
+                is DomainResult.Failure -> {
+                    Log.e(VIEWMODEL_TAG, result.throwable.message ?: "Something went wrong")
+                    _state.update { currentState ->
+                        currentState.copy(
+                            uiState = UiState.Failure(result.throwable)
+                        )
+                    }
                 }
             }
         }

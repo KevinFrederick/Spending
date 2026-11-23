@@ -7,7 +7,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -179,6 +178,10 @@ fun ViewTextInputField(
                     unfocusedIndicatorColor = Color.Transparent,
                     disabledIndicatorColor = Color.Transparent,
                     errorIndicatorColor = Color.Transparent,
+
+                    disabledTextColor = Theme.custom.secondaryTextColor.copy(0.6f),
+                    disabledLeadingIconColor = Theme.custom.secondaryTextColor.copy(0.6f),
+                    disabledTrailingIconColor = Theme.custom.secondaryTextColor.copy(0.6f),
 
                     focusedLabelColor = Theme.custom.secondaryTextColor,
                     unfocusedLabelColor = Theme.custom.secondaryTextColor,

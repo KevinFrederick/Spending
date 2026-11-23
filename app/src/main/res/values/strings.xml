@@ -169,6 +169,7 @@
     <string name="btn_next">Next</string>
     <string name="btn_sign_out">Sign out</string>
     <string name="btn_close">Close</string>
+    <string name="btn_save_changes">Save changes</string>
 
     <string name="all">All</string>
     <string name="cancel">Cancel</string>
@@ -260,6 +261,7 @@
     <string name="error_loading_data">Error Loading Data</string>
     <string name="error_no_transaction">No transaction yet</string>
     <string name="error_transaction_not_found">Transaction not found</string>
+    <string name="error_user_not_found">User not found</string>
     <string name="error_rate_unavailable">Rate Unavailable</string>
     <string name="error_some_transaction_rate_unavailable">Some transaction\'s exchange rate unavailable</string>
     <string name="error_transaction_missing">Transaction Not Found</string>
@@ -283,7 +285,8 @@
     <string name="description_delete_transaction">This transaction will be permanently removed and cannot be undone</string>
     <string name="description_transaction_missing">This transaction may have been deleted or is unavailable</string>
     <string name="description_delete_transaction_success">Transaction deleted successfully</string>
-    <string name="description_discard_change">Your unsaved transaction details will be lost.</string>
+    <string name="description_discard_change_transaction">Your unsaved transaction details will be lost.</string>
+    <string name="description_discard_change_user">Your unsaved changes will be lost.</string>
     <string name="description_reset_password">Enter your email to receive a reset link</string>
     <string name="description_email_sent">We have sent a password recover instruction to your email</string>
     <string name="description_notification_settings">Control how and when you receive updates. Tailor your notification preferences to ensure you always stay informed.</string>
@@ -331,6 +334,7 @@
     <string name="greeting_evening">Good evening, %1$s</string>
     
     <string name="hint_custom_date_filter">Leave either date empty for an open-ended range</string>
+    <string name="hint_profile_email">Linked to your account and cannot be edited</string>
 
     <string name="search_no_result">No matching transactions</string>
     <string name="search_message_query_no_match">No transactions match. Clear query to see transactions</string>

@@ -123,11 +123,7 @@ fun SettingsContent(
                 ProfileCardPlaceholder()
             } else {
                 ProfileCard(
-                    state = ProfileCardState(
-                        imageUrl = null,
-                        name = "John Doe",
-                        email = "John.Doe@email.com",
-                    ),
+                    state = state.profile,
                     onClick = {
                         onNavigate(
                             SettingsNavigation.NavigateToEditProfile
