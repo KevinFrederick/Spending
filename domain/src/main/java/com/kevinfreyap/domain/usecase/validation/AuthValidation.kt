@@ -76,7 +76,9 @@ fun validateChangePassword(
 ): List<ValidationError> {
     val errors = mutableListOf<ValidationError>()
 
-    errors.addAll(validatePassword(oldPassword, isNew = false))
+    if (oldPassword.isBlank()) {
+        errors.add(ValidationError.AuthenticationNewPasswordBlank)
+    }
     errors.addAll(validatePassword(newPassword, isNew = true))
 
     return errors

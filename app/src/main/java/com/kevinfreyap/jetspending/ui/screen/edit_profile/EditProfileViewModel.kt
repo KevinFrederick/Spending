@@ -123,6 +123,12 @@ class EditProfileViewModel @Inject constructor (
                             uiState = UiState.Failure(result.throwable)
                         )
                     }
+
+                    _uiEvent.send(
+                        UiEvent.ShowToast(
+                            messageRes = R.string.error_something_went_wrong
+                        )
+                    )
                 }
             }
         }

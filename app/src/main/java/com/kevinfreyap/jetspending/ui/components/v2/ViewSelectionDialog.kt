@@ -1,4 +1,4 @@
-package com.kevinfreyap.jetspending.ui.components
+package com.kevinfreyap.jetspending.ui.components.v2
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Column
@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.kevinfreyap.domain.model.AppCurrency
 import com.kevinfreyap.jetspending.R
+import com.kevinfreyap.jetspending.ui.components.ViewSelectionItem
 import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
 import com.kevinfreyap.jetspending.ui.theme.Theme
 import com.kevinfreyap.jetspending.utils.drawScrollbar

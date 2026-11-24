@@ -1,6 +1,6 @@
 package com.kevinfreyap.jetspending.ui.main
 
-import android.app.Activity
+import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.compose.setContent
@@ -12,8 +12,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -24,6 +26,7 @@ import com.kevinfreyap.jetspending.R
 import com.kevinfreyap.jetspending.ui.biometric.AppLockedFallbackScreen
 import com.kevinfreyap.jetspending.ui.biometric.BiometricAuthManager
 import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
+import com.kevinfreyap.jetspending.utils.findActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.Flow
 
@@ -88,6 +91,7 @@ private fun MainContent(
     onRequestBiometric: () -> Unit,
 ) {
     val context = LocalContext.current
+    val activity = remember (context) { context.findActivity() }
 
     LaunchedEffect(state.isUnlocked) {
         if (!state.isUnlocked) {
@@ -95,16 +99,23 @@ private fun MainContent(
         }
     }
 
-    LaunchedEffect(state.isSecureScreenEnabled) {
-        val window = (context as? Activity)?.window ?: return@LaunchedEffect
-        if (state.isSecureScreenEnabled) {
-            window.setFlags(
-                WindowManager.LayoutParams.FLAG_SECURE,
-                WindowManager.LayoutParams.FLAG_SECURE
-            )
-        } else {
-            window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
+    DisposableEffect(activity, state.isSecureScreenEnabled) {
+        val window = activity?.window
+
+        if (window != null) {
+            if (state.isSecureScreenEnabled) {
+                window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    activity.setRecentsScreenshotEnabled(false)
+                }
+            } else {
+                window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    activity.setRecentsScreenshotEnabled(true)
+                }
+            }
         }
+        onDispose {}
     }
 
     val isDarkTheme = when(state.theme) {

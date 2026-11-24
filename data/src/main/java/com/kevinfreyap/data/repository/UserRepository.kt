@@ -1,5 +1,6 @@
 package com.kevinfreyap.data.repository
 
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.kevinfreyap.data.mapper.NotificationPrefMapper
@@ -47,6 +48,10 @@ class UserRepository @Inject constructor(
                 } else if (currentUser != null) {
                     val isSameUser = localUser?.uid == currentUser.uid
 
+                    val userHasPassword = currentUser.providerData.any {
+                        it.providerId == EmailAuthProvider.PROVIDER_ID
+                    }
+
                     val fallbackName = currentUser.displayName
                         ?.ifBlank { null }
                         ?: currentUser.email?.substringBefore("@")
@@ -58,7 +63,7 @@ class UserRepository @Inject constructor(
                         email = if (isSameUser && localUser.email.isNotBlank()) localUser.email else (currentUser.email ?: ""),
                         displayName = if (isSameUser && localUser.displayName.isNotBlank()) localUser.displayName else fallbackName,
                         photoUrl = if (isSameUser && !localUser.photoUrl.isNullOrBlank()) localUser.photoUrl else currentUser.photoUrl?.toString(),
-                        hasPassword = localUser.takeIf { isSameUser }?.hasPassword ?: true,
+                        hasPassword = if (isSameUser) localUser.hasPassword else userHasPassword,
                         currency = localUser.takeIf { isSameUser }?.currency ?: AppCurrency.DEFAULT
                     )
 
@@ -79,7 +84,7 @@ class UserRepository @Inject constructor(
                                         email = firestoreUser.email.ifBlank { currentUser.email ?: "" },
                                         displayName = firestoreUser.name.ifBlank { fallbackName },
                                         photoUrl = firestoreUser.photoUrl.ifBlank { currentUser.photoUrl?.toString() },
-                                        hasPassword = firestoreUser.hasPassword,
+                                        hasPassword = userHasPassword || firestoreUser.hasPassword,
                                         currency = try {
                                             AppCurrency.valueOf(firestoreUser.currency)
                                         } catch (_: Exception) {

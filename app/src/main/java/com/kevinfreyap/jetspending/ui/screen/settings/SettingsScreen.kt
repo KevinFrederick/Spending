@@ -36,7 +36,7 @@ import com.kevinfreyap.domain.model.AppTheme
 import com.kevinfreyap.jetspending.BuildConfig
 import com.kevinfreyap.jetspending.R
 import com.kevinfreyap.jetspending.ui.action.SettingsAction
-import com.kevinfreyap.jetspending.ui.components.ViewSelectionDialog
+import com.kevinfreyap.jetspending.ui.components.v2.ViewSelectionDialog
 import com.kevinfreyap.jetspending.ui.components.ViewSelectionItem
 import com.kevinfreyap.jetspending.ui.components.v2.ViewPrimaryButton
 import com.kevinfreyap.jetspending.ui.components.v2.ViewTopBar

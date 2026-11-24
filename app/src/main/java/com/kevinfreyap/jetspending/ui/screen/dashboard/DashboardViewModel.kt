@@ -77,8 +77,6 @@ class DashboardViewModel @Inject constructor(
                     )
                 )
 
-                Log.d("Dashboard", user?.displayName ?: "Nothing")
-
                 resultState
             }
         }

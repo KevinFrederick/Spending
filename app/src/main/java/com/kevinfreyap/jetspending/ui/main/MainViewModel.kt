@@ -8,6 +8,7 @@ import com.kevinfreyap.jetspending.ui.navigation.Screen
 import com.kevinfreyap.domain.usecase.connectivity.ConnectivityUseCase
 import com.kevinfreyap.domain.usecase.currency.GetCurrencyUseCase
 import com.kevinfreyap.domain.usecase.privacy_security.GetAppLockPrefUseCase
+import com.kevinfreyap.domain.usecase.privacy_security.GetBlockScreenPrefUseCase
 import com.kevinfreyap.domain.usecase.privacy_security.SetAppLockPrefUseCase
 import com.kevinfreyap.domain.usecase.rates.EnsureRatesExistUseCase
 import com.kevinfreyap.domain.usecase.rates.RatesHealerUseCase
@@ -44,7 +45,7 @@ class MainViewModel @Inject constructor(
     private val getAuthStatus: GetAuthStatusUseCase,
     getTheme: GetThemeUseCase,
     getAppLockPreference: GetAppLockPrefUseCase,
-    getBlockScreenPreference: GetAppLockPrefUseCase,
+    getBlockScreenPreference: GetBlockScreenPrefUseCase,
     getCurrency: GetCurrencyUseCase,
     checkConnection: ConnectivityUseCase
 ): ViewModel(){
@@ -74,6 +75,11 @@ class MainViewModel @Inject constructor(
         )
     ) { theme, selectedCurrency, isOnline, security ->
         val startDestination = if (security.isLoggedIn) Screen.Dashboard.route else Screen.OnBoarding.route
+
+        if (security.isLoggedIn && !security.isAppLockEnabled && !security.isUnlocked) {
+            _isSessionUnlocked.value = true
+        }
+
         val effectiveUnlocked = !security.isAppLockEnabled || security.isUnlocked
 
         MainActivityState.Success(

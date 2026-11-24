@@ -8,7 +8,7 @@ data class UserFirestore(
     val email: String = "",
     val name: String = "",
     val photoUrl: String = "",
-    val hasPassword: Boolean = true,
+    val hasPassword: Boolean = false,
     val currency: String = "IDR",
     @ServerTimestamp
     val lastLogin: Date? = null,

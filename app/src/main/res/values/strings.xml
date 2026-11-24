@@ -55,11 +55,25 @@
 
     <string name="settings_header_preferences">PREFERENCES</string>
     <string name="settings_header_app_settings">APP SETTINGS</string>
+    <string name="settings_header_app_access">APP ACCESS</string>
+    <string name="settings_header_account">ACCOUNT</string>
 
     <string name="settings_base_currency">Base currency</string>
     <string name="settings_appearance">Appearance</string>
     <string name="settings_notification">Notifications</string>
     <string name="settings_security">Privacy &amp; security</string>
+    
+    <string name="settings_app_lock">App lock</string>
+    <string name="settings_block_screenshot">Screen privacy</string>
+    <string name="settings_change_password">Change password</string>
+    <string name="settings_create_password">Create password</string>
+    <string name="settings_delete_account">Delete account</string>
+    
+    <string name="settings_security_screen_header">Keep your records private</string>
+    <string name="settings_security_screen_subtitle">Choose how to securely access your information.</string>
+
+    <string name="settings_notification_screen_header">Only the alerts that matter</string>
+    <string name="settings_notification_screen_subtitle">Choose which updates to receive and how they are delivered.</string>
 
     <string name="dialog_discard_changes">Discard changes?</string>
     <string name="dialog_delete_transaction">Delete transaction?</string>
@@ -125,8 +139,8 @@
     <string name="block_screenshot_subtitle">Hide data in background previews &amp; screenshot</string>
     <string name="change_password">Change Password</string>
     <string name="create_password">Create Password</string>
-    <string name="current_password">Current Password</string>
-    <string name="new_password">New Password</string>
+    <string name="current_password">Current password</string>
+    <string name="new_password">New password</string>
     <string name="delete_account">Delete Account</string>
     <string name="app_locked">App Locked</string>
     <string name="verify_identity">Verify Your Identity</string>
@@ -237,9 +251,9 @@
     <string name="success_message_transaction_updated">Transaction updated successfully!</string>
     <string name="success_email_sent">Email Sent!</string>
     <string name="success_profile_update">Profile updated successfully!</string>
-    <string name="success_change_password">Password Changed</string>
-    <string name="success_create_password">Password Created</string>
-    <string name="success_account_deleted">Account Deleted</string>
+    <string name="success_change_password">Password updated</string>
+    <string name="success_create_password">Password created</string>
+    <string name="success_account_deleted">Account deleted</string>
     <string name="success_logout">Signed out</string>
 
     <!-- Error Message -->
@@ -302,6 +316,11 @@
     <string name="description_settings_appearance">Choose your preferred theme</string>
     <string name="description_settings_notification">Choose your preferences</string>
     <string name="description_settings_security">App lock and data preferences</string>
+
+    <string name="description_settings_app_lock">Unlock with your fingerprint, face, or screen lock</string>
+    <string name="description_settings_block_screenshot">Block screenshots, recordings, and recent app previews</string>
+    <string name="description_settings_delete_account">Permanently remove your account and all data</string>
+    <string name="description_settings_password">Keep your account secure with a strong password</string>
 
     <!-- Period Option -->
     <string name="period_weekly">Weekly</string>

@@ -50,11 +50,10 @@ import com.kevinfreyap.jetspending.R
 import com.kevinfreyap.jetspending.ui.action.SignInAction
 import com.kevinfreyap.jetspending.ui.client.GoogleAuthClient
 import com.kevinfreyap.jetspending.ui.components.ViewGoogleBtn
-import com.kevinfreyap.jetspending.ui.components.ViewInputDialog
+import com.kevinfreyap.jetspending.ui.components.v2.ViewInputDialog
 import com.kevinfreyap.jetspending.ui.components.v2.ViewTextInputField
 import com.kevinfreyap.jetspending.ui.components.v2.ViewTopBar
 import com.kevinfreyap.jetspending.ui.components.v2.ViewAnnotatedTextButton
-import com.kevinfreyap.jetspending.ui.components.v2.ViewOutlinedButton
 import com.kevinfreyap.jetspending.ui.components.v2.ViewPrimaryButton
 import com.kevinfreyap.jetspending.ui.navigation.SignInNavigation
 import com.kevinfreyap.jetspending.ui.state.SignInState
@@ -324,8 +323,12 @@ fun SignInContent(
             ViewInputDialog(
                 title = stringResource(R.string.reset_password),
                 subtitle = stringResource(R.string.description_reset_password),
+                positiveText = stringResource(R.string.send_link),
                 onDismissRequest = {
                     onShowForgotPasswordDialog(false)
+                },
+                onPositiveClicked = {
+                    onAction(SignInAction.OnSendResetEmail)
                 },
                 textField = {
                     ViewTextInputField(
@@ -340,22 +343,6 @@ fun SignInContent(
                             keyboardType = KeyboardType.Email,
                             imeAction = ImeAction.Done
                         )
-                    )
-                },
-                positiveBtn = {
-                    ViewPrimaryButton(
-                        text = stringResource(R.string.send_link),
-                        onClick = {
-                            onAction(SignInAction.OnSendResetEmail)
-                        }
-                    )
-                },
-                negativeBtn = {
-                    ViewOutlinedButton(
-                        text = stringResource(R.string.cancel),
-                        onClick = {
-                            onShowForgotPasswordDialog(false)
-                        }
                     )
                 },
             )

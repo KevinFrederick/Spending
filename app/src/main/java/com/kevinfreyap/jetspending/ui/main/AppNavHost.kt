@@ -11,6 +11,7 @@ import androidx.navigation.navArgument
 import com.kevinfreyap.jetspending.ui.navigation.DashboardNavigation
 import com.kevinfreyap.jetspending.ui.navigation.EditProfileNavigation
 import com.kevinfreyap.jetspending.ui.navigation.OnboardingNavigation
+import com.kevinfreyap.jetspending.ui.navigation.PrivacySecurityNavigation
 import com.kevinfreyap.jetspending.ui.navigation.Screen
 import com.kevinfreyap.jetspending.ui.navigation.SettingsNavigation
 import com.kevinfreyap.jetspending.ui.navigation.SignInNavigation
@@ -238,13 +239,17 @@ fun AppNavHost(
         }
         composable(Screen.PrivacySecurity.route) {
             PrivacySecurityScreen(
-                onBackClick = {
-                    navController.popBackStack()
-                },
-                navigateToOnBoarding = {
-                    navController.navigate(Screen.OnBoarding.route) {
-                        popUpTo(0) {
-                            inclusive = true
+                onNavigate = {destination ->
+                    when(destination) {
+                        PrivacySecurityNavigation.NavigateUp -> {
+                            navController.popBackStack()
+                        }
+                        PrivacySecurityNavigation.NavigateToOnboard -> {
+                            navController.navigate(Screen.OnBoarding.route) {
+                                popUpTo(0) {
+                                    inclusive = true
+                                }
+                            }
                         }
                     }
                 },

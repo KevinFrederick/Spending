@@ -5,35 +5,28 @@ import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -42,434 +35,301 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import com.kevinfreyap.domain.error.Field
 import com.kevinfreyap.jetspending.R
-import com.kevinfreyap.jetspending.ui.biometric.BiometricAuthManager
-import com.kevinfreyap.jetspending.ui.client.GoogleAuthClient
-import com.kevinfreyap.jetspending.ui.components.ViewCustomDialog
-import com.kevinfreyap.jetspending.ui.components.ViewGoogleBtn
-import com.kevinfreyap.jetspending.ui.components.ViewPasswordDialog
-import com.kevinfreyap.jetspending.ui.components.ViewPreferenceRow
-import com.kevinfreyap.jetspending.ui.components.v2.ViewTextField
 import com.kevinfreyap.jetspending.ui.components.v2.ViewTopBar
-import com.kevinfreyap.jetspending.ui.model.PendingAuthAction
-import com.kevinfreyap.jetspending.ui.state.PasswordFormState
-import com.kevinfreyap.jetspending.ui.state.PrivacySecurityAction
+import com.kevinfreyap.jetspending.ui.screen.settings.components.SettingsSection
+import com.kevinfreyap.jetspending.ui.screen.settings.state.SettingsItemState
+import com.kevinfreyap.jetspending.ui.screen.settings.state.SettingsItemType
+import com.kevinfreyap.jetspending.ui.action.PrivacySecurityAction
+import com.kevinfreyap.jetspending.ui.action.PrivacySecurityAction.*
+import com.kevinfreyap.jetspending.ui.biometric.BiometricAuthManager
+import com.kevinfreyap.jetspending.ui.components.v2.ViewAppDialog
+import com.kevinfreyap.jetspending.ui.components.v2.ViewInputDialog
+import com.kevinfreyap.jetspending.ui.components.v2.ViewTextInputField
+import com.kevinfreyap.jetspending.ui.model.DialogType
+import com.kevinfreyap.jetspending.ui.navigation.PrivacySecurityNavigation
+import com.kevinfreyap.jetspending.ui.screen.privacy_security.state.PrivacySecurityDialogType
 import com.kevinfreyap.jetspending.ui.state.PrivacySecurityState
 import com.kevinfreyap.jetspending.ui.state.UiState
-import com.kevinfreyap.jetspending.ui.theme.Green500
-import com.kevinfreyap.jetspending.ui.theme.Grey500
 import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
-import com.kevinfreyap.jetspending.ui.theme.Red500
 import com.kevinfreyap.jetspending.ui.theme.Theme
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
+import com.kevinfreyap.jetspending.utils.UiEvent
 
 @Composable
 fun PrivacySecurityScreen(
-    onBackClick: () -> Unit,
-    navigateToOnBoarding: () -> Unit,
+    onNavigate: (PrivacySecurityNavigation) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: PrivacySecurityViewModel = hiltViewModel()
 ) {
-    val privacySecurityState by viewModel.privacySecurityState.collectAsState()
-    val passwordFormState by viewModel.passwordForm.collectAsState()
-    val showDialog by viewModel.showDialog.collectAsState()
-    val showReAuthDialog by viewModel.reAuthDialog.collectAsState()
-    val uiState by viewModel.uiState.collectAsState()
-
     val context = LocalContext.current
-    val authManager = remember { BiometricAuthManager(context) }
+    val lifecycleOwner = LocalLifecycleOwner.current
 
-    val coroutineScope = rememberCoroutineScope()
-    val googleAuthClient = remember { GoogleAuthClient(context) }
+    val biometricAuthManager = remember(context) { BiometricAuthManager(context) }
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
-    val (showPasswordDialog, setShowPasswordDialog) = remember { mutableStateOf(false) }
-    val (showDeleteDialog, setShowDeleteDialog) = remember { mutableStateOf(false) }
+    val titleAppLocked = stringResource(R.string.app_locked)
 
-    val (showDeleteSuccess, setShowDeleteSuccess) = remember { mutableStateOf(false) }
-
-    val isHasPassword = remember(showPasswordDialog) { privacySecurityState.hasPassword }
-
-    LaunchedEffect(Unit) {
-        viewModel.deleteSuccessChannel.collectLatest {
-            setShowDeleteDialog(false)
-
-            setShowDeleteSuccess(true)
-        }
-    }
-
-    LaunchedEffect(uiState) {
-        if (uiState is UiState.ValidationErrors) {
-            val reAuthError = (uiState as UiState.ValidationErrors).errors[Field.RE_AUTH]
-
-            if (reAuthError != null) {
-                Toast.makeText(context,
-                    reAuthError,
-                    Toast.LENGTH_LONG
-                ).show()
+    LaunchedEffect(viewModel.uiEvent, lifecycleOwner) {
+        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewModel.uiEvent.collect { event ->
+                when(event) {
+                    is UiEvent.Navigate -> {
+                        onNavigate(event.destination)
+                    }
+                    is UiEvent.ShowToast -> {
+                        Toast.makeText(
+                            context,
+                            event.asString(context),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
             }
-
-            viewModel.clearErrors()
         }
     }
 
     PrivacySecurityContent(
-        onBackClick = onBackClick,
-        onShowPasswordDialog = {
-            setShowPasswordDialog(true)
-        },
-        onShowDeleteDialog = {
-            setShowDeleteDialog(true)
-        },
-        onDismissSuccessDialog = {
-            setShowPasswordDialog(false)
-            viewModel.onDismissSuccessDialog()
-            viewModel.clearForm()
-        },
-        onDismissDeleteSuccess = {
-            navigateToOnBoarding()
-        },
-        onDismissReAuthDialog = {
-            viewModel.onDismissReAuthDialog()
-        },
-        isHasPassword = isHasPassword,
-        showPasswordDialog = showPasswordDialog,
-        showDeleteDialog = showDeleteDialog,
-        showSuccessDialog = showDialog,
-        showDeleteSuccess = showDeleteSuccess,
-        showReAuthDialog = showReAuthDialog,
-        uiState = uiState,
-        passwordFormState = passwordFormState,
-        privacySecurityState = privacySecurityState,
-        privacySecurityAction = object: PrivacySecurityAction {
-            override fun onAppLockSwitch(isEnabled: Boolean) {
-                if (isEnabled) {
-                    if (authManager.isBiometricReady()) {
-                        viewModel.toggleAppLock(true)
-                    } else {
-                        Toast.makeText(
-                            context,
-                            R.string.error_no_biometric,
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
-                } else {
-                    viewModel.toggleAppLock(false)
-                }
-            }
-
-            override fun onBlockScreenSwitch(isEnabled: Boolean) {
-                viewModel.toggleBlockScreen(isEnabled)
-            }
-
-            override fun onPasswordChange(pass: String) {
-                viewModel.onPasswordChange(pass)
-            }
-
-            override fun onNewPasswordChange(pass: String) {
-                viewModel.onNewPasswordChange(pass)
-            }
-
-            override fun onConfirmPasswordDialog() {
-                if (isHasPassword) {
-                    viewModel.changePassword()
-                } else {
-                    viewModel.createPassword()
-                }
-            }
-
-            override fun onCancelPasswordDialog() {
-                viewModel.clearForm()
-                setShowPasswordDialog(false)
-            }
-
-            override fun onReAuthClicked() {
-                viewModel.onDismissReAuthDialog()
-
-                coroutineScope.launch {
-                    val idToken = googleAuthClient.getGoogleIdToken()
-                    if (idToken != null) {
-                        viewModel.triggerGoogleReAuth(idToken, PendingAuthAction.CREATE_PASSWORD)
-                    }
-                }
-            }
-
-            override fun onConfirmDeleteDialog() {
-                if (privacySecurityState.hasPassword) {
-                    viewModel.deleteAccount(true)
-                } else {
-                    coroutineScope.launch {
-                        val idToken = googleAuthClient.getGoogleIdToken()
-                        if (idToken != null) {
-                            viewModel.triggerGoogleReAuth(idToken, PendingAuthAction.DELETE_ACCOUNT)
+        state = state,
+        onAction = { action ->
+            if (action == OnToggleAppLock && state.isAppLockEnabled) {
+                if (biometricAuthManager.isBiometricReady()) {
+                    biometricAuthManager.showBiometricPrompt(
+                        title = titleAppLocked,
+                        onSuccess = {
+                            viewModel.onAction(action)
+                        },
+                        onError = { errorMessage ->
+                            Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
                         }
-                    }
+                    )
+                } else {
+                    viewModel.onAction(action)
                 }
+            } else {
+                viewModel.onAction(action)
             }
-
-            override fun onCancelDeleteDialog() {
-                viewModel.clearForm()
-                setShowDeleteDialog(false)
-            }
-
         },
+        onNavigate = onNavigate,
         modifier = modifier
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PrivacySecurityContent(
-    onBackClick: () -> Unit,
-    onShowPasswordDialog: () -> Unit,
-    onShowDeleteDialog: () -> Unit,
-    onDismissSuccessDialog: () -> Unit,
-    onDismissReAuthDialog: () -> Unit,
-    onDismissDeleteSuccess: () -> Unit,
-    isHasPassword: Boolean,
-    showPasswordDialog: Boolean,
-    showDeleteDialog: Boolean,
-    showSuccessDialog: Boolean,
-    showDeleteSuccess: Boolean,
-    showReAuthDialog: Boolean,
-    uiState: UiState<Unit>,
-    passwordFormState: PasswordFormState,
-    privacySecurityState: PrivacySecurityState,
-    privacySecurityAction: PrivacySecurityAction,
+    state: PrivacySecurityState,
+    onAction: (PrivacySecurityAction) -> Unit,
+    onNavigate: (PrivacySecurityNavigation) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
         topBar = {
             ViewTopBar(
                 title = stringResource(R.string.security),
-                onBackClick = onBackClick,
+                onBackClick = {
+                    onNavigate(
+                        PrivacySecurityNavigation.NavigateUp
+                    )
+                },
+                isLoading = state.uiState is UiState.Loading
             )
         }
     ) { innerPadding ->
         Column(
             modifier = modifier
-                .fillMaxSize()
                 .padding(innerPadding)
                 .padding(
-                    top = 32.dp,
-                    start = 16.dp,
-                    end = 16.dp,
-                    bottom = 16.dp
+                    top = 8.dp,
+                    bottom = 16.dp,
+                    start = 24.dp,
+                    end = 24.dp
                 )
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
         ) {
             Text(
-                text = stringResource(R.string.secure_access),
+                text = stringResource(R.string.settings_security_screen_header),
                 style = MaterialTheme.typography.headlineSmall,
-                color = Theme.custom.textColor
-            )
-
-            Spacer(
-                modifier = Modifier
-                    .height(4.dp)
+                color = Theme.custom.primaryTextColor
             )
 
             Text(
-                text = stringResource(R.string.description_secure_access),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Normal,
-                color = Theme.custom.textColor
+                text = stringResource(R.string.settings_security_screen_subtitle),
+                style = MaterialTheme.typography.bodyMedium,
+                color = Theme.custom.secondaryTextColor
             )
 
-            Spacer(
-                modifier = Modifier
-                    .height(24.dp)
-            )
+            Spacer(Modifier.height(32.dp))
 
-            ViewPreferenceRow(
-                title = stringResource(R.string.app_lock),
-                subtitle = stringResource(R.string.app_lock_subtitle)
-            ) {
-                CompositionLocalProvider(
-                    LocalMinimumInteractiveComponentSize provides 0.dp
-                ) {
-                    Switch(
-                        checked = privacySecurityState.isAppLockEnabled,
-                        colors = SwitchDefaults.colors(
-                            uncheckedBorderColor = Theme.custom.hintColor,
-                            uncheckedTrackColor = Theme.custom.nestedCardColor,
-                            uncheckedThumbColor = Theme.custom.iconColor
-                        ),
-                        onCheckedChange = { isChecked ->
-                            privacySecurityAction.onAppLockSwitch(isChecked)
-                        },
-                    )
+            SettingsSection(
+                header = R.string.settings_header_app_access,
+                settings = listOf(
+                    SettingsItemState(
+                        type = SettingsItemType.APP_LOCK,
+                        iconRes = R.drawable.ic_fingerprint_24,
+                        name = R.string.settings_app_lock,
+                        description = R.string.description_settings_app_lock,
+                        isChecked = state.isAppLockEnabled
+                    ),
+                    SettingsItemState(
+                        type = SettingsItemType.BLOCK_SCREENSHOT,
+                        iconRes = R.drawable.ic_visibility_off_24,
+                        name = R.string.settings_block_screenshot,
+                        description = R.string.description_settings_block_screenshot,
+                        isChecked = state.isScreenshotBlockEnabled
+                    ),
+                ),
+                onItemClick = { settingsItem ->
+                    when(settingsItem) {
+                        SettingsItemType.APP_LOCK -> {
+                            onAction(
+                                OnToggleAppLock
+                            )
+                        }
+                        SettingsItemType.BLOCK_SCREENSHOT -> {
+                            onAction(
+                                OnToggleBlockScreenshot
+                            )
+                        }
+                        else -> Unit
+                    }
                 }
-            }
-
-            Spacer(
-                modifier = Modifier
-                    .height(16.dp)
             )
 
-            ViewPreferenceRow(
-                title = stringResource(R.string.block_screenshot),
-                subtitle = stringResource(R.string.block_screenshot_subtitle)
-            ) {
-                CompositionLocalProvider(
-                    LocalMinimumInteractiveComponentSize provides 0.dp
-                ) {
-                    Switch(
-                        checked = privacySecurityState.isBlockScreenshotEnabled,
-                        colors = SwitchDefaults.colors(
-                            uncheckedBorderColor = Theme.custom.hintColor,
-                            uncheckedTrackColor = Theme.custom.nestedCardColor,
-                            uncheckedThumbColor = Theme.custom.iconColor
-                        ),
-                        onCheckedChange = { isChecked ->
-                            privacySecurityAction.onBlockScreenSwitch(isChecked)
-                        },
-                    )
+            Spacer(Modifier.height(32.dp))
+
+            SettingsSection(
+                header = R.string.settings_header_account,
+                settings = listOf(
+                    SettingsItemState(
+                        type = SettingsItemType.CHANGE_PASSWORD,
+                        iconRes = R.drawable.ic_password_24,
+                        name = if (state.hasPassword) R.string.settings_change_password else R.string.settings_create_password,
+                        description = R.string.description_settings_password,
+                    ),
+                    SettingsItemState(
+                        type = SettingsItemType.DELETE_ACCOUNT,
+                        iconRes = R.drawable.ic_delete_24,
+                        name = R.string.settings_delete_account,
+                        description = R.string.description_settings_delete_account,
+                    ),
+                ),
+                onItemClick = { settingsItem ->
+                    when(settingsItem) {
+                        SettingsItemType.CHANGE_PASSWORD -> {
+                            onAction(
+                                OnShowDialog(
+                                    dialog = PrivacySecurityDialogType.CHANGE_PASSWORD
+                                )
+                            )
+                        }
+                        SettingsItemType.DELETE_ACCOUNT -> {
+                            onAction(
+                                OnShowDialog(
+                                    dialog = PrivacySecurityDialogType.DELETE_ACCOUNT
+                                )
+                            )
+                        }
+                        else -> Unit
+                    }
                 }
-            }
-
-            Spacer(
-                modifier = Modifier
-                    .height(24.dp)
             )
-
-            Text(
-                text = stringResource(R.string.account_security),
-                style = MaterialTheme.typography.headlineSmall,
-                color = Theme.custom.textColor
-            )
-
-            Spacer(
-                modifier = Modifier
-                    .height(8.dp)
-            )
-
-            Text(
-                text = stringResource(R.string.description_account_security),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Normal,
-                color = Theme.custom.textColor
-            )
-
-            Spacer(
-                modifier = Modifier
-                    .height(24.dp)
-            )
-
-            ViewPreferenceRow(
-                title = if (privacySecurityState.hasPassword) stringResource(R.string.change_password) else stringResource(R.string.create_password),
-                onClick = onShowPasswordDialog
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_chevron_right),
-                    contentDescription = null,
-                    tint = Theme.custom.iconColor
-                )
-            }
-
-            Spacer(
-                modifier = Modifier
-                    .height(16.dp)
-            )
-
-            ViewPreferenceRow(
-                title = stringResource(R.string.delete_account),
-                contentColor = Red500,
-                onClick = onShowDeleteDialog
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_chevron_right),
-                    contentDescription = null,
-                    tint = Red500
-                )
-            }
         }
+    }
 
-        if (showPasswordDialog) {
-            var showPassword by remember { mutableStateOf(false) }
+    when(state.activeDialog) {
+        PrivacySecurityDialogType.NONE -> Unit
+        PrivacySecurityDialogType.CHANGE_PASSWORD -> {
+            val currentPasswordError = if (state.uiState is UiState.ValidationErrors) {
+                state.uiState.errors[Field.AUTHENTICATION_PASSWORD]
+            } else null
+
+            val newPasswordError = if (state.uiState is UiState.ValidationErrors) {
+                state.uiState.errors[Field.AUTHENTICATION_NEW_PASSWORD]
+            } else null
+
+            var showCurrentPassword by remember { mutableStateOf(false) }
             var showNewPassword by remember { mutableStateOf(false) }
 
-            val passwordError = if (uiState is UiState.ValidationErrors) {
-                uiState.errors[Field.AUTHENTICATION_PASSWORD]
-            } else null
-
-            val newPasswordError = if (uiState is UiState.ValidationErrors) {
-                uiState.errors[Field.AUTHENTICATION_NEW_PASSWORD]
-            } else null
-
-            val isError = if (isHasPassword) passwordError else newPasswordError
-
-            val title: String
-            val subtitle: String
-            val value: String
-            val onValueChange: (String) -> Unit
-            val imeAction: ImeAction
-
-            if (isHasPassword){
-                title = stringResource(R.string.change_password)
-                subtitle = stringResource(R.string.description_change_password)
-                value = passwordFormState.password
-                onValueChange = privacySecurityAction::onPasswordChange
-                imeAction = ImeAction.Next
-            } else {
-                title = stringResource(R.string.create_password)
-                subtitle = stringResource(R.string.description_create_password)
-                value = passwordFormState.newPassword
-                onValueChange = privacySecurityAction::onNewPasswordChange
-                imeAction = ImeAction.Done
-            }
-
-            ViewPasswordDialog(
-                title = title,
-                subtitle = subtitle,
-                onDismissRequest = privacySecurityAction::onCancelPasswordDialog,
-                isLoading = uiState is UiState.Loading,
-                password = {
-                    ViewTextField(
-                        value = value,
-                        onValueChange = onValueChange,
-                        label = if (isHasPassword) stringResource(R.string.current_password) else stringResource(R.string.new_password),
-                        isError = isError != null,
-                        errorMessage = isError?.let { stringResource(it) } ?: "",
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Password,
-                            imeAction = imeAction
-                        ),
-                        visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
-                        trailingIcon = {
-                            if (value.isNotBlank()){
-                                IconButton(
-                                    onClick = {
-                                        showPassword = !showPassword
-                                    }
-                                ) {
-                                    Icon(
-                                        painter = painterResource(
-                                            if (showPassword) R.drawable.ic_visibility_24 else R.drawable.ic_visibility_off_24
-                                        ),
-                                        contentDescription = "Password Visibility Toggle"
-                                    )
-                                }
-                            }
-                        }
+            ViewInputDialog(
+                title = stringResource(
+                    if (state.hasPassword) R.string.settings_change_password else R.string.settings_create_password
+                ),
+                subtitle = stringResource(R.string.description_settings_password),
+                positiveText = stringResource(R.string.confirm),
+                onDismissRequest = {
+                    onAction(
+                        OnShowDialog(
+                            dialog = PrivacySecurityDialogType.NONE
+                        )
                     )
                 },
-                newPassword = {
-                    if (isHasPassword) {
-                        ViewTextField(
-                            value = passwordFormState.newPassword,
-                            onValueChange = privacySecurityAction::onNewPasswordChange,
+                textField = {
+                    Column {
+                        if (state.hasPassword) {
+                            ViewTextInputField(
+                                value = state.passwordForm.password,
+                                onValueChange = {
+                                    onAction(
+                                        OnPasswordChange(
+                                            current = it,
+                                            new = state.passwordForm.newPassword
+                                        )
+                                    )
+                                },
+                                label = stringResource(R.string.current_password),
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Password,
+                                    imeAction = ImeAction.Done
+                                ),
+                                visualTransformation = if (showCurrentPassword) VisualTransformation.None else PasswordVisualTransformation(),
+                                isError = currentPasswordError != null,
+                                errorMessage = currentPasswordError?.let { stringResource(it) } ?: "",
+                                trailingIcon = {
+                                    if (state.passwordForm.password.isNotBlank()){
+                                        IconButton(
+                                            onClick = {
+                                                showCurrentPassword = !showCurrentPassword
+                                            }
+                                        ) {
+                                            Icon(
+                                                painter = painterResource(
+                                                    if (showCurrentPassword) R.drawable.ic_visibility_24 else R.drawable.ic_visibility_off_24
+                                                ),
+                                                contentDescription = "Password Visibility Toggle"
+                                            )
+                                        }
+                                    }
+                                }
+                            )
+
+                            Spacer(Modifier.height(8.dp))
+                        }
+
+                        ViewTextInputField(
+                            value = state.passwordForm.newPassword,
+                            onValueChange = {
+                                onAction(
+                                    OnPasswordChange(
+                                        current = state.passwordForm.password,
+                                        new = it
+                                    )
+                                )
+                            },
                             label = stringResource(R.string.new_password),
-                            isError = newPasswordError != null,
-                            errorMessage = newPasswordError?.let { stringResource(it) } ?: "",
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Password,
                                 imeAction = ImeAction.Done
                             ),
                             visualTransformation = if (showNewPassword) VisualTransformation.None else PasswordVisualTransformation(),
+                            isError = newPasswordError != null,
+                            errorMessage = newPasswordError?.let { stringResource(it) } ?: "",
                             trailingIcon = {
-                                if (passwordFormState.newPassword.isNotBlank()){
+                                if (state.passwordForm.newPassword.isNotBlank()){
                                     IconButton(
                                         onClick = {
                                             showNewPassword = !showNewPassword
@@ -485,166 +345,154 @@ fun PrivacySecurityContent(
                                 }
                             }
                         )
+
+                        if (state.hasPassword) {
+                            TextButton(
+                                onClick = {
+                                    onAction(
+                                        OnShowDialog(
+                                            dialog = PrivacySecurityDialogType.FORGOT_PASSWORD
+                                        )
+                                    )
+                                },
+                                modifier = Modifier
+                                    .align(Alignment.End)
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.forgot_password),
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.primary,
+                                )
+                            }
+                        }
                     }
                 },
-                positiveBtn = {
-                    Button(
-                        onClick = privacySecurityAction::onConfirmPasswordDialog
-                    ) {
-                        Text(
-                            text = stringResource(R.string.confirm),
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
-                },
-                negativeBtn = {
-                    Button(
-                        onClick = privacySecurityAction::onCancelPasswordDialog,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Grey500
-                        )
-                    ) {
-                        Text(
-                            text = stringResource(R.string.cancel),
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
+                onPositiveClicked = {
+                    onAction(
+                        OnSubmitPassword
+                    )
                 }
             )
         }
+        PrivacySecurityDialogType.DELETE_ACCOUNT -> {
+            if (state.hasPassword) {
+                var showDeletePassword by remember { mutableStateOf(false) }
 
-        if (showDeleteDialog) {
-            var showPassword by remember { mutableStateOf(false) }
+                val currentPasswordError = if (state.uiState is UiState.ValidationErrors) {
+                    state.uiState.errors[Field.AUTHENTICATION_PASSWORD]
+                } else null
 
-            val passwordError = if (uiState is UiState.ValidationErrors) {
-                uiState.errors[Field.AUTHENTICATION_PASSWORD]
-            } else null
-
-            ViewCustomDialog(
-                onDismissRequest = privacySecurityAction::onCancelDeleteDialog,
-                isLoading = uiState is UiState.Loading,
-                title = stringResource(R.string.delete_account),
-                message = stringResource(R.string.description_delete_account),
-                textField = {
-                    if (privacySecurityState.hasPassword) {
-                        ViewTextField(
-                            value = passwordFormState.password,
-                            onValueChange = privacySecurityAction::onPasswordChange,
-                            label = stringResource(R.string.password),
-                            isError = passwordError != null,
-                            errorMessage = passwordError?.let { stringResource(it) } ?: "",
+                ViewInputDialog(
+                    title = stringResource(R.string.settings_delete_account),
+                    subtitle = stringResource(R.string.description_settings_delete_account),
+                    positiveText = stringResource(R.string.delete_account),
+                    positiveBtnContainerColor = Theme.custom.negativeContainer,
+                    positiveBtnContentColor = Theme.custom.statusNegative,
+                    onDismissRequest = {
+                        onAction(OnShowDialog(PrivacySecurityDialogType.NONE))
+                    },
+                    textField = {
+                        ViewTextInputField(
+                            value = state.passwordForm.password,
+                            onValueChange = {
+                                onAction(
+                                    OnPasswordChange(
+                                        current = it,
+                                        new = state.passwordForm.newPassword
+                                    )
+                                )
+                            },
+                            label = stringResource(R.string.current_password),
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Password,
                                 imeAction = ImeAction.Done
                             ),
-                            visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
+                            visualTransformation = if (showDeletePassword) VisualTransformation.None else PasswordVisualTransformation(),
+                            isError = currentPasswordError != null,
+                            errorMessage = currentPasswordError?.let { stringResource(it) } ?: "",
                             trailingIcon = {
-                                if (passwordFormState.password.isNotBlank()){
+                                if (state.passwordForm.password.isNotBlank()){
                                     IconButton(
                                         onClick = {
-                                            showPassword = !showPassword
+                                            showDeletePassword = !showDeletePassword
                                         }
                                     ) {
                                         Icon(
                                             painter = painterResource(
-                                                if (showPassword) R.drawable.ic_visibility_24 else R.drawable.ic_visibility_off_24
+                                                if (showDeletePassword) R.drawable.ic_visibility_24 else R.drawable.ic_visibility_off_24
                                             ),
                                             contentDescription = "Password Visibility Toggle"
                                         )
                                     }
                                 }
-                            },
-                            modifier = Modifier
-                                .padding(top = 8.dp)
+                            }
                         )
-                    } else {
-                        ViewGoogleBtn(
-                            onClick = privacySecurityAction::onConfirmDeleteDialog,
-                            btnText = stringResource(R.string.verify_and_delete),
-                            modifier = Modifier
-                                .padding(top = 8.dp)
-                        )
+                    },
+                    onPositiveClicked = {
+                        onAction(OnConfirmDelete)
                     }
-                },
-                positiveBtn =  if (privacySecurityState.hasPassword) {
-                    {
-                        Button(
-                            onClick = privacySecurityAction::onConfirmDeleteDialog,
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Red500
-                            ),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                        ) {
-                            Text(
-                                text = stringResource(R.string.btn_delete),
-                                style = MaterialTheme.typography.bodyMedium
+                )
+            } else {
+                ViewAppDialog(
+                    dialogType = DialogType.DESTRUCTIVE,
+                    title = stringResource(R.string.settings_delete_account),
+                    message = stringResource(R.string.description_settings_delete_account),
+                    confirmText = stringResource(R.string.delete_account),
+                    dismissText = stringResource(R.string.cancel),
+                    onConfirm = {
+                        onAction(
+                            OnConfirmDelete
+                        )
+                    },
+                    onDismissRequest = {
+                        onAction(
+                            OnShowDialog(
+                                PrivacySecurityDialogType.NONE
                             )
-                        }
-                    }
-                } else {
-                    null
-                },
-                negativeBtn = {
-                    Button(
-                        onClick = privacySecurityAction::onCancelDeleteDialog,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Grey500
-                        ),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                    ) {
-                        Text(
-                            text = stringResource(R.string.cancel),
-                            style = MaterialTheme.typography.bodyMedium
                         )
                     }
-                }
-            )
-        }
-
-        if (showSuccessDialog) {
-            LaunchedEffect(Unit) {
-                delay(3000)
-                onDismissSuccessDialog()
+                )
             }
-
-            ViewCustomDialog(
-                onDismissRequest = onDismissSuccessDialog,
-                icon = R.drawable.ic_check_circle_outline_24,
-                iconColor = Green500,
-                title = stringResource(if (isHasPassword) R.string.success_change_password else R.string.success_create_password) ,
-            )
         }
 
-        if (showDeleteSuccess) {
-            LaunchedEffect(Unit) {
-                delay(3000)
-                onDismissDeleteSuccess()
-            }
+        PrivacySecurityDialogType.FORGOT_PASSWORD -> {
+            val emailResetPasswordError = if (state.uiState is UiState.ValidationErrors) {
+                state.uiState.errors[Field.AUTHENTICATION_CHANGE_PASSWORD_EMAIL]
+            } else null
 
-            ViewCustomDialog(
-                onDismissRequest = onDismissDeleteSuccess,
-                icon = R.drawable.ic_check_circle_outline_24,
-                iconColor = Red500,
-                title = stringResource(R.string.success_account_deleted),
-                message = stringResource(R.string.description_account_deleted)
-            )
-        }
-
-        if (showReAuthDialog) {
-            ViewCustomDialog(
-                onDismissRequest = onDismissReAuthDialog,
-                icon = R.drawable.ic_close_24,
-                iconColor = Red500,
-                title = stringResource(R.string.error_create_password),
-                message = stringResource(R.string.error_relogin),
-                positiveBtn = {
-                    ViewGoogleBtn(
-                        onClick = privacySecurityAction::onReAuthClicked,
-                        btnText = stringResource(R.string.verify_with_google)
+            ViewInputDialog(
+                title = stringResource(R.string.reset_password),
+                subtitle = stringResource(R.string.description_reset_password),
+                positiveText = stringResource(R.string.send_link),
+                onDismissRequest = {
+                    onAction(
+                        OnShowDialog(
+                            PrivacySecurityDialogType.NONE
+                        )
                     )
-                }
+                },
+                onPositiveClicked = {
+                    onAction(
+                        OnSendResetEmail
+                    )
+                },
+                textField = {
+                    ViewTextInputField(
+                        value = state.resetEmail,
+                        onValueChange = {
+                            onAction(
+                                OnResetEmailChange(it)
+                            )
+                        },
+                        label = stringResource(R.string.email),
+                        isError = emailResetPasswordError != null,
+                        errorMessage = emailResetPasswordError?.let { stringResource(it) } ?: "",
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Email,
+                            imeAction = ImeAction.Done
+                        )
+                    )
+                },
             )
         }
     }
@@ -659,61 +507,11 @@ fun PrivacySecurityContent(
 fun PrivacySecurityPreview() {
     JetSpendingTheme {
         PrivacySecurityContent(
-            onBackClick = {},
-            onShowPasswordDialog = {},
-            onShowDeleteDialog = {},
-            onDismissSuccessDialog = {},
-            onDismissReAuthDialog = {},
-            onDismissDeleteSuccess = {},
-            isHasPassword = false,
-            showPasswordDialog = false,
-            showDeleteDialog = false,
-            showSuccessDialog = false,
-            showDeleteSuccess = false,
-            showReAuthDialog = false,
-            uiState = UiState.Loading,
-            passwordFormState = PasswordFormState(),
-            privacySecurityState = PrivacySecurityState(
-                isAppLockEnabled = false,
-                isBlockScreenshotEnabled = true
+            state = PrivacySecurityState(
+                activeDialog = PrivacySecurityDialogType.CHANGE_PASSWORD
             ),
-            privacySecurityAction = object: PrivacySecurityAction{
-                override fun onAppLockSwitch(isEnabled: Boolean) {
-
-                }
-
-                override fun onBlockScreenSwitch(isEnabled: Boolean) {
-
-                }
-
-                override fun onPasswordChange(pass: String) {
-
-                }
-
-                override fun onNewPasswordChange(pass: String) {
-
-                }
-
-                override fun onConfirmPasswordDialog() {
-
-                }
-
-                override fun onCancelPasswordDialog() {
-
-                }
-
-                override fun onReAuthClicked() {
-
-                }
-
-                override fun onConfirmDeleteDialog() {
-
-                }
-
-                override fun onCancelDeleteDialog() {
-
-                }
-            }
+            onAction = {},
+            onNavigate = {}
         )
     }
 }

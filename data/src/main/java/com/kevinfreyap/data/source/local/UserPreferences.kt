@@ -23,14 +23,14 @@ class UserPreferences @Inject constructor(
             val uid = preferences[USER_UID]
 
             if (uid != null) {
-                val currency = preferences[CURRENCY_KEY] ?: "IDR"
+                val currency = preferences[CURRENCY_KEY] ?: AppCurrency.DEFAULT.name
 
                 User(
                     uid = uid,
                     email = preferences[EMAIL_KEY] ?: "",
                     displayName = preferences[USERNAME_KEY] ?: "",
                     photoUrl = preferences[PHOTO_URL_KEY],
-                    hasPassword = preferences[HAS_PASSWORD] ?: true,
+                    hasPassword = preferences[HAS_PASSWORD] ?: false,
                     currency = AppCurrency.valueOf(currency)
                 )
             } else {
@@ -41,14 +41,14 @@ class UserPreferences @Inject constructor(
 
     fun getCurrency(): Flow<AppCurrency> {
         return dataStore.data.map { preferences ->
-            val currency = preferences[CURRENCY_KEY] ?: "IDR"
+            val currency = preferences[CURRENCY_KEY] ?: AppCurrency.DEFAULT.name
             AppCurrency.valueOf(currency)
         }
     }
 
     fun getTheme(): Flow<AppTheme> {
         return dataStore.data.map { preferences ->
-            val theme = preferences[THEME_KEY] ?: "SYSTEM"
+            val theme = preferences[THEME_KEY] ?: AppTheme.DEFAULT.name
             AppTheme.valueOf(theme)
         }
     }
@@ -72,7 +72,7 @@ class UserPreferences @Inject constructor(
 
     fun getBlockScreenPreference(): Flow<Boolean> {
         return dataStore.data.map { preferences ->
-            preferences[BLOCK_SCREEN_PREFERENCE] ?: true
+            preferences[BLOCK_SCREEN_PREFERENCE] ?: false
         }
     }
 
