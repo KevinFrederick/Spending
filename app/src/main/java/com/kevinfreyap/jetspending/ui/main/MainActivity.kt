@@ -13,7 +13,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -22,9 +21,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kevinfreyap.domain.model.AppTheme
-import com.kevinfreyap.jetspending.R
-import com.kevinfreyap.jetspending.ui.biometric.AppLockedFallbackScreen
-import com.kevinfreyap.jetspending.ui.biometric.BiometricAuthManager
+import com.kevinfreyap.jetspending.ui.biometric.AppLockedScreen
 import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
 import com.kevinfreyap.jetspending.utils.findActivity
 import dagger.hilt.android.AndroidEntryPoint
@@ -33,14 +30,12 @@ import kotlinx.coroutines.flow.Flow
 @AndroidEntryPoint
 class MainActivity : FragmentActivity() {
     private val viewModel: MainViewModel by viewModels()
-    private lateinit var authManager: BiometricAuthManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
         val splashScreen = installSplashScreen()
-        authManager = BiometricAuthManager(this)
 
         splashScreen.setKeepOnScreenCondition {
             viewModel.uiState.value is MainActivityState.Loading
@@ -55,7 +50,12 @@ class MainActivity : FragmentActivity() {
                     MainContent(
                         state = state,
                         effects = viewModel.effects,
-                        onRequestBiometric = { triggerBiometricPrompt(state) }
+                        onUnlocked = {
+                            viewModel.onEvent(MainEvent.SetUnlocked(true))
+                        },
+                        onDisableAppLockAndUnlock = {
+                            viewModel.onEvent(MainEvent.DisableAppLockAndUnlock)
+                        }
                     )
                 }
             }
@@ -68,36 +68,17 @@ class MainActivity : FragmentActivity() {
             viewModel.onEvent(MainEvent.AppBackgrounded)
         }
     }
-
-    private fun triggerBiometricPrompt(state: MainActivityState.Success) {
-        if (!state.isAppLockEnabled || state.isUnlocked) return
-
-        if (authManager.isBiometricReady()) {
-            authManager.showBiometricPrompt(
-                title = getString(R.string.app_locked),
-                onSuccess = { viewModel.onEvent(MainEvent.SetUnlocked(true)) },
-                onError = {}
-            )
-        } else {
-            viewModel.onEvent(MainEvent.EmergencyLogout)
-        }
-    }
 }
 
 @Composable
 private fun MainContent(
     state: MainActivityState.Success,
     effects: Flow<MainEffect>,
-    onRequestBiometric: () -> Unit,
+    onUnlocked: () -> Unit,
+    onDisableAppLockAndUnlock: () -> Unit
 ) {
     val context = LocalContext.current
     val activity = remember (context) { context.findActivity() }
-
-    LaunchedEffect(state.isUnlocked) {
-        if (!state.isUnlocked) {
-            onRequestBiometric()
-        }
-    }
 
     DisposableEffect(activity, state.isSecureScreenEnabled) {
         val window = activity?.window
@@ -141,8 +122,9 @@ private fun MainContent(
                         effects = effects
                     )
                 } else {
-                    AppLockedFallbackScreen (
-                        onUnlockClick = onRequestBiometric
+                    AppLockedScreen (
+                        onUnlocked = onUnlocked,
+                        onDisableAppLockAndUnlock = onDisableAppLockAndUnlock
                     )
                 }
             }

@@ -83,6 +83,12 @@
     <string name="dialog_title_select_currency">Select currency</string>
     <string name="dialog_title_select_theme">Select theme</string>
 
+    <string name="label_verify_identity">Verify your identity</string>
+    <string name="label_biometric_unavailable">Device authentication is unavailable on this device</string>
+    <string name="label_no_screen_lock">Set up a screen lock in device settings first</string>
+    <string name="label_app_locked">App Locked</string>
+    <string name="label_subtitle_app_lock">Use your device\'s credentials</string>
+
     <string name="total_balance">Total Balance</string>
     <string name="income">Income</string>
     <string name="expense">Expense</string>
@@ -142,8 +148,6 @@
     <string name="current_password">Current password</string>
     <string name="new_password">New password</string>
     <string name="delete_account">Delete Account</string>
-    <string name="app_locked">App Locked</string>
-    <string name="verify_identity">Verify Your Identity</string>
     <string name="coming_soon">Coming Soon</string>
     <string name="rate_unavailable">Rate unavailable</string>
 
@@ -184,6 +188,8 @@
     <string name="btn_sign_out">Sign out</string>
     <string name="btn_close">Close</string>
     <string name="btn_save_changes">Save changes</string>
+
+    <string name="btn_unlock_biometric">Unlock with biometrics</string>
 
     <string name="all">All</string>
     <string name="cancel">Cancel</string>
@@ -342,11 +348,13 @@
     <string name="title_message_onboarding">Less Clutter. \nMore Control.</string>
     <string name="title_message_sign_in">Welcome back</string>
     <string name="title_message_sign_up">Let\'s start</string>
+    <string name="title_message_locked">Verify your identity</string>
 
     <string name="subtitle_message_onboarding">Track everyday expense in any currency. \nOne simple view of where your money goes.</string>
     <string name="subtitle_message_sign_in">Track your expenses in one place</string>
     <string name="subtitle_message_sign_up">Create your free account today</string>
     <string name="subtitle_message_balance">All currencies synced • Balance up to date</string>
+    <string name="subtitle_message_locked">Use your fingerprint, face, or screen lock to unlock</string>
     
     <string name="greeting_morning">Good morning, %1$s</string>
     <string name="greeting_afternoon">Good afternoon, %1$s</string>
@@ -354,6 +362,7 @@
     
     <string name="hint_custom_date_filter">Leave either date empty for an open-ended range</string>
     <string name="hint_profile_email">Linked to your account and cannot be edited</string>
+    <string name="hint_locked_screen">Secure verification is handled by your device</string>
 
     <string name="search_no_result">No matching transactions</string>
     <string name="search_message_query_no_match">No transactions match. Clear query to see transactions</string>

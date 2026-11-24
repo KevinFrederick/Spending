@@ -14,6 +14,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -21,6 +24,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -59,6 +63,7 @@ import com.kevinfreyap.jetspending.ui.state.UiState
 import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
 import com.kevinfreyap.jetspending.ui.theme.Theme
 import com.kevinfreyap.jetspending.utils.UiEvent
+import kotlinx.coroutines.launch
 
 @Composable
 fun PrivacySecurityScreen(
@@ -68,11 +73,16 @@ fun PrivacySecurityScreen(
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
+    val scope = rememberCoroutineScope()
 
-    val biometricAuthManager = remember(context) { BiometricAuthManager(context) }
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    val titleAppLocked = stringResource(R.string.app_locked)
+    val biometricAuthManager = remember(context) { BiometricAuthManager(context) }
+    val snackBarHostState = remember { SnackbarHostState() }
+
+    val titleAppLocked = stringResource(R.string.label_app_locked)
+    val noScreenLock = stringResource(R.string.label_no_screen_lock)
+    val settings = stringResource(R.string.settings)
 
     LaunchedEffect(viewModel.uiEvent, lifecycleOwner) {
         lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -96,19 +106,42 @@ fun PrivacySecurityScreen(
     PrivacySecurityContent(
         state = state,
         onAction = { action ->
-            if (action == OnToggleAppLock && state.isAppLockEnabled) {
-                if (biometricAuthManager.isBiometricReady()) {
+            if (action == OnToggleAppLock) {
+                if (!state.isAppLockEnabled) {
                     biometricAuthManager.showBiometricPrompt(
                         title = titleAppLocked,
                         onSuccess = {
                             viewModel.onAction(action)
+                        },
+                        onNotEnrolled = {
+                            scope.launch {
+                                val result = snackBarHostState.showSnackbar(
+                                    message = noScreenLock,
+                                    actionLabel = settings,
+                                    duration = SnackbarDuration.Long
+                                )
+                                if (result == SnackbarResult.ActionPerformed) {
+                                    context.startActivity(biometricAuthManager.createEnrollIntent())
+                                }
+                            }
                         },
                         onError = { errorMessage ->
                             Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
                         }
                     )
                 } else {
-                    viewModel.onAction(action)
+                    biometricAuthManager.showBiometricPrompt(
+                        title = titleAppLocked,
+                        onSuccess = {
+                            viewModel.onAction(action)
+                        },
+                        onNotEnrolled = {
+                            viewModel.onAction(action)
+                        },
+                        onError = { errorMessage ->
+                            Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
+                        }
+                    )
                 }
             } else {
                 viewModel.onAction(action)
@@ -508,7 +541,7 @@ fun PrivacySecurityPreview() {
     JetSpendingTheme {
         PrivacySecurityContent(
             state = PrivacySecurityState(
-                activeDialog = PrivacySecurityDialogType.CHANGE_PASSWORD
+                activeDialog = PrivacySecurityDialogType.NONE
             ),
             onAction = {},
             onNavigate = {}

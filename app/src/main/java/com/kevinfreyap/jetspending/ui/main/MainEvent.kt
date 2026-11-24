@@ -7,4 +7,5 @@ sealed interface MainEvent {
     data class RateMissing(val date: Instant): MainEvent
     data object AppBackgrounded: MainEvent
     data object EmergencyLogout: MainEvent
+    data object DisableAppLockAndUnlock: MainEvent
 }

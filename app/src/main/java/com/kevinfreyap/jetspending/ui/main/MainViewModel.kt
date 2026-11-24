@@ -1,5 +1,6 @@
 package com.kevinfreyap.jetspending.ui.main
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kevinfreyap.domain.usecase.authentication.GetAuthStatusUseCase
@@ -35,6 +36,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
+    getTheme: GetThemeUseCase,
+    getAppLockPreference: GetAppLockPrefUseCase,
+    getBlockScreenPreference: GetBlockScreenPrefUseCase,
+    getCurrency: GetCurrencyUseCase,
+    checkConnection: ConnectivityUseCase,
     private val logout: LogoutUseCase,
     private val syncTransactions: SyncTransactionsUseCase,
     private val syncCategories: SyncCategoriesUseCase,
@@ -43,11 +49,6 @@ class MainViewModel @Inject constructor(
     private val ensureRatesExist: EnsureRatesExistUseCase,
     private val setAppLockPref: SetAppLockPrefUseCase,
     private val getAuthStatus: GetAuthStatusUseCase,
-    getTheme: GetThemeUseCase,
-    getAppLockPreference: GetAppLockPrefUseCase,
-    getBlockScreenPreference: GetBlockScreenPrefUseCase,
-    getCurrency: GetCurrencyUseCase,
-    checkConnection: ConnectivityUseCase
 ): ViewModel(){
 
     private data class SecurityAndAuth(
@@ -76,11 +77,7 @@ class MainViewModel @Inject constructor(
     ) { theme, selectedCurrency, isOnline, security ->
         val startDestination = if (security.isLoggedIn) Screen.Dashboard.route else Screen.OnBoarding.route
 
-        if (security.isLoggedIn && !security.isAppLockEnabled && !security.isUnlocked) {
-            _isSessionUnlocked.value = true
-        }
-
-        val effectiveUnlocked = !security.isAppLockEnabled || security.isUnlocked
+        val effectiveUnlocked = !security.isLoggedIn || !security.isAppLockEnabled || security.isUnlocked
 
         MainActivityState.Success(
             theme = theme,
@@ -102,13 +99,8 @@ class MainViewModel @Inject constructor(
     }
 
     fun onEvent(event: MainEvent) {
+        Log.d("AppLock", "Event received: $event")
         when(event) {
-            MainEvent.AppBackgrounded -> {
-                _isSessionUnlocked.value = false
-            }
-            MainEvent.EmergencyLogout -> {
-                performEmergencyLogout()
-            }
             is MainEvent.RateMissing -> {
                 val dateString = DateFormatter.formatToDailyRatesString(event.date)
                 viewModelScope.launch(Dispatchers.IO) {
@@ -117,6 +109,21 @@ class MainViewModel @Inject constructor(
             }
             is MainEvent.SetUnlocked -> {
                 _isSessionUnlocked.value = event.unlocked
+            }
+            MainEvent.AppBackgrounded -> {
+                if ((uiState.value as? MainActivityState.Success)?.isAppLockEnabled == true) {
+                    _isSessionUnlocked.value = false
+                }
+            }
+            MainEvent.EmergencyLogout -> {
+                performEmergencyLogout()
+            }
+
+            MainEvent.DisableAppLockAndUnlock -> {
+                viewModelScope.launch {
+                    setAppLockPref(false)
+                    _isSessionUnlocked.value = true
+                }
             }
         }
     }

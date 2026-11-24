@@ -49,7 +49,7 @@ import com.kevinfreyap.domain.error.Field
 import com.kevinfreyap.jetspending.R
 import com.kevinfreyap.jetspending.ui.action.SignInAction
 import com.kevinfreyap.jetspending.ui.client.GoogleAuthClient
-import com.kevinfreyap.jetspending.ui.components.ViewGoogleBtn
+import com.kevinfreyap.jetspending.ui.components.v2.ViewGoogleBtn
 import com.kevinfreyap.jetspending.ui.components.v2.ViewInputDialog
 import com.kevinfreyap.jetspending.ui.components.v2.ViewTextInputField
 import com.kevinfreyap.jetspending.ui.components.v2.ViewTopBar
