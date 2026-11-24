@@ -1,10 +1,12 @@
 package com.kevinfreyap.domain.usecase.authentication
 
-import android.util.Patterns
-import com.kevinfreyap.domain.error.ValidationError
 import com.kevinfreyap.domain.model.AuthenticationRequest
 import com.kevinfreyap.domain.repository.IAuthenticationRepository
 import com.kevinfreyap.domain.resource.DomainResult
+import com.kevinfreyap.domain.usecase.validation.validateChangePassword
+import com.kevinfreyap.domain.usecase.validation.validateEmailAndPassword
+import com.kevinfreyap.domain.usecase.validation.validatePassword
+import com.kevinfreyap.domain.usecase.validation.validateResetPasswordEmail
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -74,14 +76,7 @@ class AuthenticationInteractor @Inject constructor(
         oldPassword: String,
         newPassword: String
     ): DomainResult<Unit> {
-        val errors = mutableListOf<ValidationError>()
-
-        validatePassword(oldPassword).forEach {
-            errors.add(it)
-        }
-        validatePassword(newPassword, true).forEach {
-            errors.add(it)
-        }
+        val errors = validateChangePassword(oldPassword, newPassword)
 
         if (errors.isNotEmpty()) {
             return DomainResult.ValidationFailed(errors)
@@ -91,7 +86,7 @@ class AuthenticationInteractor @Inject constructor(
     }
 
     override suspend fun createPassword(newPassword: String): DomainResult<Unit> {
-        val validateNewPassword = validatePassword(newPassword, true)
+        val validateNewPassword = validatePassword(newPassword, isNew = true)
 
         if (validateNewPassword.isNotEmpty()) {
             return DomainResult.ValidationFailed(validateNewPassword)
@@ -116,57 +111,5 @@ class AuthenticationInteractor @Inject constructor(
         }
 
         return authenticationRepository.deleteAccount(password)
-    }
-
-    private fun validateEmailAndPassword(
-        email: String,
-        password: String,
-        confirmPassword: String? = null
-    ): List<ValidationError> {
-        val errors = mutableListOf<ValidationError>()
-
-        if (email.isBlank()) errors.add(ValidationError.AuthenticationEmailBlank)
-        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) errors.add(ValidationError.AuthenticationEmailWrongFormat)
-
-        validatePassword(password).forEach {
-            errors.add(it)
-        }
-
-        if (password.isNotBlank() && confirmPassword != null) {
-            validatePassword(confirmPassword).forEach {
-                errors.add(it)
-            }
-            if (password != confirmPassword) errors.add(ValidationError.AuthenticationConfirmPasswordNotMatch)
-        }
-
-        return errors
-    }
-
-    private fun validatePassword(
-        password: String,
-        isNew: Boolean = false
-    ): List<ValidationError> {
-        val errors = mutableListOf<ValidationError>()
-
-        if (isNew) {
-            if (password.isBlank()) errors.add(ValidationError.AuthenticationNewPasswordBlank)
-            if (password.length < 8) errors.add(ValidationError.AuthenticationNewPasswordTooShort)
-        } else {
-            if (password.isBlank()) errors.add(ValidationError.AuthenticationPasswordBlank)
-            if (password.length < 8) errors.add(ValidationError.AuthenticationPasswordTooShort)
-        }
-
-        return errors
-    }
-
-    private fun validateResetPasswordEmail(
-        email: String
-    ): List<ValidationError> {
-        val errors = mutableListOf<ValidationError>()
-
-        if (email.isBlank()) errors.add(ValidationError.AuthenticationResetPasswordEmailBlank)
-        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) errors.add(ValidationError.AuthenticationResetPasswordEmailWrongFormat)
-
-        return errors
     }
 }

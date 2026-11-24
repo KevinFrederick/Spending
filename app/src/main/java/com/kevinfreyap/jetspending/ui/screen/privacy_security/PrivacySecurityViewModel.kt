@@ -6,14 +6,17 @@ import androidx.lifecycle.viewModelScope
 import com.kevinfreyap.domain.error.Field
 import com.kevinfreyap.domain.error.ValidationError
 import com.kevinfreyap.domain.resource.DomainResult
-import com.kevinfreyap.domain.usecase.authentication.AuthenticationUseCase
+import com.kevinfreyap.domain.usecase.authentication.ChangePasswordUseCase
+import com.kevinfreyap.domain.usecase.authentication.CreatePasswordUseCase
+import com.kevinfreyap.domain.usecase.authentication.DeleteAccountUseCase
+import com.kevinfreyap.domain.usecase.authentication.ReauthenticateWithGoogleUseCase
 import com.kevinfreyap.domain.usecase.privacy_security.PrivacySecurityUseCase
 import com.kevinfreyap.domain.usecase.user.UserUseCase
+import com.kevinfreyap.jetspending.ui.helper.error.ErrorHelper
 import com.kevinfreyap.jetspending.ui.model.PendingAuthAction
 import com.kevinfreyap.jetspending.ui.state.PasswordFormState
 import com.kevinfreyap.jetspending.ui.state.PrivacySecurityState
 import com.kevinfreyap.jetspending.ui.state.UiState
-import com.kevinfreyap.jetspending.ui.helper.error.ErrorHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,7 +33,10 @@ import javax.inject.Inject
 @HiltViewModel
 class PrivacySecurityViewModel @Inject constructor(
     private val privacySecurityUseCase: PrivacySecurityUseCase,
-    private val authenticationUseCase: AuthenticationUseCase,
+    private val changePasswordUseCase: ChangePasswordUseCase,
+    private val createPasswordUseCase: CreatePasswordUseCase,
+    private val reauthenticateWithGoogleUseCase: ReauthenticateWithGoogleUseCase,
+    private val deleteAccountUseCase: DeleteAccountUseCase,
     userUseCase: UserUseCase,
 ): ViewModel() {
     val privacySecurityState: StateFlow<PrivacySecurityState> = combine(
@@ -103,7 +109,7 @@ class PrivacySecurityViewModel @Inject constructor(
         val newPassword = _passwordForm.value.newPassword
 
         viewModelScope.launch {
-            when(val result = authenticationUseCase.changePassword(oldPassword, newPassword)) {
+            when(val result = changePasswordUseCase(oldPassword, newPassword)) {
                 is DomainResult.Success -> {
                     _uiState.value = UiState.Success(Unit)
                     _showDialog.value = true
@@ -127,7 +133,7 @@ class PrivacySecurityViewModel @Inject constructor(
         val newPassword = _passwordForm.value.newPassword
 
         viewModelScope.launch {
-            when(val result = authenticationUseCase.createPassword(newPassword)) {
+            when(val result = createPasswordUseCase(newPassword)) {
                 is DomainResult.Success -> {
                     _uiState.value = UiState.Success(Unit)
                     _showDialog.value = true
@@ -154,7 +160,7 @@ class PrivacySecurityViewModel @Inject constructor(
 
     fun triggerGoogleReAuth(idToken: String, pendingAction: PendingAuthAction) {
         viewModelScope.launch {
-            when(val result = authenticationUseCase.reauthenticateWithGoogle(idToken)) {
+            when(val result = reauthenticateWithGoogleUseCase(idToken)) {
                 is DomainResult.Success -> {
                     when(pendingAction) {
                         PendingAuthAction.NONE -> {}
@@ -180,7 +186,7 @@ class PrivacySecurityViewModel @Inject constructor(
         val password = if (hasPassword) _passwordForm.value.password else null
 
         viewModelScope.launch {
-            when(val result = authenticationUseCase.deleteAccount(password)) {
+            when(val result = deleteAccountUseCase(password)) {
                 is DomainResult.Success -> {
                     _uiState.value = UiState.Success(Unit)
                     _deleteSuccessChannel.send(Unit)

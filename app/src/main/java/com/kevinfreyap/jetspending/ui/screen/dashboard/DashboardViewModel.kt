@@ -1,5 +1,6 @@
 package com.kevinfreyap.jetspending.ui.screen.dashboard
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kevinfreyap.domain.model.PeriodSelectorOption
@@ -75,6 +76,8 @@ class DashboardViewModel @Inject constructor(
                         }
                     )
                 )
+
+                Log.d("Dashboard", user?.displayName ?: "Nothing")
 
                 resultState
             }

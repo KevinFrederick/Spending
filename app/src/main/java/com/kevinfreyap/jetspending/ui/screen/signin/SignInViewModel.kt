@@ -5,15 +5,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kevinfreyap.domain.error.Field
 import com.kevinfreyap.domain.resource.DomainResult
-import com.kevinfreyap.domain.usecase.authentication.AuthenticationUseCase
+import com.kevinfreyap.domain.usecase.authentication.AuthWithGoogleUseCase
+import com.kevinfreyap.domain.usecase.authentication.ResetPasswordUseCase
+import com.kevinfreyap.domain.usecase.authentication.SignInUseCase
 import com.kevinfreyap.jetspending.R
 import com.kevinfreyap.jetspending.ui.action.SignInAction
+import com.kevinfreyap.jetspending.ui.helper.error.removeError
+import com.kevinfreyap.jetspending.ui.helper.error.toUIError
 import com.kevinfreyap.jetspending.ui.navigation.SignInNavigation
 import com.kevinfreyap.jetspending.ui.state.SignInState
 import com.kevinfreyap.jetspending.ui.state.UiState
-import com.kevinfreyap.jetspending.utils.AuthUiValidation
-import com.kevinfreyap.jetspending.ui.helper.error.removeError
-import com.kevinfreyap.jetspending.ui.helper.error.toUIError
 import com.kevinfreyap.jetspending.utils.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -26,7 +27,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SignInViewModel @Inject constructor(
-    private val authenticationUseCase: AuthenticationUseCase
+    private val signInUseCase: SignInUseCase,
+    private val authWithGoogleUseCase: AuthWithGoogleUseCase,
+    private val resetPasswordUseCase: ResetPasswordUseCase
 ): ViewModel(){
     private val _uiEvent = Channel<UiEvent<SignInNavigation>>()
     val uiEvent = _uiEvent.receiveAsFlow()
@@ -81,22 +84,8 @@ class SignInViewModel @Inject constructor(
             )
         }
 
-        val validationRes = AuthUiValidation.validateEmailAndPassword(
-            email = _state.value.emailInput,
-            password = _state.value.passwordInput
-        )
-
-        if (validationRes.isNotEmpty()) {
-            _state.update { currentStatus ->
-                currentStatus.copy(
-                    authStatus = UiState.ValidationErrors(validationRes.toUIError())
-                )
-            }
-            return
-        }
-
         viewModelScope.launch {
-            val result = authenticationUseCase.login(
+            val result = signInUseCase(
                 email = _state.value.emailInput,
                 password = _state.value.passwordInput
             )
@@ -144,7 +133,7 @@ class SignInViewModel @Inject constructor(
 
         viewModelScope.launch {
             when(
-                val result = authenticationUseCase.authWithGoogle(idToken)
+                val result = authWithGoogleUseCase(idToken)
             ) {
                 is DomainResult.Success -> {
                     _state.update { currentState ->
@@ -155,8 +144,6 @@ class SignInViewModel @Inject constructor(
 
                     _uiEvent.send(UiEvent.ShowToast(R.string.success_login_success))
                     _uiEvent.send(UiEvent.Navigate(SignInNavigation.NavigateToDashboard))
-
-                    _state.value = SignInState()
                 }
                 is DomainResult.ValidationFailed -> {
                     _state.update { currentState ->
@@ -178,22 +165,9 @@ class SignInViewModel @Inject constructor(
     }
 
     private fun onSendResetEmail() {
-        val validationRes = AuthUiValidation.validateEmail(
-            email = _state.value.resetPasswordEmailInput
-        )
-
-        if (validationRes.isNotEmpty()) {
-            _state.update { currentState ->
-                currentState.copy(
-                    authStatus = UiState.ValidationErrors(validationRes.toUIError())
-                )
-            }
-            return
-        }
-
         viewModelScope.launch {
             when(
-                val result = authenticationUseCase.resetPassword(_state.value.resetPasswordEmailInput)
+                val result = resetPasswordUseCase(_state.value.resetPasswordEmailInput)
             ) {
                 is DomainResult.Success -> {
                     _state.update { currentState ->

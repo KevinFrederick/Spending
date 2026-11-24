@@ -5,15 +5,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kevinfreyap.domain.error.Field
 import com.kevinfreyap.domain.resource.DomainResult
-import com.kevinfreyap.domain.usecase.authentication.AuthenticationUseCase
+import com.kevinfreyap.domain.usecase.authentication.AuthWithGoogleUseCase
+import com.kevinfreyap.domain.usecase.authentication.SignUpUseCase
 import com.kevinfreyap.jetspending.R
 import com.kevinfreyap.jetspending.ui.action.SignUpAction
+import com.kevinfreyap.jetspending.ui.helper.error.removeError
+import com.kevinfreyap.jetspending.ui.helper.error.toUIError
 import com.kevinfreyap.jetspending.ui.navigation.SignUpNavigation
 import com.kevinfreyap.jetspending.ui.state.SignUpState
 import com.kevinfreyap.jetspending.ui.state.UiState
-import com.kevinfreyap.jetspending.utils.AuthUiValidation
-import com.kevinfreyap.jetspending.ui.helper.error.removeError
-import com.kevinfreyap.jetspending.ui.helper.error.toUIError
 import com.kevinfreyap.jetspending.utils.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -26,7 +26,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
-    private val authenticationUseCase: AuthenticationUseCase
+    private val signUpUseCase: SignUpUseCase,
+    private val authWithGoogleUseCase: AuthWithGoogleUseCase
 ): ViewModel() {
     private val _uiEvent = Channel<UiEvent<SignUpNavigation>>()
     val uiEvent = _uiEvent.receiveAsFlow()
@@ -80,23 +81,8 @@ class SignUpViewModel @Inject constructor(
             )
         }
 
-        val validationRes = AuthUiValidation.validateEmailAndPassword(
-            email = _state.value.email,
-            password = _state.value.password,
-            confirmPassword = _state.value.confirmPassword
-        )
-
-        if (validationRes.isNotEmpty()) {
-            _state.update { currentStatus ->
-                currentStatus.copy(
-                    authStatus = UiState.ValidationErrors(validationRes.toUIError())
-                )
-            }
-            return
-        }
-
         viewModelScope.launch {
-            val result = authenticationUseCase.register(
+            val result = signUpUseCase(
                 email = _state.value.email,
                 password = _state.value.password,
                 confirmPassword = _state.value.confirmPassword
@@ -112,8 +98,6 @@ class SignUpViewModel @Inject constructor(
 
                     _uiEvent.send(UiEvent.ShowToast(R.string.success_register_success))
                     _uiEvent.send(UiEvent.Navigate(SignUpNavigation.NavigateToDashboard))
-
-                    _state.value = SignUpState()
                 }
                 is DomainResult.ValidationFailed -> {
                     _state.update { currentState ->
@@ -145,7 +129,7 @@ class SignUpViewModel @Inject constructor(
 
         viewModelScope.launch {
             when(
-                val result = authenticationUseCase.authWithGoogle(idToken)
+                val result = authWithGoogleUseCase(idToken)
             ) {
                 is DomainResult.Success -> {
                     _state.update { currentState ->
