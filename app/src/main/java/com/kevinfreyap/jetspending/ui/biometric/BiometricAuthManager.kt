@@ -9,7 +9,7 @@ import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import com.kevinfreyap.jetspending.R
-import com.kevinfreyap.jetspending.utils.getFragmentActivity
+import com.kevinfreyap.jetspending.ui.helper.other.getFragmentActivity
 
 class BiometricAuthManager(
     private val context: Context

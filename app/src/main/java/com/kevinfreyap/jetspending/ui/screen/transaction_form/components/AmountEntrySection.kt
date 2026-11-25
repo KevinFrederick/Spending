@@ -1,5 +1,7 @@
 package com.kevinfreyap.jetspending.ui.screen.transaction_form.components
 
+import android.content.res.Configuration.UI_MODE_NIGHT_NO
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -32,7 +34,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kevinfreyap.domain.model.AppCurrency
 import com.kevinfreyap.jetspending.R
-import com.kevinfreyap.jetspending.ui.components.v2.ViewDropdownSelection
+import com.kevinfreyap.jetspending.ui.components.ViewDropdownSelection
 import com.kevinfreyap.jetspending.ui.screen.transaction_form.state.AmountEntryState
 import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
 import com.kevinfreyap.jetspending.ui.theme.Theme
@@ -55,7 +57,7 @@ fun AmountEntrySection(
         ?: if (state.convertedCurrency.isFraction) "0.00" else "0"
 
     val conversionRate = state.conversionRate
-        ?: stringResource(R.string.rate_unavailable)
+        ?: stringResource(R.string.label_rate_unavailable)
 
     val textColor = if (isError) MaterialTheme.colorScheme.error else Theme.custom.primaryTextColor
 
@@ -69,7 +71,7 @@ fun AmountEntrySection(
             )
     ) {
         Text(
-            text = stringResource(R.string.amount),
+            text = stringResource(R.string.label_amount),
             style = MaterialTheme.typography.bodySmall,
             color = Theme.custom.secondaryTextColor
         )
@@ -245,11 +247,18 @@ fun AmountEntrySectionPlaceholder(
     }
 }
 
-@Preview (
-    showBackground = true
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
 )
 @Composable
-fun AmountEntrySectionPreview() {
+private fun AmountEntrySectionPreview() {
     JetSpendingTheme {
         AmountEntrySection(
             state = AmountEntryState(
@@ -267,10 +276,17 @@ fun AmountEntrySectionPreview() {
 }
 
 @Preview(
-    showBackground = true
+    showBackground = true,
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
 )
 @Composable
-fun AmountEntrySectionPlaceholderPreview() {
+private fun AmountEntrySectionPlaceholderPreview() {
     JetSpendingTheme {
         AmountEntrySectionPlaceholder(
             isConversionRateVisible = true

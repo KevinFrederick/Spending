@@ -11,7 +11,7 @@ class ExchangeRatesDeserializer: JsonDeserializer<ExchangeRatesResponse> {
         json: JsonElement,
         typeOfT: Type,
         context: JsonDeserializationContext
-    ): ExchangeRatesResponse? {
+    ): ExchangeRatesResponse {
         val jsonObject = json.asJsonObject
 
         val date = jsonObject.get("date").asString

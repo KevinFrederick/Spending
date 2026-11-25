@@ -1,5 +1,7 @@
 package com.kevinfreyap.jetspending.ui.screen.transaction_form
 
+import android.content.res.Configuration.UI_MODE_NIGHT_NO
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -28,6 +30,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -39,12 +42,12 @@ import com.kevinfreyap.domain.error.Field
 import com.kevinfreyap.domain.model.TransactionType
 import com.kevinfreyap.jetspending.R
 import com.kevinfreyap.jetspending.ui.action.TransactionFormAction
-import com.kevinfreyap.jetspending.ui.components.v2.ViewCustomDateDialog
-import com.kevinfreyap.jetspending.ui.components.v2.ViewTopBar
-import com.kevinfreyap.jetspending.ui.components.v2.ViewAppDialog
-import com.kevinfreyap.jetspending.ui.components.v2.ViewPrimaryButton
-import com.kevinfreyap.jetspending.ui.components.v2.ViewSelectionBar
-import com.kevinfreyap.jetspending.ui.components.v2.ViewTextInputField
+import com.kevinfreyap.jetspending.ui.components.ViewCustomDateDialog
+import com.kevinfreyap.jetspending.ui.components.ViewTopBar
+import com.kevinfreyap.jetspending.ui.components.ViewAppDialog
+import com.kevinfreyap.jetspending.ui.components.ViewPrimaryButton
+import com.kevinfreyap.jetspending.ui.components.ViewSelectionBar
+import com.kevinfreyap.jetspending.ui.components.ViewTextInputField
 import com.kevinfreyap.jetspending.ui.model.DialogType
 import com.kevinfreyap.jetspending.ui.navigation.TransactionFormNavigation
 import com.kevinfreyap.jetspending.ui.screen.transaction_form.components.AmountEntrySection
@@ -55,7 +58,7 @@ import com.kevinfreyap.jetspending.ui.state.TransactionFormState
 import com.kevinfreyap.jetspending.ui.state.UiState
 import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
 import com.kevinfreyap.jetspending.ui.theme.Theme
-import com.kevinfreyap.jetspending.utils.UiEvent
+import com.kevinfreyap.jetspending.ui.state.UiEvent
 
 @Composable
 fun TransactionFormScreen(
@@ -116,7 +119,7 @@ fun TransactionFormScreen(
 }
 
 @Composable
-fun TransactionFormContent(
+private fun TransactionFormContent(
     state: TransactionFormState,
     onAction: (TransactionFormAction) -> Unit,
     onBackAttempt: () -> Unit,
@@ -124,8 +127,8 @@ fun TransactionFormContent(
 ) {
     val focusManager = LocalFocusManager.current
 
-    val titleRes = if (state.isEditMode) R.string.edit_transaction else R.string.add_transaction
-    val buttonTextRes = if (state.isEditMode) R.string.update_transaction else R.string.add_transaction
+    val titleRes = if (state.isEditMode) R.string.screen_edit_transaction else R.string.screen_add_transaction
+    val buttonTextRes = if (state.isEditMode) R.string.btn_update_transaction else R.string.btn_add_transaction
 
     val nameError = if (state.uiState is UiState.ValidationErrors){
         state.uiState.errors[Field.TRANSACTION_NAME]
@@ -205,8 +208,8 @@ fun TransactionFormContent(
                 optionLabel = {
                     stringResource(
                         when(it) {
-                            TransactionType.SPENDING -> R.string.expense
-                            TransactionType.INCOME -> R.string.income
+                            TransactionType.SPENDING -> R.string.label_expense
+                            TransactionType.INCOME -> R.string.label_income
                         }
                     )
                 }
@@ -251,7 +254,7 @@ fun TransactionFormContent(
 
             ViewTextInputField(
                 value = state.name,
-                label = stringResource(R.string.transaction_name),
+                label = stringResource(R.string.label_transaction_name),
                 onValueChange = {
                     onAction(
                         TransactionFormAction.TransactionMainAction.OnNameChange(
@@ -269,7 +272,7 @@ fun TransactionFormContent(
 
             ViewTextInputField(
                 value = state.notes ?: "",
-                label = stringResource(R.string.transaction_notes_optional),
+                label = stringResource(R.string.label_notes_optional),
                 onValueChange = {
                     onAction(
                         TransactionFormAction.TransactionMainAction.OnNotesChange(
@@ -286,7 +289,7 @@ fun TransactionFormContent(
 
             ViewTextInputField(
                 value = state.formattedDate,
-                label = stringResource(R.string.date),
+                label = stringResource(R.string.label_date),
                 onValueChange = {},
                 onClick = {
                     focusManager.clearFocus()
@@ -359,7 +362,7 @@ fun TransactionFormContent(
             dialogType = DialogType.WARNING,
             title = stringResource(R.string.dialog_discard_changes),
             message = stringResource(R.string.description_discard_change_transaction),
-            confirmText = stringResource(R.string.discard),
+            confirmText = stringResource(R.string.btn_discard),
             onConfirm = {
                 onAction(
                     TransactionFormAction.TransactionOverlayAction.OnConfirmDiscard
@@ -377,9 +380,20 @@ fun TransactionFormContent(
     }
 }
 
-@Preview
+@Preview(
+    showBackground = true,
+    device = Devices.PIXEL_9_PRO,
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    device = Devices.PIXEL_9_PRO,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
+)
 @Composable
-fun TransactionFormScreenPreview() {
+private fun TransactionFormScreenPreview() {
     JetSpendingTheme {
         TransactionFormContent(
             state = TransactionFormState(

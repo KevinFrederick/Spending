@@ -1,5 +1,7 @@
 package com.kevinfreyap.jetspending.ui.screen.dashboard.components
 
+import android.content.res.Configuration.UI_MODE_NIGHT_NO
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -60,9 +62,18 @@ fun MonthlySummaryPlaceholder() {
     }
 }
 
-@Preview
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
+)
 @Composable
-fun MonthlySummaryPreview() {
+private fun MonthlySummaryPreview() {
     JetSpendingTheme {
         MonthlySummary(
             state = MonthlySummaryState(
@@ -83,9 +94,18 @@ fun MonthlySummaryPreview() {
     }
 }
 
-@Preview
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
+)
 @Composable
-fun MonthlySummaryPlaceholderPreview() {
+private fun MonthlySummaryPlaceholderPreview() {
     JetSpendingTheme {
         MonthlySummaryPlaceholder()
     }

@@ -51,13 +51,6 @@ private val LightColorScheme = lightColorScheme(
 
 @Immutable
 data class CustomColors(
-    val cardColor: Color,
-    val nestedCardColor: Color,
-    val textColor: Color,
-    val iconColor: Color,
-    val hintColor: Color,
-    val onBoardCardColor: Color,
-
     val primaryTextColor: Color,
     val secondaryTextColor: Color,
     val highlightContainer: Color,
@@ -74,13 +67,6 @@ data class CustomColors(
 // Define the default/fallback
 val LocalCustomColors = staticCompositionLocalOf {
     CustomColors(
-        cardColor = Color.Unspecified,
-        nestedCardColor = Color.Unspecified,
-        textColor = Color.Unspecified,
-        iconColor = Color.Unspecified,
-        hintColor = Color.Unspecified,
-        onBoardCardColor = Color.Unspecified,
-
         primaryTextColor = Color.Unspecified,
         secondaryTextColor = Color.Unspecified,
         highlightContainer = Color.Unspecified,
@@ -124,13 +110,6 @@ fun JetSpendingTheme(
 
     val customColors = if (darkTheme) {
         CustomColors(
-            cardColor = Grey1000,
-            nestedCardColor = Grey950,
-            textColor = OffWhite,
-            iconColor = Grey400,
-            hintColor = Color.White.copy(alpha = 0.2f),
-            onBoardCardColor = Blue500.copy(alpha = 0.9f),
-
             primaryTextColor = DarkPrimaryText,
             secondaryTextColor = DarkSecondaryText,
             highlightContainer = DarkHighlightContainer,
@@ -145,13 +124,6 @@ fun JetSpendingTheme(
         )
     } else {
         CustomColors(
-            cardColor = Grey200.copy(alpha = 0.5f),
-            nestedCardColor = Grey200,
-            textColor = Grey900,
-            iconColor = Grey800,
-            hintColor = Grey400,
-            onBoardCardColor = Blue200.copy(alpha = 0.8f),
-
             primaryTextColor = LightPrimaryText,
             secondaryTextColor = LightSecondaryText,
             highlightContainer = LightHighlightContainer,
@@ -171,7 +143,6 @@ fun JetSpendingTheme(
     ) {
         MaterialTheme(
             colorScheme = colorScheme,
-            typography = Typography,
             content = content
         )
     }

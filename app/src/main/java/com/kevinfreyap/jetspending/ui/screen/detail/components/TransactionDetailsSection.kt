@@ -1,5 +1,7 @@
 package com.kevinfreyap.jetspending.ui.screen.detail.components
 
+import android.content.res.Configuration.UI_MODE_NIGHT_NO
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -38,18 +40,18 @@ fun TransactionDetailsSection(
     onAction: (TransactionDetailAction) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val exchangeRateLabel = stringResource(R.string.exchange_rate)
+    val exchangeRateLabel = stringResource(R.string.label_exchange_rate)
 
     val rows = buildList {
-        add(stringResource(R.string.category) to stringResource(transaction.category.name))
-        add(stringResource(R.string.date) to transaction.dateText)
+        add(stringResource(R.string.label_category) to stringResource(transaction.category.name))
+        add(stringResource(R.string.label_date) to transaction.dateText)
 
         if (transaction.isCurrencyDifferent) {
-            add(stringResource(R.string.original_currency) to transaction.originalCurrency.displayCodeName)
-            add(stringResource(R.string.converted_amount) to (transaction.summary.convertedAmountWithCurrency ?: stringResource(R.string.rate_unavailable)))
-            add(exchangeRateLabel to (transaction.exchangeRate ?: stringResource(R.string.rate_unavailable)))
+            add(stringResource(R.string.label_original_currency) to transaction.originalCurrency.displayCodeName)
+            add(stringResource(R.string.label_converted_amount) to (transaction.summary.convertedAmountWithCurrency ?: stringResource(R.string.label_rate_unavailable)))
+            add(exchangeRateLabel to (transaction.exchangeRate ?: stringResource(R.string.label_rate_unavailable)))
         } else {
-            add(stringResource(R.string.currency) to transaction.originalCurrency.displayCodeName)
+            add(stringResource(R.string.label_currency) to transaction.originalCurrency.displayCodeName)
         }
     }
 
@@ -78,7 +80,7 @@ fun TransactionDetailsSection(
                         ) {
                             Icon(
                                 painter = painterResource(R.drawable.ic_swap_horizontal_24),
-                                contentDescription = stringResource(R.string.exchange_rate),
+                                contentDescription = stringResource(R.string.cd_swap_exchange_rates),
                                 tint = Theme.custom.secondaryTextColor,
                                 modifier = Modifier.size(16.dp)
                             )
@@ -98,7 +100,7 @@ fun TransactionDetailsSection(
                     .padding(vertical = 12.dp)
             ) {
                 Text(
-                    text = stringResource(R.string.notes),
+                    text = stringResource(R.string.label_notes),
                     style = MaterialTheme.typography.bodySmall,
                     color = Theme.custom.secondaryTextColor
                 )
@@ -190,10 +192,17 @@ fun TransactionDetailSectionPlaceholder() {
 }
 
 @Preview(
-    showBackground = true
+    showBackground = true,
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
 )
 @Composable
-fun TransactionDetailSectionPreview() {
+private fun TransactionDetailSectionPreview() {
     JetSpendingTheme {
         TransactionDetailsSection(
             transaction = TransactionDetailState(
@@ -225,10 +234,17 @@ fun TransactionDetailSectionPreview() {
 }
 
 @Preview(
-    showBackground = true
+    showBackground = true,
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
 )
 @Composable
-fun TransactionDetailSectionPlaceholderPreview() {
+private fun TransactionDetailSectionPlaceholderPreview() {
     JetSpendingTheme {
         TransactionDetailSectionPlaceholder()
     }

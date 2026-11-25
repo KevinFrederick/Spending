@@ -1,5 +1,7 @@
 package com.kevinfreyap.jetspending.ui.screen.notification.components
 
+import android.content.res.Configuration.UI_MODE_NIGHT_NO
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -72,7 +74,7 @@ fun ReminderTimePickerDialog(
 }
 
 @Composable
-fun ReminderTimePickerDialogContent(
+private fun ReminderTimePickerDialogContent(
     showDial: Boolean,
     timePickerState: TimePickerState,
     onDismiss: () -> Unit,
@@ -170,7 +172,7 @@ fun ReminderTimePickerDialogContent(
                     onClick = onDismiss,
                 ) {
                     Text(
-                        text = stringResource(R.string.cancel),
+                        text = stringResource(R.string.btn_cancel),
                         style = MaterialTheme.typography.labelMedium,
                         color = Theme.custom.secondaryTextColor
                     )
@@ -193,9 +195,18 @@ fun ReminderTimePickerDialogContent(
     }
 }
 
-@Preview
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
+)
 @Composable
-fun ReminderTimePickerPreview() {
+private fun ReminderTimePickerPreview() {
     JetSpendingTheme {
         val timePickerState = rememberTimePickerState(
             initialHour = 20,

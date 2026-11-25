@@ -1,6 +1,7 @@
 package com.kevinfreyap.jetspending.ui.screen.settings
 
-import android.content.res.Configuration
+import android.content.res.Configuration.UI_MODE_NIGHT_NO
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -36,11 +37,11 @@ import com.kevinfreyap.domain.model.AppTheme
 import com.kevinfreyap.jetspending.BuildConfig
 import com.kevinfreyap.jetspending.R
 import com.kevinfreyap.jetspending.ui.action.SettingsAction
-import com.kevinfreyap.jetspending.ui.components.v2.ViewSelectionDialog
+import com.kevinfreyap.jetspending.ui.components.ViewSelectionDialog
 import com.kevinfreyap.jetspending.ui.components.ViewSelectionItem
-import com.kevinfreyap.jetspending.ui.components.v2.ViewAppDialog
-import com.kevinfreyap.jetspending.ui.components.v2.ViewPrimaryButton
-import com.kevinfreyap.jetspending.ui.components.v2.ViewTopBar
+import com.kevinfreyap.jetspending.ui.components.ViewAppDialog
+import com.kevinfreyap.jetspending.ui.components.ViewPrimaryButton
+import com.kevinfreyap.jetspending.ui.components.ViewTopBar
 import com.kevinfreyap.jetspending.ui.model.DialogType
 import com.kevinfreyap.jetspending.ui.navigation.SettingsNavigation
 import com.kevinfreyap.jetspending.ui.screen.settings.components.ProfileCard
@@ -54,7 +55,7 @@ import com.kevinfreyap.jetspending.ui.state.SettingsState
 import com.kevinfreyap.jetspending.ui.state.UiState
 import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
 import com.kevinfreyap.jetspending.ui.theme.Theme
-import com.kevinfreyap.jetspending.utils.UiEvent
+import com.kevinfreyap.jetspending.ui.state.UiEvent
 
 @Composable
 fun SettingsScreen(
@@ -95,7 +96,7 @@ fun SettingsScreen(
 }
 
 @Composable
-fun SettingsContent(
+private fun SettingsContent(
     state: SettingsState,
     onAction: (SettingsAction) -> Unit,
     onNavigate: (SettingsNavigation) -> Unit,
@@ -104,7 +105,7 @@ fun SettingsContent(
     Scaffold(
         topBar = {
             ViewTopBar(
-                title = stringResource(R.string.settings),
+                title = stringResource(R.string.screen_settings),
             )
         },
     ) { innerPadding ->
@@ -340,15 +341,17 @@ fun SettingsContent(
 @Preview(
     showBackground = true,
     device = Devices.PIXEL_9_PRO,
-    uiMode = Configuration.UI_MODE_NIGHT_NO
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
 )
 @Preview(
     showBackground = true,
     device = Devices.PIXEL_9_PRO,
-    uiMode = Configuration.UI_MODE_NIGHT_YES
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
 )
 @Composable
-fun SettingsContentPreview() {
+private fun SettingsContentPreview() {
     JetSpendingTheme {
         SettingsContent(
             state = SettingsState(

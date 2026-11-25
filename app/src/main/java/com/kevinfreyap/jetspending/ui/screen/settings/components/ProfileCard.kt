@@ -1,6 +1,7 @@
 package com.kevinfreyap.jetspending.ui.screen.settings.components
 
-import android.content.res.Configuration
+import android.content.res.Configuration.UI_MODE_NIGHT_NO
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -25,12 +26,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kevinfreyap.jetspending.R
-import com.kevinfreyap.jetspending.ui.components.v2.ViewUserProfile
-import com.kevinfreyap.jetspending.ui.components.v2.ViewUserProfilePlaceholder
+import com.kevinfreyap.jetspending.ui.components.ViewUserProfile
+import com.kevinfreyap.jetspending.ui.components.ViewUserProfilePlaceholder
 import com.kevinfreyap.jetspending.ui.screen.settings.state.ProfileCardState
 import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
 import com.kevinfreyap.jetspending.ui.theme.Theme
@@ -177,15 +177,17 @@ fun ProfileCardPlaceholder() {
 }
 
 @Preview(
-    showBackground = false,
-    uiMode = Configuration.UI_MODE_NIGHT_NO
+    showBackground = true,
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
 )
 @Preview(
-    showBackground = false,
-    uiMode = Configuration.UI_MODE_NIGHT_YES
+    showBackground = true,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
 )
 @Composable
-fun ProfileCardPreview() {
+private fun ProfileCardPreview() {
     JetSpendingTheme {
         ProfileCard(
             state = ProfileCardState(
@@ -198,9 +200,18 @@ fun ProfileCardPreview() {
     }
 }
 
-@Preview
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
+)
 @Composable
-fun ProfileCardPlaceholderPreview() {
+private fun ProfileCardPlaceholderPreview() {
     JetSpendingTheme {
         ProfileCardPlaceholder()
     }

@@ -17,7 +17,7 @@ import com.kevinfreyap.domain.usecase.sync.SyncCategoriesUseCase
 import com.kevinfreyap.domain.usecase.sync.SyncRatesUseCase
 import com.kevinfreyap.domain.usecase.sync.SyncTransactionsUseCase
 import com.kevinfreyap.domain.usecase.user.GetThemeUseCase
-import com.kevinfreyap.jetspending.utils.formatter.DateFormatter
+import com.kevinfreyap.jetspending.ui.helper.date.toDateKey
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
@@ -102,7 +102,7 @@ class MainViewModel @Inject constructor(
         Log.d("AppLock", "Event received: $event")
         when(event) {
             is MainEvent.RateMissing -> {
-                val dateString = DateFormatter.formatToDailyRatesString(event.date)
+                val dateString = event.date.toDateKey()
                 viewModelScope.launch(Dispatchers.IO) {
                     ensureRatesExist(dateString)
                 }

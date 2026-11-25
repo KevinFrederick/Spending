@@ -1,5 +1,7 @@
 package com.kevinfreyap.jetspending.ui.screen.list.components
 
+import android.content.res.Configuration.UI_MODE_NIGHT_NO
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,9 +27,9 @@ import androidx.compose.ui.unit.dp
 import com.kevinfreyap.domain.model.AppCurrency
 import com.kevinfreyap.domain.model.TimeFilterOption
 import com.kevinfreyap.jetspending.R
-import com.kevinfreyap.jetspending.ui.components.v2.ViewCustomDateDialog
-import com.kevinfreyap.jetspending.ui.components.v2.ViewDropdownField
-import com.kevinfreyap.jetspending.ui.components.v2.ViewPrimaryButton
+import com.kevinfreyap.jetspending.ui.components.ViewCustomDateDialog
+import com.kevinfreyap.jetspending.ui.components.ViewDropdownField
+import com.kevinfreyap.jetspending.ui.components.ViewPrimaryButton
 import com.kevinfreyap.jetspending.ui.model.CategoryUI
 import com.kevinfreyap.jetspending.ui.screen.list.action.FilterLocalAction
 import com.kevinfreyap.jetspending.ui.screen.list.state.DatePickerTarget
@@ -183,7 +185,7 @@ fun FilterBottomSheet(
 }
 
 @Composable
-fun FilterBottomSheetContent(
+private fun FilterBottomSheetContent(
     state: FilterState,
     categories: List<CategoryUI>,
     onAction: (FilterLocalAction) -> Unit,
@@ -214,7 +216,7 @@ fun FilterBottomSheetContent(
             .navigationBarsPadding()
     ) {
         Text(
-            text = stringResource(R.string.filter_transaction),
+            text = stringResource(R.string.section_header_filter_transaction),
             style = MaterialTheme.typography.headlineSmall,
             color = Theme.custom.primaryTextColor
         )
@@ -241,7 +243,7 @@ fun FilterBottomSheetContent(
                     FilterLocalAction.OnSelectCurrency(it)
                 )
             },
-            label = stringResource(R.string.currency),
+            label = stringResource(R.string.label_currency),
             optionLabel = { it?.displayCodeName ?: stringResource(R.string.placeholder_all_currency) },
         )
 
@@ -253,7 +255,7 @@ fun FilterBottomSheetContent(
                     FilterLocalAction.OnSelectCategory(it)
                 )
             },
-            label = stringResource(R.string.category),
+            label = stringResource(R.string.label_category),
             optionLabel = { stringResource(it?.name ?: R.string.placeholder_all_category) }
         )
 
@@ -262,7 +264,7 @@ fun FilterBottomSheetContent(
         ) {
             // Reset
             ViewPrimaryButton(
-                text = stringResource(R.string.reset),
+                text = stringResource(R.string.btn_reset),
                 onClick = {
                     onAction(
                         FilterLocalAction.ResetFilter
@@ -291,10 +293,17 @@ fun FilterBottomSheetContent(
 }
 
 @Preview(
-    showBackground = true
+    showBackground = true,
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
 )
 @Composable
-fun FilterBottomSheetPreview() {
+private fun FilterBottomSheetPreview() {
     JetSpendingTheme {
         FilterBottomSheetContent(
             state = FilterState(),

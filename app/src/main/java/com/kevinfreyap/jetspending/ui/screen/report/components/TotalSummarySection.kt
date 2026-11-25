@@ -1,5 +1,7 @@
 package com.kevinfreyap.jetspending.ui.screen.report.components
 
+import android.content.res.Configuration.UI_MODE_NIGHT_NO
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
@@ -35,7 +37,7 @@ import androidx.compose.ui.unit.sp
 import com.kevinfreyap.domain.model.AppCurrency
 import com.kevinfreyap.domain.model.TransactionType
 import com.kevinfreyap.jetspending.R
-import com.kevinfreyap.jetspending.ui.components.v2.ViewSegmentedPill
+import com.kevinfreyap.jetspending.ui.components.ViewSegmentedPill
 import com.kevinfreyap.jetspending.ui.helper.filter.toUiNameRes
 import com.kevinfreyap.jetspending.ui.screen.report.state.ReportTotalSummaryState
 import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
@@ -317,11 +319,18 @@ fun TotalSummarySectionPlaceholder() {
     }
 }
 
-@Preview (
-    showBackground = true
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
 )
 @Composable
-fun TotalSummarySectionPreview() {
+private fun TotalSummarySectionPreview() {
     JetSpendingTheme {
         TotalSummarySection(
             state = ReportTotalSummaryState(
@@ -338,10 +347,17 @@ fun TotalSummarySectionPreview() {
 }
 
 @Preview(
-    showBackground = true
+    showBackground = true,
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
 )
 @Composable
-fun TotalSummarySectionPlaceholderPreview() {
+private fun TotalSummarySectionPlaceholderPreview() {
     JetSpendingTheme {
         TotalSummarySectionPlaceholder()
     }

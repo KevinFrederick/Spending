@@ -1,6 +1,7 @@
 package com.kevinfreyap.jetspending.ui.screen.report.components
 
-import android.content.res.Configuration
+import android.content.res.Configuration.UI_MODE_NIGHT_NO
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -229,14 +230,17 @@ fun BarChartCardPlaceholder() {
 }
 
 @Preview(
-    showBackground = false
+    showBackground = true,
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
 )
 @Preview(
-    uiMode = Configuration.UI_MODE_NIGHT_YES,
-    showBackground = false
+    showBackground = true,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
 )
 @Composable
-fun BarChartCardMonthlyPreview() {
+private fun BarChartCardMonthlyPreview() {
     JetSpendingTheme {
         var selectedId by remember { mutableStateOf<String?>("8-14") }
 
@@ -306,10 +310,17 @@ fun BarChartCardMonthlyPreview() {
 }
 
 @Preview(
-    showBackground = false
+    showBackground = true,
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
 )
 @Composable
-fun BarChartCardEmptyPreview() {
+private fun BarChartCardEmptyPreview() {
     JetSpendingTheme {
         val baseBars = listOf(
             ChartBarItemState(
@@ -368,10 +379,17 @@ fun BarChartCardEmptyPreview() {
 }
 
 @Preview(
-    showBackground = false
+    showBackground = true,
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
 )
 @Composable
-fun BarChartCardPlaceholderPreview() {
+private fun BarChartCardPlaceholderPreview() {
     JetSpendingTheme {
         BarChartCardPlaceholder()
     }

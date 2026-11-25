@@ -1,5 +1,7 @@
 package com.kevinfreyap.jetspending.ui.screen.notification.components
 
+import android.content.res.Configuration.UI_MODE_NIGHT_NO
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -121,11 +123,18 @@ fun ReminderTime(
     }
 }
 
-@Preview (
-    showBackground = true
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
 )
 @Composable
-fun ReminderTimePreview() {
+private fun ReminderTimePreview() {
     JetSpendingTheme {
         ReminderTime(
             hour = 20,

@@ -20,9 +20,9 @@ fun TimeFilterOption.toUINameRes(): Int {
 @StringRes
 fun TransactionType?.toUiNameRes(): Int {
     return when(this) {
-        TransactionType.SPENDING -> R.string.expense
-        TransactionType.INCOME -> R.string.income
-        else -> R.string.all
+        TransactionType.SPENDING -> R.string.label_expense
+        TransactionType.INCOME -> R.string.label_income
+        else -> R.string.label_all
     }
 }
 

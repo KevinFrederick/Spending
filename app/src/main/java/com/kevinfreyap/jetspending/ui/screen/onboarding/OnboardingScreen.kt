@@ -1,5 +1,7 @@
 package com.kevinfreyap.jetspending.ui.screen.onboarding
 
+import android.content.res.Configuration.UI_MODE_NIGHT_NO
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,10 +26,10 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kevinfreyap.jetspending.R
-import com.kevinfreyap.jetspending.ui.components.v2.ViewBrandName
-import com.kevinfreyap.jetspending.ui.components.v2.ViewCurrencyCard
-import com.kevinfreyap.jetspending.ui.components.v2.ViewAnnotatedTextButton
-import com.kevinfreyap.jetspending.ui.components.v2.ViewPrimaryButton
+import com.kevinfreyap.jetspending.ui.components.ViewBrandName
+import com.kevinfreyap.jetspending.ui.components.ViewCurrencyCard
+import com.kevinfreyap.jetspending.ui.components.ViewAnnotatedTextButton
+import com.kevinfreyap.jetspending.ui.components.ViewPrimaryButton
 import com.kevinfreyap.jetspending.ui.navigation.OnboardingNavigation
 import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
 import com.kevinfreyap.jetspending.ui.theme.Theme
@@ -44,7 +46,7 @@ fun OnboardingScreen(
 }
 
 @Composable
-fun OnboardingContent(
+private fun OnboardingContent(
     onNavigate: (OnboardingNavigation) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -85,7 +87,7 @@ fun OnboardingContent(
                 )
 
                 ViewAnnotatedTextButton(
-                    labelText = stringResource(R.string.have_account_already),
+                    labelText = stringResource(R.string.annotated_label_have_account_already),
                     textButton = stringResource(R.string.btn_sign_in),
                     onClick = {
                         onNavigate(OnboardingNavigation.NavigateToSignIn)
@@ -198,10 +200,18 @@ fun OnboardingContent(
 
 @Preview(
     showBackground = true,
-    device = Devices.PIXEL_9_PRO
+    device = Devices.PIXEL_9_PRO,
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    device = Devices.PIXEL_9_PRO,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
 )
 @Composable
-fun OnboardingContentPreview() {
+private fun OnboardingContentPreview() {
     JetSpendingTheme {
         OnboardingContent(
             onNavigate = {}

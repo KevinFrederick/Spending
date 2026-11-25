@@ -1,6 +1,7 @@
 package com.kevinfreyap.jetspending.ui.screen.dashboard
 
-import android.content.res.Configuration
+import android.content.res.Configuration.UI_MODE_NIGHT_NO
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -34,11 +35,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.kevinfreyap.domain.model.TransactionType
 import com.kevinfreyap.jetspending.R
-import com.kevinfreyap.jetspending.ui.components.v2.ViewTopBar
-import com.kevinfreyap.jetspending.ui.components.v2.ViewCurrencyCard
-import com.kevinfreyap.jetspending.ui.components.v2.ViewCurrencyCardPlaceholder
-import com.kevinfreyap.jetspending.ui.components.v2.ViewPrimaryButton
-import com.kevinfreyap.jetspending.ui.components.v2.ViewPrimaryButtonPlaceholder
+import com.kevinfreyap.jetspending.ui.components.ViewTopBar
+import com.kevinfreyap.jetspending.ui.components.ViewCurrencyCard
+import com.kevinfreyap.jetspending.ui.components.ViewCurrencyCardPlaceholder
+import com.kevinfreyap.jetspending.ui.components.ViewPrimaryButton
+import com.kevinfreyap.jetspending.ui.components.ViewPrimaryButtonPlaceholder
 import com.kevinfreyap.jetspending.ui.helper.date.DayGreeting
 import com.kevinfreyap.jetspending.ui.navigation.DashboardNavigation
 import com.kevinfreyap.jetspending.ui.screen.dashboard.components.MonthlySummary
@@ -70,7 +71,7 @@ fun DashboardScreen(
 }
 
 @Composable
-fun DashboardContent(
+private fun DashboardContent(
     state: UiState<DashboardState>,
     onNavigate: (DashboardNavigation) -> Unit,
     modifier: Modifier = Modifier
@@ -78,7 +79,7 @@ fun DashboardContent(
     Scaffold(
         topBar = {
             ViewTopBar(
-                title = stringResource(R.string.overview),
+                title = stringResource(R.string.screen_overview),
             )
         }
     ) { innerPadding ->
@@ -110,7 +111,7 @@ fun DashboardContent(
 }
 
 @Composable
-fun DashboardSuccess(
+private fun DashboardSuccess(
     state: DashboardState,
     onNavigate: (DashboardNavigation) -> Unit
 ) {
@@ -136,7 +137,7 @@ fun DashboardSuccess(
     ViewCurrencyCard(
         topLabel = {
             Text(
-                text = stringResource(R.string.total_balance),
+                text = stringResource(R.string.label_total_balance),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.primary
             )
@@ -215,7 +216,7 @@ fun DashboardSuccess(
     )
 
     ViewPrimaryButton(
-        text = stringResource(R.string.add_transaction),
+        text = stringResource(R.string.btn_add_transaction),
         onClick = {
             onNavigate(DashboardNavigation.NavigateToAddTransaction)
         },
@@ -274,10 +275,17 @@ private fun DashboardPlaceholder() {
 @Preview(
     showBackground = true,
     device = Devices.PIXEL_9_PRO,
-    uiMode = Configuration.UI_MODE_NIGHT_NO
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    device = Devices.PIXEL_9_PRO,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
 )
 @Composable
-fun DashboardContentPreview(){
+private fun DashboardContentPreview(){
     JetSpendingTheme {
         DashboardContent(
             state = UiState.Success(
@@ -353,10 +361,17 @@ fun DashboardContentPreview(){
 @Preview(
     showBackground = true,
     device = Devices.PIXEL_9_PRO,
-    uiMode = Configuration.UI_MODE_NIGHT_NO
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    device = Devices.PIXEL_9_PRO,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
 )
 @Composable
-fun DashboardContentPlaceholderPreview() {
+private fun DashboardContentPlaceholderPreview() {
     JetSpendingTheme {
         DashboardContent(
             state = UiState.Loading,

@@ -1,6 +1,7 @@
 package com.kevinfreyap.jetspending.ui.screen.signin
 
-import android.content.res.Configuration
+import android.content.res.Configuration.UI_MODE_NIGHT_NO
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -49,18 +50,18 @@ import com.kevinfreyap.domain.error.Field
 import com.kevinfreyap.jetspending.R
 import com.kevinfreyap.jetspending.ui.action.SignInAction
 import com.kevinfreyap.jetspending.ui.client.GoogleAuthClient
-import com.kevinfreyap.jetspending.ui.components.v2.ViewGoogleBtn
-import com.kevinfreyap.jetspending.ui.components.v2.ViewInputDialog
-import com.kevinfreyap.jetspending.ui.components.v2.ViewTextInputField
-import com.kevinfreyap.jetspending.ui.components.v2.ViewTopBar
-import com.kevinfreyap.jetspending.ui.components.v2.ViewAnnotatedTextButton
-import com.kevinfreyap.jetspending.ui.components.v2.ViewPrimaryButton
+import com.kevinfreyap.jetspending.ui.components.ViewGoogleBtn
+import com.kevinfreyap.jetspending.ui.components.ViewInputDialog
+import com.kevinfreyap.jetspending.ui.components.ViewTextInputField
+import com.kevinfreyap.jetspending.ui.components.ViewTopBar
+import com.kevinfreyap.jetspending.ui.components.ViewAnnotatedTextButton
+import com.kevinfreyap.jetspending.ui.components.ViewPrimaryButton
 import com.kevinfreyap.jetspending.ui.navigation.SignInNavigation
 import com.kevinfreyap.jetspending.ui.state.SignInState
 import com.kevinfreyap.jetspending.ui.state.UiState
 import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
 import com.kevinfreyap.jetspending.ui.theme.Theme
-import com.kevinfreyap.jetspending.utils.UiEvent
+import com.kevinfreyap.jetspending.ui.state.UiEvent
 import kotlinx.coroutines.launch
 
 @Composable
@@ -119,7 +120,7 @@ fun SignInScreen(
 }
 
 @Composable
-fun SignInContent(
+private fun SignInContent(
     state: SignInState,
     showForgotPasswordDialog: Boolean,
     onAction: (SignInAction) -> Unit,
@@ -156,7 +157,7 @@ fun SignInContent(
         },
         bottomBar = {
             ViewAnnotatedTextButton(
-                labelText = stringResource(R.string.do_not_have_account_label),
+                labelText = stringResource(R.string.annotated_label_do_not_have_account_label),
                 textButton = stringResource(R.string.btn_sign_up),
                 onClick = {
                     onNavigate(SignInNavigation.NavigateToSignUp)
@@ -199,7 +200,7 @@ fun SignInContent(
 
             ViewTextInputField(
                 value = state.emailInput,
-                label = stringResource(R.string.email),
+                label = stringResource(R.string.label_email),
                 onValueChange = {
                     onAction(SignInAction.OnEmailChanged(it))
                 },
@@ -221,7 +222,7 @@ fun SignInContent(
                 onValueChange = {
                     onAction(SignInAction.OnPasswordChanged(it))
                 },
-                label = stringResource(R.string.password),
+                label = stringResource(R.string.label_password),
                 isError = passwordError != null,
                 errorMessage = passwordError?.let { stringResource(it) } ?: "",
                 keyboardOptions = KeyboardOptions(
@@ -255,7 +256,7 @@ fun SignInContent(
                     .align(Alignment.End)
             ) {
                 Text(
-                    text = stringResource(R.string.forgot_password),
+                    text = stringResource(R.string.label_forgot_password),
                     color = MaterialTheme.colorScheme.primary,
                     style = MaterialTheme.typography.labelLarge,
                 )
@@ -293,7 +294,7 @@ fun SignInContent(
                 )
 
                 Text(
-                    text = stringResource(R.string.email_google_divider),
+                    text = stringResource(R.string.label_email_google_divider),
                     style = MaterialTheme.typography.bodySmall,
                     color = Theme.custom.secondaryTextColor,
                     modifier = Modifier
@@ -321,9 +322,9 @@ fun SignInContent(
 
         if (showForgotPasswordDialog) {
             ViewInputDialog(
-                title = stringResource(R.string.reset_password),
+                title = stringResource(R.string.dialog_title_reset_password),
                 subtitle = stringResource(R.string.description_reset_password),
-                positiveText = stringResource(R.string.send_link),
+                positiveText = stringResource(R.string.btn_send_link),
                 onDismissRequest = {
                     onShowForgotPasswordDialog(false)
                 },
@@ -336,7 +337,7 @@ fun SignInContent(
                         onValueChange = {
                             onAction(SignInAction.OnResetPasswordEmailChanged(it))
                         },
-                        label = stringResource(R.string.email),
+                        label = stringResource(R.string.label_email),
                         isError = emailResetPasswordError != null,
                         errorMessage = emailResetPasswordError?.let { stringResource(it) } ?: "",
                         keyboardOptions = KeyboardOptions(
@@ -353,10 +354,17 @@ fun SignInContent(
 @Preview(
     showBackground = true,
     device = Devices.PIXEL_9_PRO,
-    uiMode = Configuration.UI_MODE_NIGHT_YES
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    device = Devices.PIXEL_9_PRO,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
 )
 @Composable
-fun SignInContentPreview() {
+private fun SignInContentPreview() {
     JetSpendingTheme {
         SignInContent(
             state = SignInState(),

@@ -124,7 +124,7 @@ fun ViewSelectionItem (
     uiMode = Configuration.UI_MODE_NIGHT_YES
 )
 @Composable
-fun ViewSelectionItemPreview() {
+private fun ViewSelectionItemPreview() {
     JetSpendingTheme {
         ViewSelectionItem(
             title = "Indonesia",

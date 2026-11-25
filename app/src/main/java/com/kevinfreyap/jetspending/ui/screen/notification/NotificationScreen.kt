@@ -4,7 +4,8 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.content.res.Configuration
+import android.content.res.Configuration.UI_MODE_NIGHT_NO
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
@@ -47,8 +48,8 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kevinfreyap.jetspending.R
 import com.kevinfreyap.jetspending.ui.action.NotificationAction
-import com.kevinfreyap.jetspending.ui.components.v2.ViewPrimaryButton
-import com.kevinfreyap.jetspending.ui.components.v2.ViewTopBar
+import com.kevinfreyap.jetspending.ui.components.ViewPrimaryButton
+import com.kevinfreyap.jetspending.ui.components.ViewTopBar
 import com.kevinfreyap.jetspending.ui.navigation.NotificationNavigation
 import com.kevinfreyap.jetspending.ui.screen.notification.components.ReminderTime
 import com.kevinfreyap.jetspending.ui.screen.notification.components.ReminderTimePickerDialog
@@ -110,7 +111,7 @@ fun NotificationScreen(
 }
 
 @Composable
-fun NotificationContent(
+private fun NotificationContent(
     state: NotificationState,
     onAction: (NotificationAction) -> Unit,
     onNavigate: (NotificationNavigation) -> Unit,
@@ -120,7 +121,7 @@ fun NotificationContent(
     Scaffold(
         topBar = {
             ViewTopBar(
-                title = stringResource(R.string.notifications),
+                title = stringResource(R.string.screen_notifications),
                 onBackClick = {
                     onNavigate(
                         NotificationNavigation.NavigateUp
@@ -146,13 +147,13 @@ fun NotificationContent(
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Text(
-                    text = stringResource(R.string.settings_notification_screen_header),
+                    text = stringResource(R.string.screen_header_settings_notification),
                     style = MaterialTheme.typography.headlineSmall,
                     color = Theme.custom.primaryTextColor
                 )
 
                 Text(
-                    text = stringResource(R.string.settings_notification_screen_subtitle),
+                    text = stringResource(R.string.screen_subtitle_settings_notification),
                     style = MaterialTheme.typography.bodyMedium,
                     color = Theme.custom.secondaryTextColor
                 )
@@ -315,15 +316,17 @@ private fun openSystemNotificationSettings(context: Context) {
 @Preview(
     showBackground = true,
     device = Devices.PIXEL_9_PRO,
-    uiMode = Configuration.UI_MODE_NIGHT_NO
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
 )
 @Preview(
     showBackground = true,
     device = Devices.PIXEL_9_PRO,
-    uiMode = Configuration.UI_MODE_NIGHT_YES
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
 )
 @Composable
-fun NotificationPreview() {
+private fun NotificationPreview() {
     JetSpendingTheme {
         NotificationContent(
             state = NotificationState(

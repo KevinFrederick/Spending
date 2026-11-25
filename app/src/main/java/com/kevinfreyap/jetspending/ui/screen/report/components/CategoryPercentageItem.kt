@@ -270,13 +270,13 @@ fun CategoryPercentageItemPlaceholder() {
 
 @Preview (
     showBackground = true,
+    backgroundColor = 0xFFFAFCFB,
     uiMode = UI_MODE_NIGHT_NO,
-    backgroundColor = 0xFFFAFCFB
 )
 @Preview (
     showBackground = true,
+    backgroundColor = 0xFF121214,
     uiMode = UI_MODE_NIGHT_YES,
-    backgroundColor = 0xFF121214
 )
 @Composable
 fun CategoryPercentageItemPreview() {
@@ -300,7 +300,14 @@ fun CategoryPercentageItemPreview() {
 }
 
 @Preview(
-    showBackground = true
+    showBackground = true,
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
 )
 @Composable
 fun CategoryPercentageItemPlaceholderPreview() {

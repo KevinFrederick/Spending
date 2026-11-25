@@ -27,7 +27,7 @@ import com.kevinfreyap.jetspending.ui.navigation.TransactionFormNavigation
 import com.kevinfreyap.jetspending.ui.screen.transaction_form.state.AmountEntryState
 import com.kevinfreyap.jetspending.ui.state.TransactionFormState
 import com.kevinfreyap.jetspending.ui.state.UiState
-import com.kevinfreyap.jetspending.utils.UiEvent
+import com.kevinfreyap.jetspending.ui.state.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel

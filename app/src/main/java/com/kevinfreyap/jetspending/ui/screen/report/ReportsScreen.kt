@@ -1,5 +1,7 @@
 package com.kevinfreyap.jetspending.ui.screen.report
 
+import android.content.res.Configuration.UI_MODE_NIGHT_NO
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -33,13 +35,13 @@ import com.kevinfreyap.domain.model.PeriodSelectorOption
 import com.kevinfreyap.domain.model.TransactionType
 import com.kevinfreyap.jetspending.R
 import com.kevinfreyap.jetspending.ui.action.ReportsAction
-import com.kevinfreyap.jetspending.ui.components.v2.ViewTopBar
-import com.kevinfreyap.jetspending.ui.components.v2.ViewDropdownSelection
-import com.kevinfreyap.jetspending.ui.components.v2.ViewMonthYearPickerDialog
-import com.kevinfreyap.jetspending.ui.components.v2.ViewPageStatus
-import com.kevinfreyap.jetspending.ui.components.v2.ViewPeriodNavigator
-import com.kevinfreyap.jetspending.ui.components.v2.ViewPrimaryButton
-import com.kevinfreyap.jetspending.ui.components.v2.ViewWeekPickerDialog
+import com.kevinfreyap.jetspending.ui.components.ViewTopBar
+import com.kevinfreyap.jetspending.ui.components.ViewDropdownSelection
+import com.kevinfreyap.jetspending.ui.components.ViewMonthYearPickerDialog
+import com.kevinfreyap.jetspending.ui.components.ViewPageStatus
+import com.kevinfreyap.jetspending.ui.components.ViewPeriodNavigator
+import com.kevinfreyap.jetspending.ui.components.ViewPrimaryButton
+import com.kevinfreyap.jetspending.ui.components.ViewWeekPickerDialog
 import com.kevinfreyap.jetspending.ui.helper.other.toLocalePercentageText
 import com.kevinfreyap.jetspending.ui.model.CategoryUI
 import com.kevinfreyap.jetspending.ui.screen.report.components.BarChartCard
@@ -73,7 +75,7 @@ fun ReportsScreen(
 }
 
 @Composable
-fun ReportsContent(
+private fun ReportsContent(
     state: ReportsState,
     onAction: (ReportsAction) -> Unit,
     modifier: Modifier = Modifier
@@ -81,7 +83,7 @@ fun ReportsContent(
     Scaffold(
         topBar = {
             ViewTopBar(
-                title = stringResource(R.string.report),
+                title = stringResource(R.string.screen_report),
                 actionButton = {
                     ViewDropdownSelection(
                         options = PeriodSelectorOption.entries,
@@ -373,10 +375,18 @@ private fun ReportsError(
 
 @Preview(
     showBackground = true,
-    device = Devices.PIXEL_9_PRO
+    device = Devices.PIXEL_9_PRO,
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    device = Devices.PIXEL_9_PRO,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
 )
 @Composable
-fun ReportsScreenPreview() {
+private fun ReportsScreenPreview() {
     JetSpendingTheme {
         ReportsContent(
             state = ReportsState(
@@ -486,10 +496,18 @@ fun ReportsScreenPreview() {
 
 @Preview(
     showBackground = true,
-    device = Devices.PIXEL_9_PRO
+    device = Devices.PIXEL_9_PRO,
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    device = Devices.PIXEL_9_PRO,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
 )
 @Composable
-fun ReportsScreenPreview_Loading() {
+private fun ReportsScreenPreview_Loading() {
     JetSpendingTheme {
         ReportsContent(
             state = ReportsState(
@@ -503,10 +521,18 @@ fun ReportsScreenPreview_Loading() {
 
 @Preview(
     showBackground = true,
-    device = Devices.PIXEL_9_PRO
+    device = Devices.PIXEL_9_PRO,
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    device = Devices.PIXEL_9_PRO,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
 )
 @Composable
-fun ReportsScreenPreview_Failure() {
+private fun ReportsScreenPreview_Failure() {
     JetSpendingTheme {
         ReportsContent(
             state = ReportsState(

@@ -1,5 +1,7 @@
 package com.kevinfreyap.jetspending.ui.screen.signup
 
+import android.content.res.Configuration.UI_MODE_NIGHT_NO
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -48,17 +50,17 @@ import com.kevinfreyap.domain.error.Field
 import com.kevinfreyap.jetspending.R
 import com.kevinfreyap.jetspending.ui.action.SignUpAction
 import com.kevinfreyap.jetspending.ui.client.GoogleAuthClient
-import com.kevinfreyap.jetspending.ui.components.v2.ViewGoogleBtn
-import com.kevinfreyap.jetspending.ui.components.v2.ViewTextInputField
-import com.kevinfreyap.jetspending.ui.components.v2.ViewTopBar
-import com.kevinfreyap.jetspending.ui.components.v2.ViewAnnotatedTextButton
-import com.kevinfreyap.jetspending.ui.components.v2.ViewPrimaryButton
+import com.kevinfreyap.jetspending.ui.components.ViewGoogleBtn
+import com.kevinfreyap.jetspending.ui.components.ViewTextInputField
+import com.kevinfreyap.jetspending.ui.components.ViewTopBar
+import com.kevinfreyap.jetspending.ui.components.ViewAnnotatedTextButton
+import com.kevinfreyap.jetspending.ui.components.ViewPrimaryButton
 import com.kevinfreyap.jetspending.ui.navigation.SignUpNavigation
 import com.kevinfreyap.jetspending.ui.state.SignUpState
 import com.kevinfreyap.jetspending.ui.state.UiState
 import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
 import com.kevinfreyap.jetspending.ui.theme.Theme
-import com.kevinfreyap.jetspending.utils.UiEvent
+import com.kevinfreyap.jetspending.ui.state.UiEvent
 import kotlinx.coroutines.launch
 
 @Composable
@@ -111,7 +113,7 @@ fun SignUpScreen(
 }
 
 @Composable
-fun SignUpContent(
+private fun SignUpContent(
     state: SignUpState,
     onAction: (SignUpAction) -> Unit,
     onNavigate: (SignUpNavigation) -> Unit,
@@ -147,7 +149,7 @@ fun SignUpContent(
         },
         bottomBar = {
             ViewAnnotatedTextButton(
-                labelText = stringResource(R.string.have_account_already),
+                labelText = stringResource(R.string.annotated_label_have_account_already),
                 textButton = stringResource(R.string.btn_sign_in),
                 onClick = {
                     onNavigate(SignUpNavigation.NavigateToSignIn)
@@ -196,7 +198,7 @@ fun SignUpContent(
                     onValueChange = {
                         onAction(SignUpAction.OnEmailChanged(it))
                     },
-                    label = stringResource(R.string.email),
+                    label = stringResource(R.string.label_email),
                     isError = emailError != null,
                     errorMessage = emailError?.let { stringResource(it) } ?: "",
                     keyboardOptions = KeyboardOptions(
@@ -210,7 +212,7 @@ fun SignUpContent(
                     onValueChange = {
                         onAction(SignUpAction.OnPasswordChanged(it))
                     },
-                    label = stringResource(R.string.password),
+                    label = stringResource(R.string.label_password),
                     isError = passwordError != null,
                     errorMessage = passwordError?.let { stringResource(it) } ?: "",
                     keyboardOptions = KeyboardOptions(
@@ -241,7 +243,7 @@ fun SignUpContent(
                     onValueChange = {
                         onAction(SignUpAction.OnConfirmPasswordChanged(it))
                     },
-                    label = stringResource(R.string.confirm_password),
+                    label = stringResource(R.string.label_confirm_password),
                     isError = confirmPasswordError != null,
                     errorMessage = confirmPasswordError?.let { stringResource(it) } ?: "",
                     keyboardOptions = KeyboardOptions(
@@ -301,7 +303,7 @@ fun SignUpContent(
                 )
 
                 Text(
-                    text = stringResource(R.string.email_google_divider),
+                    text = stringResource(R.string.label_email_google_divider),
                     style = MaterialTheme.typography.bodySmall,
                     color = Theme.custom.secondaryTextColor,
                     modifier = Modifier
@@ -331,10 +333,18 @@ fun SignUpContent(
 
 @Preview(
     showBackground = true,
-    device = Devices.PIXEL_9_PRO
+    device = Devices.PIXEL_9_PRO,
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    device = Devices.PIXEL_9_PRO,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
 )
 @Composable
-fun SignUpContentPreview() {
+private fun SignUpContentPreview() {
     JetSpendingTheme {
         SignUpContent(
             state = SignUpState(),

@@ -1,6 +1,7 @@
 package com.kevinfreyap.jetspending.ui.screen.privacy_security
 
-import android.content.res.Configuration
+import android.content.res.Configuration.UI_MODE_NIGHT_NO
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -46,16 +47,16 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import com.kevinfreyap.domain.error.Field
 import com.kevinfreyap.jetspending.R
-import com.kevinfreyap.jetspending.ui.components.v2.ViewTopBar
+import com.kevinfreyap.jetspending.ui.components.ViewTopBar
 import com.kevinfreyap.jetspending.ui.screen.settings.components.SettingsSection
 import com.kevinfreyap.jetspending.ui.screen.settings.state.SettingsItemState
 import com.kevinfreyap.jetspending.ui.screen.settings.state.SettingsItemType
 import com.kevinfreyap.jetspending.ui.action.PrivacySecurityAction
 import com.kevinfreyap.jetspending.ui.action.PrivacySecurityAction.*
 import com.kevinfreyap.jetspending.ui.biometric.BiometricAuthManager
-import com.kevinfreyap.jetspending.ui.components.v2.ViewAppDialog
-import com.kevinfreyap.jetspending.ui.components.v2.ViewInputDialog
-import com.kevinfreyap.jetspending.ui.components.v2.ViewTextInputField
+import com.kevinfreyap.jetspending.ui.components.ViewAppDialog
+import com.kevinfreyap.jetspending.ui.components.ViewInputDialog
+import com.kevinfreyap.jetspending.ui.components.ViewTextInputField
 import com.kevinfreyap.jetspending.ui.model.DialogType
 import com.kevinfreyap.jetspending.ui.navigation.PrivacySecurityNavigation
 import com.kevinfreyap.jetspending.ui.screen.privacy_security.state.PrivacySecurityDialogType
@@ -63,7 +64,7 @@ import com.kevinfreyap.jetspending.ui.state.PrivacySecurityState
 import com.kevinfreyap.jetspending.ui.state.UiState
 import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
 import com.kevinfreyap.jetspending.ui.theme.Theme
-import com.kevinfreyap.jetspending.utils.UiEvent
+import com.kevinfreyap.jetspending.ui.state.UiEvent
 import kotlinx.coroutines.launch
 
 @Composable
@@ -83,7 +84,7 @@ fun PrivacySecurityScreen(
 
     val titleAppLocked = stringResource(R.string.label_app_locked)
     val noScreenLock = stringResource(R.string.label_no_screen_lock)
-    val settings = stringResource(R.string.settings)
+    val settings = stringResource(R.string.btn_settings)
 
     LaunchedEffect(viewModel.uiEvent, lifecycleOwner) {
         lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -154,7 +155,7 @@ fun PrivacySecurityScreen(
 }
 
 @Composable
-fun PrivacySecurityContent(
+private fun PrivacySecurityContent(
     state: PrivacySecurityState,
     onAction: (PrivacySecurityAction) -> Unit,
     onNavigate: (PrivacySecurityNavigation) -> Unit,
@@ -163,7 +164,7 @@ fun PrivacySecurityContent(
     Scaffold(
         topBar = {
             ViewTopBar(
-                title = stringResource(R.string.security),
+                title = stringResource(R.string.screen_security),
                 onBackClick = {
                     onNavigate(
                         PrivacySecurityNavigation.NavigateUp
@@ -189,13 +190,13 @@ fun PrivacySecurityContent(
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Text(
-                    text = stringResource(R.string.settings_security_screen_header),
+                    text = stringResource(R.string.screen_header_settings_security),
                     style = MaterialTheme.typography.headlineSmall,
                     color = Theme.custom.primaryTextColor
                 )
 
                 Text(
-                    text = stringResource(R.string.settings_security_screen_subtitle),
+                    text = stringResource(R.string.screen_subtitle_settings_security),
                     style = MaterialTheme.typography.bodyMedium,
                     color = Theme.custom.secondaryTextColor
                 )
@@ -299,7 +300,7 @@ fun PrivacySecurityContent(
                     if (state.hasPassword) R.string.settings_change_password else R.string.settings_create_password
                 ),
                 subtitle = stringResource(R.string.description_settings_password),
-                positiveText = stringResource(R.string.confirm),
+                positiveText = stringResource(R.string.btn_confirm),
                 onDismissRequest = {
                     onAction(
                         OnShowDialog(
@@ -320,7 +321,7 @@ fun PrivacySecurityContent(
                                         )
                                     )
                                 },
-                                label = stringResource(R.string.current_password),
+                                label = stringResource(R.string.label_current_password),
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Password,
                                     imeAction = ImeAction.Done
@@ -359,7 +360,7 @@ fun PrivacySecurityContent(
                                     )
                                 )
                             },
-                            label = stringResource(R.string.new_password),
+                            label = stringResource(R.string.label_new_password),
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Password,
                                 imeAction = ImeAction.Done
@@ -398,7 +399,7 @@ fun PrivacySecurityContent(
                                     .align(Alignment.End)
                             ) {
                                 Text(
-                                    text = stringResource(R.string.forgot_password),
+                                    text = stringResource(R.string.label_forgot_password),
                                     style = MaterialTheme.typography.labelMedium,
                                     color = MaterialTheme.colorScheme.primary,
                                 )
@@ -424,7 +425,7 @@ fun PrivacySecurityContent(
                 ViewInputDialog(
                     title = stringResource(R.string.settings_delete_account),
                     subtitle = stringResource(R.string.description_settings_delete_account),
-                    positiveText = stringResource(R.string.delete_account),
+                    positiveText = stringResource(R.string.btn_delete),
                     positiveBtnContainerColor = Theme.custom.negativeContainer,
                     positiveBtnContentColor = Theme.custom.statusNegative,
                     onDismissRequest = {
@@ -441,7 +442,7 @@ fun PrivacySecurityContent(
                                     )
                                 )
                             },
-                            label = stringResource(R.string.current_password),
+                            label = stringResource(R.string.label_current_password),
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Password,
                                 imeAction = ImeAction.Done
@@ -476,8 +477,8 @@ fun PrivacySecurityContent(
                     dialogType = DialogType.DESTRUCTIVE,
                     title = stringResource(R.string.settings_delete_account),
                     message = stringResource(R.string.description_settings_delete_account),
-                    confirmText = stringResource(R.string.delete_account),
-                    dismissText = stringResource(R.string.cancel),
+                    confirmText = stringResource(R.string.btn_delete),
+                    dismissText = stringResource(R.string.btn_cancel),
                     onConfirm = {
                         onAction(
                             OnConfirmDelete
@@ -500,9 +501,9 @@ fun PrivacySecurityContent(
             } else null
 
             ViewInputDialog(
-                title = stringResource(R.string.reset_password),
+                title = stringResource(R.string.dialog_title_reset_password),
                 subtitle = stringResource(R.string.description_reset_password),
-                positiveText = stringResource(R.string.send_link),
+                positiveText = stringResource(R.string.btn_send_link),
                 onDismissRequest = {
                     onAction(
                         OnShowDialog(
@@ -523,7 +524,7 @@ fun PrivacySecurityContent(
                                 OnResetEmailChange(it)
                             )
                         },
-                        label = stringResource(R.string.email),
+                        label = stringResource(R.string.label_email),
                         isError = emailResetPasswordError != null,
                         errorMessage = emailResetPasswordError?.let { stringResource(it) } ?: "",
                         keyboardOptions = KeyboardOptions(
@@ -540,10 +541,17 @@ fun PrivacySecurityContent(
 @Preview(
     showBackground = true,
     device = Devices.PIXEL_9_PRO,
-    uiMode = Configuration.UI_MODE_NIGHT_NO
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    device = Devices.PIXEL_9_PRO,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
 )
 @Composable
-fun PrivacySecurityPreview() {
+private fun PrivacySecurityPreview() {
     JetSpendingTheme {
         PrivacySecurityContent(
             state = PrivacySecurityState(

@@ -1,5 +1,7 @@
 package com.kevinfreyap.jetspending.ui.screen.dashboard.components
 
+import android.content.res.Configuration.UI_MODE_NIGHT_NO
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -44,13 +46,13 @@ fun SummaryCard(
     when(state.transactionType) {
         TransactionType.INCOME -> {
             icon = painterResource(R.drawable.ic_income_24)
-            typeText = stringResource(R.string.income)
+            typeText = stringResource(R.string.label_income)
             formattedValue = "+ ${state.value}"
             color = Theme.custom.statusPositive
         }
         TransactionType.SPENDING -> {
             icon = painterResource(R.drawable.ic_spending_24)
-            typeText = stringResource(R.string.expense)
+            typeText = stringResource(R.string.label_expense)
             formattedValue = "- ${state.value}"
             color = Theme.custom.statusNegative
         }
@@ -172,9 +174,18 @@ fun SummaryCardPlaceholder(
     }
 }
 
-@Preview
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
+)
 @Composable
-fun SummaryCardPreview() {
+private fun SummaryCardPreview() {
     JetSpendingTheme {
         SummaryCard(
             state = SummaryState(
@@ -187,9 +198,18 @@ fun SummaryCardPreview() {
     }
 }
 
-@Preview
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
+)
 @Composable
-fun SummaryCardPlaceholderPreview() {
+private fun SummaryCardPlaceholderPreview() {
     JetSpendingTheme {
         SummaryCardPlaceholder(
             modifier = Modifier

@@ -1,5 +1,7 @@
 package com.kevinfreyap.jetspending.ui.screen.detail.components
 
+import android.content.res.Configuration.UI_MODE_NIGHT_NO
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -97,7 +99,7 @@ fun TransactionDetailSummary(
             Text(
                 text = state.convertedAmountWithCurrency?.let {
                     "≈ $it"
-                } ?: stringResource(R.string.rate_unavailable),
+                } ?: stringResource(R.string.label_rate_unavailable),
                 style = MaterialTheme.typography.bodyMedium,
                 color = Theme.custom.secondaryTextColor
             )
@@ -202,10 +204,17 @@ fun TransactionDetailSummaryPlaceholder() {
 }
 
 @Preview(
-    showBackground = true
+    showBackground = true,
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
 )
 @Composable
-fun TransactionDetailSummaryPreview() {
+private fun TransactionDetailSummaryPreview() {
     JetSpendingTheme {
         TransactionDetailSummary(
             state = TransactionDetailSummaryState(
@@ -222,10 +231,17 @@ fun TransactionDetailSummaryPreview() {
 }
 
 @Preview(
-    showBackground = true
+    showBackground = true,
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
 )
 @Composable
-fun TransactionDetailSummaryPlaceholderPreview() {
+private fun TransactionDetailSummaryPlaceholderPreview() {
     JetSpendingTheme {
         TransactionDetailSummaryPlaceholder()
     }

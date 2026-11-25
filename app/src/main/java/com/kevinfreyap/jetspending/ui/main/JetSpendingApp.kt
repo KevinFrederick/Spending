@@ -28,7 +28,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.kevinfreyap.jetspending.ui.components.OfflineBanner
+import com.kevinfreyap.jetspending.ui.components.ViewOfflineBanner
 import com.kevinfreyap.jetspending.ui.navigation.Screen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -86,7 +86,7 @@ fun JetSpendingApp(
             enter = expandVertically() + fadeIn(),
             exit = shrinkVertically() + fadeOut()
         ) {
-            OfflineBanner()
+            ViewOfflineBanner()
         }
 
         Scaffold(

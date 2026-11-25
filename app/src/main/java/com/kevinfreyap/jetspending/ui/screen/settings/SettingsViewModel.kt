@@ -16,7 +16,7 @@ import com.kevinfreyap.jetspending.ui.screen.settings.state.ProfileCardState
 import com.kevinfreyap.jetspending.ui.screen.settings.state.SettingsDialogType
 import com.kevinfreyap.jetspending.ui.state.SettingsState
 import com.kevinfreyap.jetspending.ui.state.UiState
-import com.kevinfreyap.jetspending.utils.UiEvent
+import com.kevinfreyap.jetspending.ui.state.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow

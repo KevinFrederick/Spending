@@ -1,5 +1,7 @@
 package com.kevinfreyap.jetspending.ui.screen.report.components
 
+import android.content.res.Configuration.UI_MODE_NIGHT_NO
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,7 +38,7 @@ fun CategoryListSection(
         modifier = modifier
     ) {
         Text(
-            text = stringResource(R.string.by_category),
+            text = stringResource(R.string.section_header_by_category),
             style = MaterialTheme.typography.titleMedium,
             color = Theme.custom.primaryTextColor
         )
@@ -97,10 +99,17 @@ fun CategoryListSectionPlaceholder() {
 }
 
 @Preview(
-    showBackground = true
+    showBackground = true,
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
 )
 @Composable
-fun CategoryListSectionPreview() {
+private fun CategoryListSectionPreview() {
     JetSpendingTheme {
         CategoryListSection(
             categories = listOf(
@@ -149,10 +158,17 @@ fun CategoryListSectionPreview() {
 }
 
 @Preview(
-    showBackground = true
+    showBackground = true,
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
 )
 @Composable
-fun CategoryListSectionPreview_Empty() {
+private fun CategoryListSectionPreview_Empty() {
     JetSpendingTheme {
         CategoryListSection(
             categories = emptyList()
@@ -161,10 +177,17 @@ fun CategoryListSectionPreview_Empty() {
 }
 
 @Preview(
-    showBackground = true
+    showBackground = true,
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
 )
 @Composable
-fun CategoryListSectionPlaceholderPreview() {
+private fun CategoryListSectionPlaceholderPreview() {
     JetSpendingTheme {
         CategoryListSectionPlaceholder()
     }

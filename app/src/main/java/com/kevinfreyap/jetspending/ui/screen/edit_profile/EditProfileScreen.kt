@@ -1,6 +1,7 @@
 package com.kevinfreyap.jetspending.ui.screen.edit_profile
 
-import android.content.res.Configuration
+import android.content.res.Configuration.UI_MODE_NIGHT_NO
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
@@ -37,11 +38,11 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import com.kevinfreyap.domain.error.Field
 import com.kevinfreyap.jetspending.R
-import com.kevinfreyap.jetspending.ui.components.v2.ViewAppDialog
-import com.kevinfreyap.jetspending.ui.components.v2.ViewPrimaryButton
-import com.kevinfreyap.jetspending.ui.components.v2.ViewTextInputField
-import com.kevinfreyap.jetspending.ui.components.v2.ViewTopBar
-import com.kevinfreyap.jetspending.ui.components.v2.ViewUserProfile
+import com.kevinfreyap.jetspending.ui.components.ViewAppDialog
+import com.kevinfreyap.jetspending.ui.components.ViewPrimaryButton
+import com.kevinfreyap.jetspending.ui.components.ViewTextInputField
+import com.kevinfreyap.jetspending.ui.components.ViewTopBar
+import com.kevinfreyap.jetspending.ui.components.ViewUserProfile
 import com.kevinfreyap.jetspending.ui.model.DialogType
 import com.kevinfreyap.jetspending.ui.action.EditProfileAction
 import com.kevinfreyap.jetspending.ui.navigation.EditProfileNavigation
@@ -49,7 +50,7 @@ import com.kevinfreyap.jetspending.ui.state.EditProfileState
 import com.kevinfreyap.jetspending.ui.state.UiState
 import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
 import com.kevinfreyap.jetspending.ui.theme.Theme
-import com.kevinfreyap.jetspending.utils.UiEvent
+import com.kevinfreyap.jetspending.ui.state.UiEvent
 
 @Composable
 fun EditProfileScreen(
@@ -110,7 +111,7 @@ fun EditProfileScreen(
 }
 
 @Composable
-fun EditProfileContent(
+private fun EditProfileContent(
     state: EditProfileState,
     onBackAttempt: () -> Unit,
     onAction: (EditProfileAction) -> Unit,
@@ -123,7 +124,7 @@ fun EditProfileContent(
     Scaffold(
         topBar = {
             ViewTopBar(
-                title = stringResource(R.string.edit_profile),
+                title = stringResource(R.string.screen_edit_profile),
                 onBackClick = onBackAttempt,
                 isLoading = state.uiState is UiState.Loading
             )
@@ -165,7 +166,7 @@ fun EditProfileContent(
                             )
                         )
                     },
-                    label = stringResource(R.string.username),
+                    label = stringResource(R.string.label_username),
                     isError = usernameError != null,
                     errorMessage = usernameError?.let { stringResource(it) } ?: "",
                     keyboardOptions = KeyboardOptions(
@@ -177,7 +178,7 @@ fun EditProfileContent(
                 ViewTextInputField(
                     value = state.email,
                     onValueChange = {},
-                    label = stringResource(R.string.email),
+                    label = stringResource(R.string.label_email),
                     enabled = false,
                     trailingIcon = {
                         Icon(
@@ -244,7 +245,7 @@ fun EditProfileContent(
             dialogType = DialogType.WARNING,
             title = stringResource(R.string.dialog_discard_changes),
             message = stringResource(R.string.description_discard_change_user),
-            confirmText = stringResource(R.string.discard),
+            confirmText = stringResource(R.string.btn_discard),
             onConfirm = {
                 onAction(
                     EditProfileAction.OnConfirmDiscard
@@ -271,10 +272,17 @@ fun EditProfileContent(
 @Preview(
     showBackground = true,
     device = Devices.PIXEL_9_PRO,
-    uiMode = Configuration.UI_MODE_NIGHT_YES
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    device = Devices.PIXEL_9_PRO,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
 )
 @Composable
-fun EditProfilePreview() {
+private fun EditProfilePreview() {
     JetSpendingTheme {
         EditProfileContent(
             state = EditProfileState(

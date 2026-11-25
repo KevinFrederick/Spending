@@ -1,5 +1,7 @@
 package com.kevinfreyap.jetspending.ui.screen.detail.components
 
+import android.content.res.Configuration.UI_MODE_NIGHT_NO
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -127,10 +129,17 @@ fun TransactionDetailRowPlaceholder(
 }
 
 @Preview(
-    showBackground = true
+    showBackground = true,
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
 )
 @Composable
-fun TransactionDetailRowPreview() {
+private fun TransactionDetailRowPreview() {
     JetSpendingTheme {
         TransactionDetailRow(
             label = "Category",
@@ -141,10 +150,17 @@ fun TransactionDetailRowPreview() {
 }
 
 @Preview(
-    showBackground = true
+    showBackground = true,
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
 )
 @Composable
-fun TransactionDetailRowPlaceholderPreview() {
+private fun TransactionDetailRowPlaceholderPreview() {
     JetSpendingTheme {
         TransactionDetailRowPlaceholder()
     }

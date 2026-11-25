@@ -1,6 +1,5 @@
 package com.kevinfreyap.jetspending.ui.action
 
-import com.kevinfreyap.jetspending.ui.screen.list.state.DatePickerTarget
 import com.kevinfreyap.jetspending.ui.screen.list.state.FilterState
 
 sealed interface TransactionListAction {

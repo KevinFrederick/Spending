@@ -21,8 +21,8 @@ import com.kevinfreyap.jetspending.ui.screen.detail.state.TransactionDetailSumma
 import com.kevinfreyap.jetspending.ui.state.TransactionDetailState
 import com.kevinfreyap.jetspending.ui.state.TransactionDetailUIState
 import com.kevinfreyap.jetspending.ui.state.UiState
-import com.kevinfreyap.jetspending.utils.UiEvent
-import com.kevinfreyap.jetspending.utils.UiEvent.*
+import com.kevinfreyap.jetspending.ui.state.UiEvent
+import com.kevinfreyap.jetspending.ui.state.UiEvent.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay

@@ -1,5 +1,7 @@
 package com.kevinfreyap.jetspending.ui.screen.report.components
 
+import android.content.res.Configuration.UI_MODE_NIGHT_NO
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -219,7 +221,14 @@ fun ChartBarColumnPlaceholder(
 }
 
 @Preview(
-    showBackground = true
+    showBackground = true,
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
 )
 @Composable
 private fun ChartBarColumnPreview() {
@@ -300,10 +309,17 @@ private fun ChartBarColumnPreview() {
 }
 
 @Preview(
-    showBackground = true
+    showBackground = true,
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
 )
 @Composable
-fun ChartBarColumnPlaceholderPreview() {
+private fun ChartBarColumnPlaceholderPreview() {
     JetSpendingTheme {
         ChartBarColumnPlaceholder()
     }

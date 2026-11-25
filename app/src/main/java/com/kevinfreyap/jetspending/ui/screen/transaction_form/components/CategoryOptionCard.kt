@@ -1,5 +1,7 @@
 package com.kevinfreyap.jetspending.ui.screen.transaction_form.components
 
+import android.content.res.Configuration.UI_MODE_NIGHT_NO
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -108,11 +110,18 @@ fun CategoryOptionCard(
     }
 }
 
-@Preview (
-    showBackground = true
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
 )
 @Composable
-fun CategoryOptionCardPreview_Selected() {
+private fun CategoryOptionCardPreview_Selected() {
     JetSpendingTheme {
         CategoryOptionCard(
             category = CategoryUI(
@@ -128,11 +137,18 @@ fun CategoryOptionCardPreview_Selected() {
     }
 }
 
-@Preview (
-    showBackground = true
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
 )
 @Composable
-fun CategoryOptionCardPreview_NotSelected() {
+private fun CategoryOptionCardPreview_NotSelected() {
     JetSpendingTheme {
         CategoryOptionCard(
             category = CategoryUI(

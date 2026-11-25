@@ -33,10 +33,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.kevinfreyap.jetspending.BuildConfig
 import com.kevinfreyap.jetspending.R
-import com.kevinfreyap.jetspending.ui.components.v2.ViewBrandName
-import com.kevinfreyap.jetspending.ui.components.v2.ViewPrimaryButton
+import com.kevinfreyap.jetspending.ui.components.ViewBrandName
+import com.kevinfreyap.jetspending.ui.components.ViewPrimaryButton
 import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
 import com.kevinfreyap.jetspending.ui.theme.Theme
 
@@ -48,7 +47,7 @@ fun AppLockedScreen(
 ) {
     val context = LocalContext.current
     val biometricAuthManager = remember(context) { BiometricAuthManager(context) }
-    val promptTitle = stringResource(R.string.app_lock)
+    val promptTitle = stringResource(R.string.label_app_lock)
 
     val currentOnUnlocked by rememberUpdatedState(onUnlocked)
     val currentOnDisableAndUnlock by rememberUpdatedState(onDisableAppLockAndUnlock)

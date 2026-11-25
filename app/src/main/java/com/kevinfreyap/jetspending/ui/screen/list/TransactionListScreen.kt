@@ -1,6 +1,7 @@
 package com.kevinfreyap.jetspending.ui.screen.list
 
-import android.content.res.Configuration
+import android.content.res.Configuration.UI_MODE_NIGHT_NO
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
@@ -47,12 +48,12 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.kevinfreyap.domain.model.TransactionType
 import com.kevinfreyap.jetspending.R
 import com.kevinfreyap.jetspending.ui.action.TransactionListAction
-import com.kevinfreyap.jetspending.ui.components.v2.ViewTopBar
-import com.kevinfreyap.jetspending.ui.components.v2.ViewPageStatus
-import com.kevinfreyap.jetspending.ui.components.v2.ViewPrimaryButton
-import com.kevinfreyap.jetspending.ui.components.v2.ViewSearchBar
-import com.kevinfreyap.jetspending.ui.components.v2.ViewTransactionItem
-import com.kevinfreyap.jetspending.ui.components.v2.ViewTransactionItemPlaceholder
+import com.kevinfreyap.jetspending.ui.components.ViewTopBar
+import com.kevinfreyap.jetspending.ui.components.ViewPageStatus
+import com.kevinfreyap.jetspending.ui.components.ViewPrimaryButton
+import com.kevinfreyap.jetspending.ui.components.ViewSearchBar
+import com.kevinfreyap.jetspending.ui.components.ViewTransactionItem
+import com.kevinfreyap.jetspending.ui.components.ViewTransactionItemPlaceholder
 import com.kevinfreyap.jetspending.ui.model.TransactionsUI
 import com.kevinfreyap.jetspending.ui.navigation.TransactionListNavigation
 import com.kevinfreyap.jetspending.ui.screen.list.components.FilterBottomSheet
@@ -83,7 +84,7 @@ fun TransactionListScreen(
 }
 
 @Composable
-fun TransactionListContent(
+private fun TransactionListContent(
     state: TransactionListState,
     transactions: LazyPagingItems<TransactionsUI>,
     onAction: (TransactionListAction) -> Unit,
@@ -97,7 +98,7 @@ fun TransactionListContent(
     Scaffold(
         topBar = {
             ViewTopBar(
-                title = stringResource(R.string.transactions),
+                title = stringResource(R.string.screen_transactions),
                 isLoading = isRefreshLoading,
                 actionButton = {
                     IconButton(
@@ -109,7 +110,7 @@ fun TransactionListContent(
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.ic_add_24),
-                            contentDescription = stringResource(R.string.add_transaction)
+                            contentDescription = stringResource(R.string.cd_add_transaction)
                         )
                     }
                 }
@@ -128,7 +129,7 @@ fun TransactionListContent(
         ) {
             ViewSearchBar(
                 query = state.query,
-                placeholder = stringResource(R.string.search_transactions),
+                placeholder = stringResource(R.string.placeholder_search_transactions),
                 onQueryChanged = {
                     onAction(
                         TransactionListAction.OnQueryChange(it)
@@ -163,7 +164,7 @@ fun TransactionListContent(
                         ) {
                             Icon(
                                 painter = painterResource(R.drawable.ic_tune_24),
-                                contentDescription = stringResource(R.string.transaction_filter),
+                                contentDescription = stringResource(R.string.cd_transaction_filter),
                                 tint = MaterialTheme.colorScheme.primary
                             )
                         }
@@ -401,7 +402,7 @@ private fun StatusError(
 }
 
 @Composable
-fun StatusEmpty(
+private fun StatusEmpty(
     state: TransactionListState,
     onAction: (TransactionListAction) -> Unit,
     onNavigateToAddTransaction: () -> Unit
@@ -488,10 +489,17 @@ fun StatusEmpty(
 @Preview(
     showBackground = true,
     device = Devices.PIXEL_9_PRO,
-    uiMode = Configuration.UI_MODE_NIGHT_NO
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    device = Devices.PIXEL_9_PRO,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
 )
 @Composable
-fun TransactionListContentPreview() {
+private fun TransactionListContentPreview() {
     // 1. Create Sample Preview Items (Headers + Items)
     val sampleItems = listOf(
         TransactionsUI.Header("December 2026"),
@@ -570,10 +578,17 @@ fun TransactionListContentPreview() {
 @Preview(
     showBackground = true,
     device = Devices.PIXEL_9_PRO,
-    uiMode = Configuration.UI_MODE_NIGHT_NO
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    device = Devices.PIXEL_9_PRO,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
 )
 @Composable
-fun TransactionListContentPreview_Loading() {
+private fun TransactionListContentPreview_Loading() {
     val loadStates = LoadStates(
         refresh = LoadState.Loading,
         prepend = LoadState.NotLoading(endOfPaginationReached = true),
@@ -600,10 +615,17 @@ fun TransactionListContentPreview_Loading() {
 @Preview(
     showBackground = true,
     device = Devices.PIXEL_9_PRO,
-    uiMode = Configuration.UI_MODE_NIGHT_NO
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    device = Devices.PIXEL_9_PRO,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
 )
 @Composable
-fun TransactionListContentPreview_NoResult() {
+private fun TransactionListContentPreview_NoResult() {
     val loadStates = LoadStates(
         refresh = LoadState.NotLoading(endOfPaginationReached = true),
         prepend = LoadState.NotLoading(endOfPaginationReached = true),

@@ -1,5 +1,7 @@
 package com.kevinfreyap.jetspending.ui.screen.settings.components
 
+import android.content.res.Configuration.UI_MODE_NIGHT_NO
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -26,7 +28,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kevinfreyap.jetspending.R
-import com.kevinfreyap.jetspending.ui.components.v2.ViewAppSwitch
+import com.kevinfreyap.jetspending.ui.components.ViewAppSwitch
 import com.kevinfreyap.jetspending.ui.screen.settings.state.SettingsItemState
 import com.kevinfreyap.jetspending.ui.screen.settings.state.SettingsItemType
 import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
@@ -138,11 +140,18 @@ fun SettingsItem(
     }
 }
 
-@Preview (
-    showBackground = true
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
 )
 @Composable
-fun SettingsItemPreview() {
+private fun SettingsItemPreview() {
     JetSpendingTheme {
         SettingsItem(
             state = SettingsItemState(
@@ -157,11 +166,18 @@ fun SettingsItemPreview() {
     }
 }
 
-@Preview (
-    showBackground = true
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
 )
 @Composable
-fun SettingsItemPreview_Switch() {
+private fun SettingsItemPreview_Switch() {
     JetSpendingTheme {
         SettingsItem(
             state = SettingsItemState(

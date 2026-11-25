@@ -1,5 +1,7 @@
 package com.kevinfreyap.jetspending.ui.screen.settings.components
 
+import android.content.res.Configuration.UI_MODE_NIGHT_NO
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -47,11 +49,18 @@ fun SettingsSection(
     }
 }
 
-@Preview (
-    showBackground = true
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
 )
 @Composable
-fun SettingsSectionPreview() {
+private fun SettingsSectionPreview() {
     JetSpendingTheme {
         SettingsSection(
             header = R.string.settings_header_preferences,

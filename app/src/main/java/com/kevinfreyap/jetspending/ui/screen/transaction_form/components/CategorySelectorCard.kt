@@ -1,5 +1,7 @@
 package com.kevinfreyap.jetspending.ui.screen.transaction_form.components
 
+import android.content.res.Configuration.UI_MODE_NIGHT_NO
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.expandVertically
@@ -112,7 +114,7 @@ fun CategorySelectorCard(
                     modifier = Modifier.weight(1f)
                 ) {
                     Text(
-                        text = stringResource(R.string.category),
+                        text = stringResource(R.string.label_category),
                         style = MaterialTheme.typography.labelMedium,
                         color = Theme.custom.secondaryTextColor
                     )
@@ -158,9 +160,18 @@ fun CategorySelectorCard(
     }
 }
 
-@Preview
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
+)
 @Composable
-fun CategorySelectorCardPreview() {
+private fun CategorySelectorCardPreview() {
     JetSpendingTheme {
         CategorySelectorCard(
             selectedCategory = CategoryUI(

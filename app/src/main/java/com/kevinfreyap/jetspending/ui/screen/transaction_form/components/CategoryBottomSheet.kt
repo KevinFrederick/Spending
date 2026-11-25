@@ -1,5 +1,7 @@
 package com.kevinfreyap.jetspending.ui.screen.transaction_form.components
 
+import android.content.res.Configuration.UI_MODE_NIGHT_NO
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -55,7 +57,7 @@ fun CategoryBottomSheet(
 }
 
 @Composable
-fun CategoryBottomSheetContent(
+private fun CategoryBottomSheetContent(
     categories: List<CategoryUI>,
     selectedCategory: CategoryUI?,
     onSelectCategory: (CategoryUI) -> Unit,
@@ -106,10 +108,17 @@ fun CategoryBottomSheetContent(
 }
 
 @Preview(
-    showBackground = true
+    showBackground = true,
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
 )
 @Composable
-fun CategoryBottomSheetPreview() {
+private fun CategoryBottomSheetPreview() {
     JetSpendingTheme {
         CategoryBottomSheetContent(
             categories = listOf(

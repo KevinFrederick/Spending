@@ -1,5 +1,7 @@
 package com.kevinfreyap.jetspending.ui.screen.dashboard.components
 
+import android.content.res.Configuration.UI_MODE_NIGHT_NO
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,8 +27,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kevinfreyap.domain.model.TransactionType
 import com.kevinfreyap.jetspending.R
-import com.kevinfreyap.jetspending.ui.components.v2.ViewTransactionItem
-import com.kevinfreyap.jetspending.ui.components.v2.ViewTransactionItemPlaceholder
+import com.kevinfreyap.jetspending.ui.components.ViewTransactionItem
+import com.kevinfreyap.jetspending.ui.components.ViewTransactionItemPlaceholder
 import com.kevinfreyap.jetspending.ui.state.TransactionItemState
 import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
 import com.kevinfreyap.jetspending.ui.theme.Theme
@@ -51,7 +53,7 @@ fun RecentTransactionSection(
                 .fillMaxWidth()
         ) {
             Text(
-                text = stringResource(R.string.recent_transaction),
+                text = stringResource(R.string.section_header_recent_transaction),
                 style = MaterialTheme.typography.titleMedium,
                 color = Theme.custom.primaryTextColor
             )
@@ -154,11 +156,18 @@ fun RecentTransactionSectionPlaceholder() {
     }
 }
 
-@Preview (
-    showBackground = true
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
 )
 @Composable
-fun RecentTransactionSectionPreview() {
+private fun RecentTransactionSectionPreview() {
     JetSpendingTheme {
         RecentTransactionSection(
             onTransactionClicked = {},
@@ -209,10 +218,17 @@ fun RecentTransactionSectionPreview() {
 }
 
 @Preview(
-    showBackground = true
+    showBackground = true,
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
 )
 @Composable
-fun RecentTransactionSectionPlaceholderPreview() {
+private fun RecentTransactionSectionPlaceholderPreview() {
     JetSpendingTheme {
         RecentTransactionSectionPlaceholder()
     }

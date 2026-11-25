@@ -26,22 +26,22 @@ private data class BottomNavItem(
 
 private val bottomNavItems = listOf(
     BottomNavItem(
-        titleRes = R.string.home,
+        titleRes = R.string.bottom_nav_home,
         iconRes = R.drawable.ic_home_24,
         route = Screen.Dashboard.route
     ),
     BottomNavItem(
-        titleRes = R.string.transactions,
+        titleRes = R.string.bottom_nav_transactions,
         iconRes = R.drawable.ic_swap_horizontal_24,
         route = Screen.TransactionList.route
     ),
     BottomNavItem(
-        titleRes = R.string.report,
+        titleRes = R.string.bottom_nav_report,
         iconRes = R.drawable.ic_bar_chart_24,
         route = Screen.Report.route
     ),
     BottomNavItem(
-        titleRes = R.string.settings,
+        titleRes = R.string.bottom_nav_settings,
         iconRes = R.drawable.ic_settings_24,
         route = Screen.Settings.route
     )

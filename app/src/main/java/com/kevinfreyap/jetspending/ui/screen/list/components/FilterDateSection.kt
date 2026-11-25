@@ -1,5 +1,7 @@
 package com.kevinfreyap.jetspending.ui.screen.list.components
 
+import android.content.res.Configuration.UI_MODE_NIGHT_NO
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
@@ -31,8 +33,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kevinfreyap.domain.model.TimeFilterOption
 import com.kevinfreyap.jetspending.R
-import com.kevinfreyap.jetspending.ui.components.v2.ViewChipOption
-import com.kevinfreyap.jetspending.ui.components.v2.ViewTextInputField
+import com.kevinfreyap.jetspending.ui.components.ViewChipOption
+import com.kevinfreyap.jetspending.ui.components.ViewTextInputField
 import com.kevinfreyap.jetspending.ui.helper.filter.toUINameRes
 import com.kevinfreyap.jetspending.ui.screen.list.action.FilterLocalAction
 import com.kevinfreyap.jetspending.ui.screen.list.state.DatePickerTarget
@@ -66,7 +68,7 @@ fun FilterDateSection(
             .fillMaxWidth()
     ) {
         Text(
-            text = stringResource(R.string.filter_date_range),
+            text = stringResource(R.string.label_filter_date_range),
             style = MaterialTheme.typography.labelMedium,
             color = Theme.custom.primaryTextColor
         )
@@ -116,7 +118,7 @@ fun FilterDateSection(
                     // Start Date
                     ViewTextInputField(
                         value = state.customStartDateText ?: stringResource(R.string.placeholder_select_date),
-                        label = stringResource(R.string.from),
+                        label = stringResource(R.string.label_from),
                         onValueChange = {},
                         readOnly = true,
                         isPlaceholder = state.customStartDateText == null,
@@ -140,7 +142,7 @@ fun FilterDateSection(
                                 ) {
                                     Icon(
                                         painter = painterResource(R.drawable.ic_close_24),
-                                        contentDescription = stringResource(R.string.clear_date),
+                                        contentDescription = stringResource(R.string.cd_clear_date),
                                         tint = Theme.custom.secondaryTextColor,
                                         modifier = Modifier.size(16.dp)
                                     )
@@ -161,7 +163,7 @@ fun FilterDateSection(
                     // End Date
                     ViewTextInputField(
                         value = state.customEndDateText ?: stringResource(R.string.placeholder_select_date),
-                        label = stringResource(R.string.to),
+                        label = stringResource(R.string.label_to),
                         onValueChange = {},
                         readOnly = true,
                         isPlaceholder = state.customEndDateText == null,
@@ -185,7 +187,7 @@ fun FilterDateSection(
                                 ) {
                                     Icon(
                                         painter = painterResource(R.drawable.ic_close_24),
-                                        contentDescription = stringResource(R.string.clear_date),
+                                        contentDescription = stringResource(R.string.cd_clear_date),
                                         tint = Theme.custom.secondaryTextColor,
                                         modifier = Modifier.size(16.dp)
                                     )
@@ -230,11 +232,18 @@ fun FilterDateSection(
     }
 }
 
-@Preview (
-    showBackground = true
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
 )
 @Composable
-fun FilterDateSectionPreview() {
+private fun FilterDateSectionPreview() {
     JetSpendingTheme {
         FilterDateSection(
             state = FilterDateState(

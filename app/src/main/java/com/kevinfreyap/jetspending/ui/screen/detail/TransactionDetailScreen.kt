@@ -1,6 +1,7 @@
 package com.kevinfreyap.jetspending.ui.screen.detail
 
-import android.content.res.Configuration
+import android.content.res.Configuration.UI_MODE_NIGHT_NO
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -37,10 +38,10 @@ import com.kevinfreyap.domain.model.AppCurrency
 import com.kevinfreyap.domain.model.TransactionType
 import com.kevinfreyap.jetspending.R
 import com.kevinfreyap.jetspending.ui.action.TransactionDetailAction
-import com.kevinfreyap.jetspending.ui.components.v2.ViewTopBar
-import com.kevinfreyap.jetspending.ui.components.v2.ViewAppDialog
-import com.kevinfreyap.jetspending.ui.components.v2.ViewPageStatus
-import com.kevinfreyap.jetspending.ui.components.v2.ViewPrimaryButton
+import com.kevinfreyap.jetspending.ui.components.ViewTopBar
+import com.kevinfreyap.jetspending.ui.components.ViewAppDialog
+import com.kevinfreyap.jetspending.ui.components.ViewPageStatus
+import com.kevinfreyap.jetspending.ui.components.ViewPrimaryButton
 import com.kevinfreyap.jetspending.ui.model.CategoryUI
 import com.kevinfreyap.jetspending.ui.model.DialogType
 import com.kevinfreyap.jetspending.ui.navigation.TransactionDetailNavigation
@@ -54,7 +55,7 @@ import com.kevinfreyap.jetspending.ui.state.TransactionDetailUIState
 import com.kevinfreyap.jetspending.ui.state.UiState
 import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
 import com.kevinfreyap.jetspending.ui.theme.Theme
-import com.kevinfreyap.jetspending.utils.UiEvent
+import com.kevinfreyap.jetspending.ui.state.UiEvent
 
 @Composable
 fun TransactionDetailScreen(
@@ -95,7 +96,7 @@ fun TransactionDetailScreen(
 }
 
 @Composable
-fun TransactionDetailContent(
+private fun TransactionDetailContent(
     state: TransactionDetailUIState,
     onAction: (TransactionDetailAction) -> Unit,
     onNavigate: (TransactionDetailNavigation) -> Unit,
@@ -104,7 +105,7 @@ fun TransactionDetailContent(
     Scaffold(
         topBar = {
             ViewTopBar(
-                title = stringResource(R.string.transaction_detail),
+                title = stringResource(R.string.screen_transaction_detail),
                 onBackClick = {
                     onNavigate(
                         TransactionDetailNavigation.NavigateUp
@@ -226,7 +227,7 @@ fun TransactionDetailContent(
                     TransactionDetailAction.OnConfirmDelete
                 )
             },
-            dismissText = stringResource(R.string.cancel),
+            dismissText = stringResource(R.string.btn_cancel),
             onDismissRequest = {
                 onAction(
                     TransactionDetailAction.OnToggleDeleteDialog(
@@ -305,10 +306,17 @@ private fun TransactionDetailError(
 @Preview(
     showBackground = true,
     device = Devices.PIXEL_9_PRO,
-    uiMode = Configuration.UI_MODE_NIGHT_NO
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    device = Devices.PIXEL_9_PRO,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
 )
 @Composable
-fun TransactionDetailPreview() {
+private fun TransactionDetailPreview() {
     JetSpendingTheme {
         TransactionDetailContent(
             state = TransactionDetailUIState(
@@ -348,10 +356,17 @@ fun TransactionDetailPreview() {
 @Preview(
     showBackground = true,
     device = Devices.PIXEL_9_PRO,
-    uiMode = Configuration.UI_MODE_NIGHT_NO
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    device = Devices.PIXEL_9_PRO,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
 )
 @Composable
-fun DetailTransactionPreview_Loading() {
+private fun DetailTransactionPreview_Loading() {
     JetSpendingTheme {
         TransactionDetailContent(
             state = TransactionDetailUIState(
@@ -366,10 +381,17 @@ fun DetailTransactionPreview_Loading() {
 @Preview(
     showBackground = true,
     device = Devices.PIXEL_9_PRO,
-    uiMode = Configuration.UI_MODE_NIGHT_NO
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    device = Devices.PIXEL_9_PRO,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
 )
 @Composable
-fun DetailTransactionPreview_Error() {
+private fun DetailTransactionPreview_Error() {
     JetSpendingTheme {
         TransactionDetailContent(
             state = TransactionDetailUIState(
