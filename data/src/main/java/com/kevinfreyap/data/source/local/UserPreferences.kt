@@ -56,12 +56,20 @@ class UserPreferences @Inject constructor(
 
     fun getNotificationPreferences(): Flow<NotificationPreferences> {
         return dataStore.data.map { preferences ->
+            val hour = preferences[NOTIFICATION_TIME_HOUR]
+                ?: 20
+
+            val minute = preferences[NOTIFICATION_TIME_MINUTE]
+                ?: 0
+
+            val isMaster = preferences[MASTER_NOTIFICATION] ?: false
+
             NotificationPreferences(
-                isMasterEnabled = preferences[MASTER_NOTIFICATION] ?: false,
-                isWeeklyEnabled = preferences[WEEKLY_NOTIFICATION] ?: true,
-                isDailyEnabled = preferences[DAILY_NOTIFICATION] ?: true,
-                reminderHour = preferences[NOTIFICATION_TIME_HOUR] ?: 20,
-                reminderMinute = preferences[NOTIFICATION_TIME_MINUTE] ?: 0
+                isMasterEnabled = isMaster,
+                isWeeklyEnabled = isMaster && (preferences[WEEKLY_NOTIFICATION] ?: false),
+                isDailyEnabled = isMaster && (preferences[DAILY_NOTIFICATION] ?: false),
+                reminderHour = hour,
+                reminderMinute = minute
             )
         }
     }

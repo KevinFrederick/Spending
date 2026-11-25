@@ -193,14 +193,16 @@ fun NotificationContent(
                             iconRes = R.drawable.ic_calendar_month_24,
                             name = R.string.settings_notification_weekly_summary,
                             description = R.string.description_settings_weekly_summary,
-                            isChecked = state.isMasterNotificationEnabled && state.isWeeklyNotificationEnabled
+                            isChecked = state.isWeeklyNotificationEnabled,
+                            enabled = state.isMasterNotificationEnabled
                         ),
                         SettingsItemState(
                             type = SettingsItemType.DAILY_NOTIFICATION,
                             iconRes = R.drawable.ic_info_24,
                             name = R.string.settings_notification_daily_reminder,
                             description = R.string.description_settings_weekly_summary,
-                            isChecked = state.isMasterNotificationEnabled && state.isDailyNotificationEnabled
+                            isChecked = state.isDailyNotificationEnabled,
+                            enabled = state.isMasterNotificationEnabled
                         ),
                     ),
                     onItemClick = { settingsItem ->
