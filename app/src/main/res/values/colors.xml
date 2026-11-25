@@ -2,4 +2,5 @@
 <resources>
     <color name="white">#FFFFFFFF</color>
     <color name="icon_stroke_primary">#286B59</color>
+    <color name="splash_background">#FAFCFB</color>
 </resources>

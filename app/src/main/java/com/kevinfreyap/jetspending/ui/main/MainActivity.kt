@@ -32,10 +32,10 @@ class MainActivity : FragmentActivity() {
     private val viewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        val splashScreen = installSplashScreen()
+
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-
-        val splashScreen = installSplashScreen()
 
         splashScreen.setKeepOnScreenCondition {
             viewModel.uiState.value is MainActivityState.Loading
