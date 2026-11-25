@@ -2,6 +2,7 @@ package com.kevinfreyap.jetspending.ui.screen.privacy_security
 
 import android.content.res.Configuration
 import android.widget.Toast
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -176,7 +177,7 @@ fun PrivacySecurityContent(
             modifier = modifier
                 .padding(innerPadding)
                 .padding(
-                    top = 8.dp,
+                    top = 12.dp,
                     bottom = 16.dp,
                     start = 24.dp,
                     end = 24.dp
@@ -184,17 +185,22 @@ fun PrivacySecurityContent(
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
         ) {
-            Text(
-                text = stringResource(R.string.settings_security_screen_header),
-                style = MaterialTheme.typography.headlineSmall,
-                color = Theme.custom.primaryTextColor
-            )
+            Column(
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.settings_security_screen_header),
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = Theme.custom.primaryTextColor
+                )
 
-            Text(
-                text = stringResource(R.string.settings_security_screen_subtitle),
-                style = MaterialTheme.typography.bodyMedium,
-                color = Theme.custom.secondaryTextColor
-            )
+                Text(
+                    text = stringResource(R.string.settings_security_screen_subtitle),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Theme.custom.secondaryTextColor
+                )
+            }
+
 
             Spacer(Modifier.height(32.dp))
 

@@ -4,6 +4,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.kevinfreyap.domain.model.AppCurrency
 import com.kevinfreyap.domain.model.AppTheme
@@ -56,10 +57,11 @@ class UserPreferences @Inject constructor(
     fun getNotificationPreferences(): Flow<NotificationPreferences> {
         return dataStore.data.map { preferences ->
             NotificationPreferences(
-                isMonthlyEnabled = preferences[MONTHLY_NOTIFICATION] ?: false,
-                isDailyEnabled = preferences[DAILY_NOTIFICATION] ?: false,
-                reminderHour = preferences[NOTIFICATION_TIME_HOUR] ?: "21",
-                reminderMinute = preferences[NOTIFICATION_TIME_MINUTE] ?: "00"
+                isMasterEnabled = preferences[MASTER_NOTIFICATION] ?: false,
+                isWeeklyEnabled = preferences[WEEKLY_NOTIFICATION] ?: true,
+                isDailyEnabled = preferences[DAILY_NOTIFICATION] ?: true,
+                reminderHour = preferences[NOTIFICATION_TIME_HOUR] ?: 20,
+                reminderMinute = preferences[NOTIFICATION_TIME_MINUTE] ?: 0
             )
         }
     }
@@ -104,7 +106,8 @@ class UserPreferences @Inject constructor(
     suspend fun saveNotificationPref(notificationPref: NotificationPreferences) {
         dataStore.edit { preferences ->
             with(notificationPref) {
-                preferences[MONTHLY_NOTIFICATION] = isMonthlyEnabled
+                preferences[MASTER_NOTIFICATION] = isMasterEnabled
+                preferences[WEEKLY_NOTIFICATION] = isWeeklyEnabled
                 preferences[DAILY_NOTIFICATION] = isDailyEnabled
                 preferences[NOTIFICATION_TIME_HOUR] = reminderHour
                 preferences[NOTIFICATION_TIME_MINUTE] = reminderMinute
@@ -157,10 +160,11 @@ class UserPreferences @Inject constructor(
         private val HAS_PASSWORD = booleanPreferencesKey("has_password")
         private val THEME_KEY = stringPreferencesKey("theme_mode")
         private val CURRENCY_KEY = stringPreferencesKey("currency")
-        private val MONTHLY_NOTIFICATION = booleanPreferencesKey("monthly_notification")
+        private val MASTER_NOTIFICATION = booleanPreferencesKey("master_notification")
+        private val WEEKLY_NOTIFICATION = booleanPreferencesKey("weekly_notification")
         private val DAILY_NOTIFICATION = booleanPreferencesKey("daily_notification")
-        private val NOTIFICATION_TIME_HOUR = stringPreferencesKey("time_notification_hour")
-        private val NOTIFICATION_TIME_MINUTE = stringPreferencesKey("time_notification_minute")
+        private val NOTIFICATION_TIME_HOUR = intPreferencesKey("time_notification_hour")
+        private val NOTIFICATION_TIME_MINUTE = intPreferencesKey("time_notification_minute")
         private val APP_LOCK_PREFERENCE = booleanPreferencesKey("app_lock_preference")
         private val BLOCK_SCREEN_PREFERENCE = booleanPreferencesKey("block_screen_preference")
     }

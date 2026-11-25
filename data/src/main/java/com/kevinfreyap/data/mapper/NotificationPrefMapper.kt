@@ -7,7 +7,8 @@ import javax.inject.Inject
 class NotificationPrefMapper @Inject constructor() {
     fun mapNotificationPreferenceToFirestore(notificationPref: NotificationPreferences): NotificationFirestore {
         return NotificationFirestore(
-            monthlyNotification = notificationPref.isMonthlyEnabled,
+            masterNotification = notificationPref.isMasterEnabled,
+            weeklyNotification = notificationPref.isWeeklyEnabled,
             dailyNotification = notificationPref.isDailyEnabled,
             selectedHour = notificationPref.reminderHour,
             selectedMinute = notificationPref.reminderMinute

@@ -99,7 +99,11 @@ class SettingsViewModel @Inject constructor(
                 _dialogState.value = action.dialog
             }
 
-            SettingsAction.OnLogout -> onLogout()
+            SettingsAction.OnLogout -> {
+                _dialogState.value = SettingsDialogType.NONE
+
+                onLogout()
+            }
         }
     }
 

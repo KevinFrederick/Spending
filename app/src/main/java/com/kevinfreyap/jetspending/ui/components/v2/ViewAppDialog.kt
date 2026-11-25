@@ -1,5 +1,6 @@
 package com.kevinfreyap.jetspending.ui.components.v2
 
+import android.content.res.Configuration
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -12,7 +13,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BasicAlertDialog
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -88,8 +88,8 @@ fun ViewAppDialogContent(
             confirmContentColor = Theme.custom.statusOnWarning
         }
         DialogType.DESTRUCTIVE -> {
-            accentColor = MaterialTheme.colorScheme.error
-            confirmContentColor = MaterialTheme.colorScheme.onError
+            accentColor = Theme.custom.negativeContainer
+            confirmContentColor = Theme.custom.statusNegative
         }
     }
 
@@ -176,7 +176,12 @@ fun ViewAppDialogContent(
     }
 }
 
-@Preview
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_NO
+)
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
 @Composable
 fun ViewConfirmationDialogPreview() {
     JetSpendingTheme {

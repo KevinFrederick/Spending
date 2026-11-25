@@ -16,13 +16,13 @@ class NotificationInteractor @Inject constructor(
         userRepository.setNotificationPref(notificationPref)
 
         manageDailyReminder(notificationPref)
-        manageMonthlySummary(notificationPref)
+        manageWeeklySummary(notificationPref)
     }
 
     private fun manageDailyReminder(notificationPref: NotificationPreferences) {
-        if (notificationPref.isDailyEnabled) {
-            val hour = notificationPref.reminderHour.toIntOrNull() ?: 21
-            val minute = notificationPref.reminderMinute.toIntOrNull() ?: 0
+        if (notificationPref.isMasterEnabled && notificationPref.isDailyEnabled) {
+            val hour = notificationPref.reminderHour
+            val minute = notificationPref.reminderMinute
 
             notificationScheduler.scheduleDailyReminder(hour, minute)
         } else {
@@ -30,14 +30,14 @@ class NotificationInteractor @Inject constructor(
         }
     }
 
-    private fun manageMonthlySummary(notificationPref: NotificationPreferences) {
-        if (notificationPref.isMonthlyEnabled) {
+    private fun manageWeeklySummary(notificationPref: NotificationPreferences) {
+        if (notificationPref.isMasterEnabled && notificationPref.isWeeklyEnabled) {
             val hour = 21
             val minute = 0
 
-            notificationScheduler.scheduleMonthlySummary(hour, minute)
+            notificationScheduler.scheduleWeeklySummary(hour, minute)
         } else {
-            notificationScheduler.cancelMonthlySummary()
+            notificationScheduler.cancelWeeklySummary()
         }
     }
 }

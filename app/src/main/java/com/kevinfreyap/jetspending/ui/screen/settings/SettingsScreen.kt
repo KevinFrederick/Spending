@@ -38,8 +38,10 @@ import com.kevinfreyap.jetspending.R
 import com.kevinfreyap.jetspending.ui.action.SettingsAction
 import com.kevinfreyap.jetspending.ui.components.v2.ViewSelectionDialog
 import com.kevinfreyap.jetspending.ui.components.ViewSelectionItem
+import com.kevinfreyap.jetspending.ui.components.v2.ViewAppDialog
 import com.kevinfreyap.jetspending.ui.components.v2.ViewPrimaryButton
 import com.kevinfreyap.jetspending.ui.components.v2.ViewTopBar
+import com.kevinfreyap.jetspending.ui.model.DialogType
 import com.kevinfreyap.jetspending.ui.navigation.SettingsNavigation
 import com.kevinfreyap.jetspending.ui.screen.settings.components.ProfileCard
 import com.kevinfreyap.jetspending.ui.screen.settings.components.ProfileCardPlaceholder
@@ -209,7 +211,9 @@ fun SettingsContent(
                     contentColor = Theme.custom.statusNegative,
                     onClick = {
                         onAction(
-                            SettingsAction.OnLogout
+                            SettingsAction.OnShowDialog(
+                                dialog = SettingsDialogType.LOGOUT
+                            )
                         )
                     },
                     icon = {
@@ -309,6 +313,27 @@ fun SettingsContent(
                 subtitle = stringResource(R.string.description_settings_appearance)
             )
         }
+        SettingsDialogType.LOGOUT -> {
+            ViewAppDialog(
+                dialogType = DialogType.DESTRUCTIVE,
+                title = stringResource(R.string.dialog_logout),
+                message = stringResource(R.string.description_log_out),
+                confirmText = stringResource(R.string.btn_sign_out),
+                onConfirm = {
+                    onAction(
+                        SettingsAction.OnLogout
+                    )
+                },
+                dismissText = stringResource(R.string.btn_cancel),
+                onDismissRequest = {
+                    onAction(
+                        SettingsAction.OnShowDialog(
+                            dialog = SettingsDialogType.NONE
+                        )
+                    )
+                },
+            )
+        }
     }
 }
 
@@ -333,6 +358,7 @@ fun SettingsContentPreview() {
                     email = "JohnDoe@email.com",
                 ),
                 selectedCurrency = AppCurrency.IDR,
+                activeDialog = SettingsDialogType.NONE
             ),
             onAction = {},
             onNavigate = {}

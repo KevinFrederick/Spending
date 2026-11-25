@@ -1,6 +1,7 @@
 package com.kevinfreyap.jetspending.ui.screen.dashboard.components
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -84,6 +85,21 @@ fun RecentTransactionSection(
                 state = transaction,
                 onClick = onTransactionClicked
             )
+        }
+
+        if (transactions.isEmpty()) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 40.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.empty_transactions),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Theme.custom.secondaryTextColor,
+                )
+            }
         }
     }
 }

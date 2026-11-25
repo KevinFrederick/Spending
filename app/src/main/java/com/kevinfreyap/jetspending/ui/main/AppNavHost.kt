@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.kevinfreyap.jetspending.ui.navigation.DashboardNavigation
 import com.kevinfreyap.jetspending.ui.navigation.EditProfileNavigation
+import com.kevinfreyap.jetspending.ui.navigation.NotificationNavigation
 import com.kevinfreyap.jetspending.ui.navigation.OnboardingNavigation
 import com.kevinfreyap.jetspending.ui.navigation.PrivacySecurityNavigation
 import com.kevinfreyap.jetspending.ui.navigation.Screen
@@ -232,9 +233,11 @@ fun AppNavHost(
         }
         composable(Screen.Notification.route) {
             NotificationScreen(
-                onBackClick = {
-                    navController.popBackStack()
-                }
+                onNavigate = {destination ->
+                    when(destination) {
+                        NotificationNavigation.NavigateUp -> navController.popBackStack()
+                    }
+                },
             )
         }
         composable(Screen.PrivacySecurity.route) {

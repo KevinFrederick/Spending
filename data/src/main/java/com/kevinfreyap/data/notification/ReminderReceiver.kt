@@ -9,23 +9,39 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.kevinfreyap.data.R
 import com.kevinfreyap.domain.notification.NotificationConst
-import com.kevinfreyap.domain.notification.NotificationConst.IS_MONTHLY
+import com.kevinfreyap.domain.notification.NotificationConst.IS_WEEKLY
+import com.kevinfreyap.domain.notification.NotificationScheduler
+import com.kevinfreyap.domain.repository.IUserRepository
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class ReminderReceiver: BroadcastReceiver() {
+    @Inject
+    lateinit var userRepository: IUserRepository
+
+    @Inject
+    lateinit var notificationScheduler: NotificationScheduler
+
+
     @SuppressLint("MissingPermission")
     override fun onReceive(context: Context, intent: Intent) {
-        val isMonthly = intent.getBooleanExtra(IS_MONTHLY, false)
+        val isWeekly = intent.getBooleanExtra(IS_WEEKLY, false)
 
         val title: String
         val desc: String
         val channelId: String
         val notificationId: Int
 
-        if (isMonthly) {
-            title = context.getString(R.string.notification_monthly_title)
-            desc = context.getString(R.string.notification_monthly_desc)
-            channelId = NotificationConst.MONTHLY_CHANNEL_ID
-            notificationId = MONTHLY_NOTIFICATION_ID
+        if (isWeekly) {
+            title = context.getString(R.string.notification_weekly_title)
+            desc = context.getString(R.string.notification_weekly_desc)
+            channelId = NotificationConst.WEEKLY_CHANNEL_ID
+            notificationId = WEEKLY_NOTIFICATION_ID
 
         } else {
             title = context.getString(R.string.notification_daily_title)
@@ -50,7 +66,7 @@ class ReminderReceiver: BroadcastReceiver() {
             context,
             channelId
         )
-            .setSmallIcon(R.drawable.ic_notifications_active_24)
+            .setSmallIcon(R.drawable.app_icon_wallet)
             .setContentTitle(title)
             .setContentText(desc)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
@@ -60,10 +76,31 @@ class ReminderReceiver: BroadcastReceiver() {
 
         val notificationManager = NotificationManagerCompat.from(context)
         notificationManager.notify(notificationId, notification)
+
+        val pendingResult = goAsync()
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val prefs = userRepository.getNotificationPref().first()
+
+                if (isWeekly) {
+                    if (prefs.isMasterEnabled && prefs.isWeeklyEnabled) {
+                        notificationScheduler.scheduleWeeklySummary(20, 0)
+                    }
+                } else {
+                    if (prefs.isMasterEnabled && prefs.isDailyEnabled) {
+                        notificationScheduler.scheduleDailyReminder(prefs.reminderHour, prefs.reminderMinute)
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            } finally {
+                pendingResult.finish()
+            }
+        }
     }
 
     companion object {
         private const val DAILY_NOTIFICATION_ID = 1001
-        private const val MONTHLY_NOTIFICATION_ID = 1002
+        private const val WEEKLY_NOTIFICATION_ID = 1002
     }
 }

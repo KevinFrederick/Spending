@@ -4,7 +4,7 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import com.kevinfreyap.domain.notification.NotificationConst.IS_MONTHLY
+import com.kevinfreyap.domain.notification.NotificationConst
 import com.kevinfreyap.domain.notification.NotificationScheduler
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.Calendar
@@ -17,7 +17,6 @@ class NotificationSchedulerImpl @Inject constructor(
 
     override fun scheduleDailyReminder(hour: Int, minute: Int) {
         val intent = Intent(context, ReminderReceiver::class.java)
-
         val pendingIntent = PendingIntent.getBroadcast(
             context,
             DAILY_REMINDER_REQ_CODE,
@@ -47,20 +46,20 @@ class NotificationSchedulerImpl @Inject constructor(
         }
     }
 
-    override fun scheduleMonthlySummary(hour: Int, minute: Int) {
+    override fun scheduleWeeklySummary(hour: Int, minute: Int) {
         val intent = Intent(context, ReminderReceiver::class.java).apply {
-            putExtra(IS_MONTHLY, true)
+            putExtra(NotificationConst.IS_WEEKLY, true)
         }
 
         val pendingIntent = PendingIntent.getBroadcast(
             context,
-            MONTHLY_SUMMARY_REQ_CODE,
+            WEEKLY_SUMMARY_REQ_CODE,
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
         val calendar = Calendar.getInstance().apply {
-            set(Calendar.DAY_OF_MONTH, 1)
+            set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY)
             set(Calendar.HOUR_OF_DAY, hour)
             set(Calendar.MINUTE, minute)
             set(Calendar.SECOND, 0)
@@ -68,18 +67,14 @@ class NotificationSchedulerImpl @Inject constructor(
         }
 
         if (calendar.timeInMillis <= System.currentTimeMillis()) {
-            calendar.add(Calendar.MONTH, 1)
+            calendar.add(Calendar.WEEK_OF_YEAR, 1)
         }
 
-        try {
-            alarmManager.setAndAllowWhileIdle(
-                AlarmManager.RTC_WAKEUP,
-                calendar.timeInMillis,
-                pendingIntent
-            )
-        } catch (e: SecurityException) {
-            e.printStackTrace()
-        }
+        alarmManager.setAndAllowWhileIdle(
+            AlarmManager.RTC_WAKEUP,
+            calendar.timeInMillis,
+            pendingIntent
+        )
     }
 
     override fun cancelDailyReminder() {
@@ -94,22 +89,21 @@ class NotificationSchedulerImpl @Inject constructor(
         alarmManager.cancel(pendingIntent)
     }
 
-    override fun cancelMonthlySummary() {
+    override fun cancelWeeklySummary() {
         val intent = Intent(context, ReminderReceiver::class.java).apply {
-            putExtra(IS_MONTHLY, true)
+            putExtra(NotificationConst.IS_WEEKLY, true)
         }
         val pendingIntent = PendingIntent.getBroadcast(
             context,
-            MONTHLY_SUMMARY_REQ_CODE,
+            WEEKLY_SUMMARY_REQ_CODE,
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-
         alarmManager.cancel(pendingIntent)
     }
 
     companion object {
         private const val DAILY_REMINDER_REQ_CODE = 100
-        private const val MONTHLY_SUMMARY_REQ_CODE = 101
+        private const val WEEKLY_SUMMARY_REQ_CODE = 101
     }
 }

@@ -20,9 +20,9 @@ import com.kevinfreyap.jetspending.ui.theme.Theme
 @Composable
 fun ViewAppSwitch(
     checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    onCheckedChange: ((Boolean) -> Unit)? = null,
 ) {
     Switch(
         checked = checked,

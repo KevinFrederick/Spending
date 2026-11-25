@@ -57,6 +57,7 @@
     <string name="settings_header_app_settings">APP SETTINGS</string>
     <string name="settings_header_app_access">APP ACCESS</string>
     <string name="settings_header_account">ACCOUNT</string>
+    <string name="settings_notification_type">NOTIFICATION TYPES</string>
 
     <string name="settings_base_currency">Base currency</string>
     <string name="settings_appearance">Appearance</string>
@@ -68,26 +69,37 @@
     <string name="settings_change_password">Change password</string>
     <string name="settings_create_password">Create password</string>
     <string name="settings_delete_account">Delete account</string>
-    
+    <string name="settings_master_notification">Allow notifications</string>
+    <string name="settings_notification_weekly_summary">Weekly summary</string>
+    <string name="settings_notification_daily_reminder">Daily reminder</string>
+
     <string name="settings_security_screen_header">Keep your records private</string>
     <string name="settings_security_screen_subtitle">Choose how to securely access your information.</string>
 
     <string name="settings_notification_screen_header">Only the alerts that matter</string>
-    <string name="settings_notification_screen_subtitle">Choose which updates to receive and how they are delivered.</string>
+    <string name="settings_notification_screen_subtitle">Choose which updates to receive. Leave the rest quiet.</string>
 
     <string name="dialog_discard_changes">Discard changes?</string>
     <string name="dialog_delete_transaction">Delete transaction?</string>
+    <string name="dialog_logout">Sign out?</string>
 
     <string name="dialog_title_select_month">Select month</string>
     <string name="dialog_title_select_year">Select year</string>
     <string name="dialog_title_select_currency">Select currency</string>
     <string name="dialog_title_select_theme">Select theme</string>
 
+    <string name="dialog_title_select_reminder_time">Select reminder time</string>
+    <string name="cd_switch_to_text_input">Switch to text input</string>
+    <string name="cd_switch_to_clock_dial">Switch to clock dial</string>
+
     <string name="label_verify_identity">Verify your identity</string>
     <string name="label_biometric_unavailable">Device authentication is unavailable on this device</string>
     <string name="label_no_screen_lock">Set up a screen lock in device settings first</string>
     <string name="label_app_locked">App Locked</string>
     <string name="label_subtitle_app_lock">Use your device\'s credentials</string>
+
+    <string name="label_title_reminder_time">Reminder time</string>
+    <string name="label_subtitle_reminder_time">Daily notification schedule</string>
 
     <string name="total_balance">Total Balance</string>
     <string name="income">Income</string>
@@ -188,8 +200,11 @@
     <string name="btn_sign_out">Sign out</string>
     <string name="btn_close">Close</string>
     <string name="btn_save_changes">Save changes</string>
+    <string name="btn_save">Save</string>
+    <string name="btn_cancel">Cancel</string>
 
     <string name="btn_unlock_biometric">Unlock with biometrics</string>
+    <string name="btn_device_settings">Open device settings</string>
 
     <string name="all">All</string>
     <string name="cancel">Cancel</string>
@@ -295,11 +310,12 @@
     <string name="error_relogin">Please authenticate before create password.</string>
     <string name="error_no_biometric">Please set up a PIN or Fingerprint in your Device Settings first.</string>
     <string name="error_wrong_account">Wrong account selected. Please select the Google account linked to this profile.</string>
+    <string name="error_notification_permission_denied">Notification permission is required</string>
 
     <!-- Description -->
     <string name="description_sign_up">Let\'s get started with a free account</string>
     <string name="description_sign_in">Please enter your details</string>
-    <string name="description_log_out">Are you sure you want to log out?</string>
+    <string name="description_log_out">Unsynced local data will be removed. Sign in again to restore synced data.</string>
     <string name="description_date_range">Select a date or range of date</string>
     <string name="description_select_currency">Choose currency for your transactions</string>
     <string name="description_delete_transaction">This transaction will be permanently removed and cannot be undone</string>
@@ -327,6 +343,9 @@
     <string name="description_settings_block_screenshot">Block screenshots, recordings, and recent app previews</string>
     <string name="description_settings_delete_account">Permanently remove your account and all data</string>
     <string name="description_settings_password">Keep your account secure with a strong password</string>
+    <string name="description_settings_master_notification">Receive reminders and updates</string>
+    <string name="description_settings_daily_reminder">Remind you to log your daily expenses</string>
+    <string name="description_settings_weekly_summary">Get a weekly recap of your transactions</string>
 
     <!-- Period Option -->
     <string name="period_weekly">Weekly</string>
@@ -363,6 +382,7 @@
     <string name="hint_custom_date_filter">Leave either date empty for an open-ended range</string>
     <string name="hint_profile_email">Linked to your account and cannot be edited</string>
     <string name="hint_locked_screen">Secure verification is handled by your device</string>
+    <string name="hint_notification">Device settings may also affect how notifications are delivered</string>
 
     <string name="search_no_result">No matching transactions</string>
     <string name="search_message_query_no_match">No transactions match. Clear query to see transactions</string>

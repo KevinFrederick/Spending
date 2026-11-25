@@ -55,7 +55,7 @@ fun CategoryListSection(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 32.dp)
+                        .padding(vertical = 40.dp)
                 ) {
                     Text(
                         text = stringResource(R.string.empty_transactions),

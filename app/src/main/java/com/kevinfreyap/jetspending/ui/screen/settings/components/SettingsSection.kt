@@ -40,7 +40,8 @@ fun SettingsSection(
             SettingsItem(
                 state = setting,
                 onClick = { onItemClick(setting.type) },
-                isLoading = isLoading
+                isLoading = isLoading,
+                enabled = setting.enabled
             )
         }
     }

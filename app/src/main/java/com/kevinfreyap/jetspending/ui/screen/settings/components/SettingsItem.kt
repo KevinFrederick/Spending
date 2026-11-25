@@ -3,10 +3,12 @@ package com.kevinfreyap.jetspending.ui.screen.settings.components
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -37,30 +39,40 @@ fun SettingsItem(
     modifier: Modifier = Modifier,
     isLoading: Boolean = false,
     onClick: (() -> Unit)? = null,
+    enabled: Boolean = true,
+    contentPadding: PaddingValues = PaddingValues(vertical = 12.dp, horizontal = 4.dp)
 ) {
     val isSwitch = state.isChecked != null
+    val contentAlpha = if (enabled) 1f else 0.38f
+
+    val interactionModifier = if (isSwitch) {
+        Modifier.toggleable(
+            value = state.isChecked,
+            enabled = onClick != null && enabled,
+            role = Role.Switch,
+            onValueChange = { onClick?.invoke() }
+        )
+    } else {
+        Modifier.clickable(
+            enabled = onClick != null && enabled,
+            role = Role.Button,
+            onClick = { onClick?.invoke() }
+        )
+    }
 
     Row(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
             .fillMaxWidth()
-            .clickable(
-                enabled = onClick != null && !isSwitch,
-                role = Role.Button,
-                onClick = {
-                    if (onClick != null && !isSwitch) onClick()
-                }
-            )
-            .padding(
-                vertical = 12.dp,
-                horizontal = 4.dp
-            )
+            .clip(RoundedCornerShape(16.dp))
+            .then(interactionModifier)
+            .padding(contentPadding)
     ) {
         Icon(
             painter = painterResource(state.iconRes),
             contentDescription = null,
-            tint = Theme.custom.secondaryTextColor,
+            tint = Theme.custom.secondaryTextColor.copy(alpha = contentAlpha),
             modifier = Modifier
                 .size(24.dp)
         )
@@ -73,13 +85,13 @@ fun SettingsItem(
             Text(
                 text = stringResource(state.name),
                 style = MaterialTheme.typography.bodyLarge,
-                color = Theme.custom.primaryTextColor,
+                color = Theme.custom.primaryTextColor.copy(alpha = contentAlpha),
             )
 
             Text(
                 text = stringResource(state.description),
                 style = MaterialTheme.typography.bodySmall,
-                color = Theme.custom.secondaryTextColor,
+                color = Theme.custom.secondaryTextColor.copy(alpha = contentAlpha),
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
@@ -104,7 +116,7 @@ fun SettingsItem(
                     Text(
                         text = label,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = Theme.custom.secondaryTextColor
+                        color = Theme.custom.secondaryTextColor.copy(alpha = contentAlpha)
                     )
                 }
             }
@@ -112,16 +124,15 @@ fun SettingsItem(
             Icon(
                 painter = painterResource(R.drawable.ic_chevron_right),
                 contentDescription = null,
-                tint = Theme.custom.secondaryTextColor,
+                tint = Theme.custom.secondaryTextColor.copy(alpha = contentAlpha),
                 modifier = Modifier
                     .size(20.dp)
             )
         } else {
             ViewAppSwitch(
                 checked = state.isChecked,
-                onCheckedChange = {
-                    onClick?.invoke()
-                }
+                enabled = enabled,
+                onCheckedChange = null
             )
         }
     }

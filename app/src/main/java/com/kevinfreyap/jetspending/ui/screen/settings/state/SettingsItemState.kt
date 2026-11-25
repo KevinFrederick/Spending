@@ -9,5 +9,6 @@ data class SettingsItemState(
     @StringRes val name: Int,
     @StringRes val description: Int,
     val selectedItem: String? = null,
-    val isChecked: Boolean? = null
+    val isChecked: Boolean? = null,
+    val enabled: Boolean = true
 )
