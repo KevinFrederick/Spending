@@ -13,4 +13,5 @@ sealed interface ReportsAction {
     data object OnClearSelectedBar: ReportsAction
     data object OnPreviousPeriod: ReportsAction
     data object OnNextPeriod: ReportsAction
+    data object OnDismissWeeklyBanner: ReportsAction
 }

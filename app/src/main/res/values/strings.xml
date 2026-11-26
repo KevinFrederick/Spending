@@ -300,4 +300,14 @@
     <!--  Warning  -->
     <string name="warning_rates_missing">Offline: Some rates unavailable • Partial balance</string>
     <string name="warning_custom_date_range_invalid">Invalid date range</string>
+
+    <!-- Weekly Summary Banner -->
+    <string name="weekly_banner_spent_less">Spent %1$d%% less than last week</string>
+    <string name="weekly_banner_spent_more">Spent %1$s more than last week</string>
+    <string name="weekly_banner_spent_same">Spent the same as last week</string>
+    <string name="weekly_banner_fallback_single">You spent %1$s across 1 transaction this week</string>
+    <string name="weekly_banner_fallback_plural">You spent %1$s across %2$d transactions this week</string>
+    <string name="weekly_banner_top_category">Top category: %1$s (%2$s)</string>
+    <string name="weekly_banner_no_expense">No expenses logged this week</string>
+    <string name="cd_dismiss_weekly_banner">Dismiss weekly summary banner</string>
 </resources>

@@ -125,6 +125,11 @@ class MainViewModel @Inject constructor(
                     _isSessionUnlocked.value = true
                 }
             }
+            MainEvent.OpenWeeklySummaryReport -> {
+                viewModelScope.launch {
+                    _effects.send(MainEffect.NavigateToWeeklySummaryReport)
+                }
+            }
         }
     }
 

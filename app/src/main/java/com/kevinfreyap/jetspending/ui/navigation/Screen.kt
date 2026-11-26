@@ -5,7 +5,12 @@ sealed class Screen(val route: String) {
     data object SignUp: Screen("sign_up")
     data object SignIn: Screen("sign_in")
     data object Dashboard: Screen("dashboard")
-    data object Report: Screen("report")
+    data object Report: Screen("report") {
+        const val ROUTE_WITH_ARGS = "report?fromWeeklyNotification={fromWeeklyNotification}"
+        fun createRoute(fromWeeklyNotification: Boolean = false): String {
+            return "report?fromWeeklyNotification=$fromWeeklyNotification"
+        }
+    }
     data object Settings: Screen("settings")
     data object TransactionForm: Screen("transaction_form") {
         const val ROUTE_WITH_ARGS = "transaction_form?transactionId={transactionId}"

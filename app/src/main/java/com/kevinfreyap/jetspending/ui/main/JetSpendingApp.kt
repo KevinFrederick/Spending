@@ -70,6 +70,14 @@ fun JetSpendingApp(
                                 launchSingleTop = true
                             }
                         }
+                        MainEffect.NavigateToWeeklySummaryReport -> {
+                            navController.navigate(Screen.Report.createRoute(fromWeeklyNotification = true)) {
+                                popUpTo(Screen.Dashboard.route) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                            }
+                        }
                     }
                 }
             }

@@ -157,7 +157,15 @@ fun AppNavHost(
             )
         }
 
-        composable(Screen.Report.route) {
+        composable(
+            route = Screen.Report.ROUTE_WITH_ARGS,
+            arguments = listOf(
+                navArgument("fromWeeklyNotification") {
+                    type = NavType.BoolType
+                    defaultValue = false
+                }
+            )
+        ) {
             ReportsScreen()
         }
 

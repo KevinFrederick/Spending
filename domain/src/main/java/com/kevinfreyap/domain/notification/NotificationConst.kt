@@ -10,4 +10,5 @@ object NotificationConst {
     const val WEEKLY_CHANNEL_DESC = "Notification for your weekly summary"
 
     const val IS_WEEKLY = "is_weekly"
+    const val EXTRA_OPEN_WEEKLY_SUMMARY = "extra_open_weekly_summary"
 }

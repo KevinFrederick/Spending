@@ -8,4 +8,5 @@ sealed interface MainEvent {
     data object AppBackgrounded: MainEvent
     data object EmergencyLogout: MainEvent
     data object DisableAppLockAndUnlock: MainEvent
+    data object OpenWeeklySummaryReport: MainEvent
 }

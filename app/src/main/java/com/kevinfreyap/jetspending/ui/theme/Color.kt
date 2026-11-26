@@ -32,6 +32,7 @@ val LightNegativeContainer = Color(0xFFF8EAE6)
 
 val LightStatusWarning = Color(0xFF9E6B00)
 val LightStatusOnWarning = Color(0xFFFFFFFF)
+val LightWarningContainer = Color(0xFFFFF3D6)
 
 val LightShimmer = Color(0xFFE8EEEB)
 val LightHighlightShimmer = Color(0xFFC2DFD1)
@@ -68,6 +69,7 @@ val DarkNegativeContainer = Color(0xFF3D161C)
 
 val DarkStatusWarning = Color(0xFFE2B048)
 val DarkStatusOnWarning = Color(0xFF221700)
+val DarkWarningContainer = Color(0xFF382908)
 
 val DarkShimmer = Color(0xFF35353B)
 val DarkHighlightShimmer = Color(0xFF325246)

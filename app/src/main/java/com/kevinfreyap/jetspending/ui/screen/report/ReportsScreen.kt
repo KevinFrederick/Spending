@@ -2,6 +2,11 @@ package com.kevinfreyap.jetspending.ui.screen.report
 
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -50,13 +55,16 @@ import com.kevinfreyap.jetspending.ui.screen.report.components.CategoryListSecti
 import com.kevinfreyap.jetspending.ui.screen.report.components.CategoryListSectionPlaceholder
 import com.kevinfreyap.jetspending.ui.screen.report.components.TotalSummarySection
 import com.kevinfreyap.jetspending.ui.screen.report.components.TotalSummarySectionPlaceholder
+import com.kevinfreyap.jetspending.ui.screen.report.components.WeeklySummaryBanner
 import com.kevinfreyap.jetspending.ui.screen.report.state.CategoryPercentageItemState
 import com.kevinfreyap.jetspending.ui.screen.report.state.ChartBarItemState
 import com.kevinfreyap.jetspending.ui.screen.report.state.ChartUiState
 import com.kevinfreyap.jetspending.ui.screen.report.state.ReportTotalSummaryState
 import com.kevinfreyap.jetspending.ui.screen.report.state.ReportsContentState
+import com.kevinfreyap.jetspending.ui.screen.report.state.WeeklySummaryBannerState
 import com.kevinfreyap.jetspending.ui.state.ReportsState
 import com.kevinfreyap.jetspending.ui.state.UiState
+import com.kevinfreyap.jetspending.ui.state.UiText
 import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
 import java.time.LocalDate
 
@@ -135,6 +143,21 @@ private fun ReportsContent(
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
         ) {
+            AnimatedVisibility(
+                visible = state.weeklyBanner != null,
+                enter = expandVertically() + fadeIn(),
+                exit = shrinkVertically() + fadeOut()
+            ) {
+                state.weeklyBanner?.let { bannerState ->
+                    WeeklySummaryBanner(
+                        state = bannerState,
+                        onDismiss = {
+                            onAction(ReportsAction.OnDismissWeeklyBanner)
+                        }
+                    )
+                }
+            }
+
             ViewPeriodNavigator(
                 label = state.periodLabel,
                 onPreviousClick = {
@@ -185,8 +208,6 @@ private fun ReportsContent(
                     }
                 }
             }
-
-
         }
     }
 
@@ -391,6 +412,12 @@ private fun ReportsScreenPreview() {
         ReportsContent(
             state = ReportsState(
                 periodLabel = "September 2026",
+                weeklyBanner = WeeklySummaryBannerState(
+                    dateRangeLabel = "Nov 16 – Nov 22",
+                    headlineText = UiText.DynamicString("Spent 12% less than last week"),
+                    supportingText = UiText.DynamicString("Top category: Food & Drink ($420.00)"),
+                    isLowerSpending = true
+                ),
                 content = UiState.Success(ReportsContentState(
                     summaryState = ReportTotalSummaryState(
                         totalNet = "–900.000",

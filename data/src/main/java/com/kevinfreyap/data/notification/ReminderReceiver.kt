@@ -52,6 +52,9 @@ class ReminderReceiver: BroadcastReceiver() {
 
         val tapIntent = context.packageManager.getLaunchIntentForPackage(context.packageName)?.apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            if (isWeekly) {
+                putExtra(NotificationConst.EXTRA_OPEN_WEEKLY_SUMMARY, true)
+            }
         } ?: Intent()
 
         val pendingIntent = PendingIntent.getActivity(

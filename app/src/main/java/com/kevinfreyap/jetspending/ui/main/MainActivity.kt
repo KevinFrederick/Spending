@@ -1,5 +1,6 @@
 package com.kevinfreyap.jetspending.ui.main
 
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
@@ -21,6 +22,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kevinfreyap.domain.model.AppTheme
+import com.kevinfreyap.domain.notification.NotificationConst
 import com.kevinfreyap.jetspending.ui.biometric.AppLockedScreen
 import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
 import com.kevinfreyap.jetspending.utils.findActivity
@@ -36,6 +38,8 @@ class MainActivity : FragmentActivity() {
 
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        handleWeeklySummaryIntent(intent)
 
         splashScreen.setKeepOnScreenCondition {
             viewModel.uiState.value is MainActivityState.Loading
@@ -59,6 +63,19 @@ class MainActivity : FragmentActivity() {
                     )
                 }
             }
+        }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleWeeklySummaryIntent(intent)
+    }
+
+    private fun handleWeeklySummaryIntent(intent: Intent?) {
+        if (intent?.getBooleanExtra(NotificationConst.EXTRA_OPEN_WEEKLY_SUMMARY, false) == true) {
+            intent.removeExtra(NotificationConst.EXTRA_OPEN_WEEKLY_SUMMARY)
+            viewModel.onEvent(MainEvent.OpenWeeklySummaryReport)
         }
     }
 
