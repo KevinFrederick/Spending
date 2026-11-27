@@ -1,81 +1,127 @@
-# JetSpending
+# Spending
 
-JetSpending is a modern, offline-first Android personal finance and expense tracking application. Built entirely with Kotlin and Jetpack Compose, the app helps users manage their daily expenses, visualize their spending habits, and handle multi-currency transactions seamlessly.
+Spending is a modern, offline-first Android personal finance and expense tracking application built entirely with Kotlin, Jetpack Compose, and Material 3. The app enables users to track daily expenses, visualize financial reports, manage multi-currency transactions with dynamic exchange rates, and protect their privacy with biometric security.
 
-The project strictly adheres to **Clean Architecture** principles, ensuring a scalable, testable, and maintainable codebase separated into Presentation, Domain, and Data layers.
+The codebase strictly adheres to **Clean Architecture** principles across a multi-module setup (`:app`, `:data`, `:domain`), ensuring high testability, scalability, and strict separation of concerns.
+
+---
 
 ## ✨ Features
 
-* **Offline-First Capabilities:** Logs transactions locally using Room Database, automatically syncing with Firebase Firestore when network connectivity is restored.
+- **Offline-First & Auto-Sync**: Log transactions locally instantly using Room Database. Changes automatically sync to Cloud Firestore when network connectivity is restored.
+- **Dynamic Multi-Currency & Rate Healing**: Fetch live exchange rates and calculate multi-currency transactions locally. Automatically heals missing historical rates in the background.
+- **Comprehensive Expense Reports**: Interactive period selector (Weekly, Monthly, Yearly, Custom Date Range) with category breakdowns, percentage charts, and net balance summaries.
+- **Flexible Authentication**: Sign in using Google Authentication or Email/Password. Supports password recovery via email.
+- **App Lock & Biometric Security**: Secure app access using Fingerprint, Face, or Device Credentials. Automatically locks when backgrounded and requires authentication to disable.
+- **Screen Privacy Protection**: Toggle `FLAG_SECURE` to block screenshots and hide app contents in recent app previews.
+- **Customizable Notifications**: Set daily expense logging reminders with a custom Material 3 time picker and weekly summary notifications.
+- **Dynamic Dark & Light Themes**: Seamlessly follows System, Dark, or Light themes with custom color palettes.
 
-* **Smart Multi-Currency Support:** Pulls daily exchange rates via a remote API and caches them locally. Converts currencies instantly without requiring an API call for every transaction.
-
-* **Comprehensive Reports Screen:** Visualizes spending habits with interactive bar charts and category-based percentage breakdowns in a dedicated reporting view.
-
-* **Comprehensive Authentication:** Secure your financial data with Google Sign-In, standard Email/Password, or local device Biometric/Fingerprint authentication.
-
-* **Scheduled Reminders:** Local notification system (surviving device reboots) to remind users to log their daily expenses.
-
-* **Flexible Filtering:** Filter transactions by custom date ranges, income/expense types, and custom categories.
+---
 
 ## 🏗️ Architecture
 
-JetSpending follows the **Clean Architecture** pattern, utilizing the MVVM (Model-View-ViewModel) design pattern in the presentation layer. The project is divided into three distinct modules:
+JetSpending is structured as a 3-module Clean Architecture codebase following the **MVVM (Model-View-ViewModel)** design pattern with unidirectional data flow (UDF):
 
-* **`app` (Presentation Layer):** Contains all Jetpack Compose UI elements, ViewModels, and UI States (e.g., `UiState`, `TransactionState`).
+```
+                       ┌─────────────────────────┐
+                       │  :app (Presentation)    │
+                       │  Jetpack Compose, UI    │
+                       └────────────┬────────────┘
+                                    │
+                                    ▼
+                       ┌─────────────────────────┐
+                       │    :domain (Core)       │
+                       │  Use Cases, Models      │
+                       └────────────▲────────────┘
+                                    │
+                       ┌────────────┴────────────┐
+                       │     :data (Data)        │
+                       │  Room, DataStore,       │
+                       │  Retrofit, Firebase     │
+                       └─────────────────────────┘
+```
 
-* **`domain` (Domain Layer):** The core business logic hub containing pure Kotlin models (e.g., `Transaction`, `Category`), repository interfaces, and Use Cases/Interactors.
+* **`:app` (Presentation Layer)**: Houses Jetpack Compose UI screens, state hoisting (`UiState`), ViewModels, Navigation Graphs (`AppNavHost`), and system integrations (Biometric, Window Flags).
+* **`:domain` (Domain Layer)**: Pure Kotlin module with zero Android framework dependencies. Defines data models (`Transaction`, `User`, `AppCurrency`), repository interfaces, and focused Use Cases (`SignInUseCase`, `SignUpUseCase`, `GetTransactionsUseCase`, etc.).
+* **`:data` (Data Layer)**: Implements repository interfaces using Room Database, DataStore Preferences, Retrofit REST API, and Firebase (Auth + Firestore). Handles background alarm scheduling (`AlarmManager`, `BootReceiver`) and offline sync.
 
-* **`data` (Data Layer):** Manages data fetching, saving, and caching. Implements the Single Source of Truth pattern using Room, DataStore, Retrofit, and Firebase.
+---
 
-## 🛠️ Tech Stack
+## 🛠️ Tech Stack & Libraries
 
-* **Language:** Kotlin
+* **Language**: Kotlin
+* **UI Framework**: Jetpack Compose & Material 3
+* **Architecture**: Clean Architecture (Multi-module) + MVVM + Unidirectional Data Flow
+* **Dependency Injection**: Hilt (Dagger)
+* **Local Storage**:
+  * **Room**: Local SQLite relational database with Paging 3 support.
+  * **Preferences DataStore**: Reactive type-safe user settings and session caching.
+* **Networking**: Retrofit 2, Gson, OkHttp
+* **Cloud & Backend**: Firebase Authentication & Cloud Firestore
+* **Asynchronous Programming**: Kotlin Coroutines & `Flow` / `StateFlow`
+* **Security & Biometrics**: AndroidX Biometric API & Window `FLAG_SECURE`
+* **Notifications**: `AlarmManager` with `BroadcastReceiver` and `NotificationManagerCompat`
+* **Image Loading**: Coil 3 (Compose)
 
-* **UI:** Jetpack Compose
+---
 
-* **Architecture:** Clean Architecture + MVVM
+## 📁 Project Module Breakdown
 
-* **Local Database:** Room
+```text
+JetSpending/
+├── app/                  # UI, Compose Screens, ViewModels, MainActivity, Hilt DI
+│   ├── ui/
+│   │   ├── screen/       # Dashboard, Reports, Transactions, Settings, Auth, Security
+│   │   ├── components/   # Reusable Material 3 Compose UI components
+│   │   ├── theme/        # Material 3 Color scheme, Typography, Theme definition
+│   │   └── main/         # MainActivity, AppNavHost, MainViewModel
+├── domain/               # Pure Kotlin Core Domain
+│   ├── model/            # Transaction, User, Currency, NotificationPreferences
+│   ├── repository/       # Repository Interfaces (IUserRepository, ITransactionRepository, etc.)
+│   └── usecase/          # Granular Use Cases (SignInUseCase, GetTransactionsUseCase, etc.)
+└── data/                 # Data Sources & Repositories
+    ├── repository/       # Repository implementations (UserRepository, AuthenticationRepository, etc.)
+    ├── source/
+    │   ├── local/        # Room Database, DAOs, UserPreferences DataStore
+    │   └── remote/       # Retrofit ApiService, Firebase Firestore & Auth
+    └── notification/     # AlarmManager Scheduler, BootReceiver, ReminderReceiver
+```
 
-* **Preferences:** Preferences Datastore
-
-* **Networking:** Retrofit & OkHttp
-
-* **Backend & Sync:** Firebase Authentication & Firestore
-
-* **Asynchronous Programming:** Kotlin Coroutines & Flow
-
-* **Security:** AndroidX Biometric API
+---
 
 ## 🚀 Getting Started
 
 ### Prerequisites
 
-* Android Studio
+* **Android Studio**: Ladybug or newer
+* **JDK**: 17 or higher
+* **Android Device / Emulator**: Android 7.1 (API Level 25) or higher
+* **Firebase Project**: Configured for Google Sign-In and Cloud Firestore
 
-* JDK 17
+### Installation & Setup
 
-* A Firebase Project (for Authentication and Firestore)
-
-### Installation
-
-1. **Clone the repository:**
-
+1. **Clone the repository**:
    ```bash
    git clone https://github.com/KevinFrederick/Spending.git
+   cd Spending
    ```
 
-2. **Open the project** in Android Studio.
+2. **Configure Local Properties**:
+   Create a `local.properties` file in the root directory (if not present) and add your Google Web Client ID for Authentication:
+   ```properties
+   GOOGLE_WEB_CLIENT_ID=your_google_web_client_id_here
+   ```
 
-3. **Configure Firebase:**
+3. **Configure Firebase**:
+   * Create an Android App in your [Firebase Console](https://console.firebase.google.com/).
+   * Enable **Email/Password** and **Google** sign-in providers in Firebase Authentication.
+   * Enable **Cloud Firestore** database.
+   * Download `google-services.json` and place it in the `app/` directory.
 
-   * Register your app in your Firebase console.
+4. **Build and Run**:
+   * Open the project in Android Studio.
+   * Sync Gradle files (`Gradle Sync`).
+   * Select an emulator or connected device and press **Run (Shift + F10)**.
 
-   * Download the `google-services.json` file and place it in the `app/` directory.
-
-4. **Build and Run:**
-
-   * Sync the project with Gradle files.
-
-   * Select an emulator or physical device and click Run.
+---

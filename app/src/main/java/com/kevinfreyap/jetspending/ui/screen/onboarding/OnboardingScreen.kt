@@ -1,245 +1,220 @@
 package com.kevinfreyap.jetspending.ui.screen.onboarding
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import android.content.res.Configuration.UI_MODE_NIGHT_NO
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.kevinfreyap.jetspending.R
-import com.kevinfreyap.jetspending.ui.components.ViewCustomDialog
-import com.kevinfreyap.jetspending.ui.components.ViewGoogleBtn
-import com.kevinfreyap.jetspending.ui.state.UiState
-import com.kevinfreyap.jetspending.ui.theme.Blue500
-import com.kevinfreyap.jetspending.ui.theme.Green500
+import com.kevinfreyap.jetspending.ui.components.ViewBrandName
+import com.kevinfreyap.jetspending.ui.components.ViewCurrencyCard
+import com.kevinfreyap.jetspending.ui.components.ViewAnnotatedTextButton
+import com.kevinfreyap.jetspending.ui.components.ViewPrimaryButton
+import com.kevinfreyap.jetspending.ui.navigation.OnboardingNavigation
 import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
 import com.kevinfreyap.jetspending.ui.theme.Theme
-import com.kevinfreyap.jetspending.utils.findActivity
-import kotlinx.coroutines.delay
 
 @Composable
 fun OnboardingScreen(
-    onGetStartedClicked: () -> Unit,
-    onSignInClicked: () -> Unit,
-    navigateToDashboard: () -> Unit,
+    onNavigate: (OnboardingNavigation) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: OnboardingViewModel = hiltViewModel()
 ){
-    val context = LocalContext.current
-    val uiState by viewModel.uiState.collectAsState()
-    val showSuccessDialog by viewModel.showDialog.collectAsState()
-
     OnboardingContent(
-        showSuccessDialog = showSuccessDialog,
-        uiState = uiState,
-        onGetStartedClicked = onGetStartedClicked,
-        onGoogleClicked = {
-            val activity = context.findActivity()
-            activity?.let {
-                viewModel.onAuthWithGoogle(activity)
-            }
-        },
-        onSignInClicked = onSignInClicked,
-        onDismissDialog = {
-            viewModel.onDismissDialog()
-            navigateToDashboard()
-        },
+        onNavigate = onNavigate,
         modifier = modifier
     )
 }
 
 @Composable
-fun OnboardingContent(
-    showSuccessDialog: Boolean,
-    uiState: UiState<Unit>,
-    onGetStartedClicked: () -> Unit,
-    onGoogleClicked: () -> Unit,
-    onSignInClicked: () -> Unit,
-    onDismissDialog: () -> Unit,
+private fun OnboardingContent(
+    onNavigate: (OnboardingNavigation) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val isLoading = uiState is UiState.Loading
-
-    Box {
-        Column(
-            modifier = modifier
-                .fillMaxSize()
-                .background(
-                    color = MaterialTheme.colorScheme.background
-                )
-        ) {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = modifier
-                    .weight(0.6f)
-                    .fillMaxWidth()
-                    .background(
-                        brush = Brush.verticalGradient(
-                            colors = listOf(
-                                MaterialTheme.colorScheme.background,
-                                Theme.custom.onBoardCardColor
-                            )
-                        ),
-                        shape = RoundedCornerShape(
-                            bottomStart = 32.dp,
-                            bottomEnd = 32.dp
-                        )
-                    )
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .offset(y = 24.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.app_icon),
-                        contentDescription = "App Icon"
-                    )
-
-                    Spacer(
-                        modifier = Modifier.height(16.dp)
-                    )
-
-                    Text(
-                        text = stringResource(R.string.app_name),
-                        fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.displaySmall
-                    )
-
-                    Text(
-                        text = stringResource(R.string.tagline),
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Normal
-                    )
-                }
-            }
-
-            // Buttons Column
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
+    Scaffold(
+        topBar = {
+            ViewBrandName(
                 modifier = Modifier
-                    .weight(0.4f)
-                    .fillMaxWidth()
-                    .padding(horizontal = 32.dp)
+                    .padding(16.dp)
+            )
+        },
+        bottomBar = {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier
+                    .padding(
+                        start = 24.dp,
+                        end = 24.dp,
+                        bottom = 24.dp
+                    )
             ) {
-                Button(
-                    onClick = onGetStartedClicked,
+                ViewPrimaryButton(
+                    text = stringResource(R.string.btn_get_started),
+                    onClick = {
+                        onNavigate(OnboardingNavigation.NavigateToSignUp)
+                    },
+                    trailingIcon = {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_arrow_forward_24),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .padding(
+                                    start = 8.dp
+                                )
+                        )
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
-                ) {
-                    Text(
-                        text = stringResource(R.string.get_started),
-                        style = MaterialTheme.typography.titleLarge
-                    )
-                }
-
-                Spacer(
-                    modifier = Modifier
-                        .height(8.dp)
                 )
 
-                ViewGoogleBtn(
-                    onClick = onGoogleClicked
+                ViewAnnotatedTextButton(
+                    labelText = stringResource(R.string.annotated_label_have_account_already),
+                    textButton = stringResource(R.string.btn_sign_in),
+                    onClick = {
+                        onNavigate(OnboardingNavigation.NavigateToSignIn)
+                    }
                 )
+            }
+        }
+    ) { innerPadding ->
+        Column(
+            verticalArrangement = Arrangement.Center,
+            modifier = modifier
+                .padding(innerPadding)
+                .padding(
+                    start = 24.dp,
+                    end = 24.dp,
+                    bottom = 16.dp
+                )
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+        ) {
+            ViewCurrencyCard(
+                topLabel = {
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    ) {
+                        Text(
+                            text = stringResource(R.string.placeholder_transaction_name),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Theme.custom.secondaryTextColor
+                        )
 
-                Spacer(
-                    modifier = Modifier
-                        .height(32.dp)
+                        Icon(
+                            painter = painterResource(R.drawable.ic_food_icon),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier
+                                .size(24.dp)
+                        )
+                    }
+                },
+                centerValue = {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        Text(
+                            text = stringResource(R.string.placeholder_transaction_amount),
+                            style = MaterialTheme.typography.displaySmall,
+                            color = Theme.custom.primaryTextColor,
+                            modifier = Modifier.alignByBaseline()
+                        )
+
+                        Text(
+                            text = stringResource(R.string.placeholder_transaction_currency_code),
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.alignByBaseline()
+                        )
+                    }
+                },
+                bottomInformation = {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_swap_horizontal_24),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                        )
+
+                        Text(
+                            text = stringResource(R.string.placeholder_transaction_converted_amount),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+
+                        Text(
+                            text = stringResource(R.string.placeholder_transaction_conversion_rate),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Theme.custom.secondaryTextColor,
+                        )
+                    }
+                },
+                containerColor = MaterialTheme.colorScheme.surfaceContainer
+            )
+
+            Spacer(Modifier.height(28.dp))
+
+            Column(
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.title_message_onboarding),
+                    style = MaterialTheme.typography.displaySmall,
+                    color = Theme.custom.primaryTextColor
                 )
 
                 Text(
-                    text = buildAnnotatedString {
-                        append(stringResource(R.string.have_account_already))
-                        append(" ")
-                        withStyle(
-                            style = SpanStyle(
-                                color = Blue500,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                        ) {
-                            append(stringResource(R.string.sign_in))
-                        }
-                    },
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Theme.custom.textColor,
-                    modifier = Modifier
-                        .clickable(
-                            onClick = onSignInClicked
-                        )
+                    text = stringResource(R.string.subtitle_message_onboarding),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = Theme.custom.secondaryTextColor
                 )
             }
         }
-
-        if (isLoading) {
-            CircularProgressIndicator(
-                modifier = modifier.align(Alignment.Center),
-                color = MaterialTheme.colorScheme.primary,
-                strokeWidth = 4.dp
-            )
-        }
-    }
-
-    if (showSuccessDialog) {
-        LaunchedEffect(Unit) {
-            delay(2000)
-            onDismissDialog()
-        }
-
-        ViewCustomDialog(
-            onDismissRequest = onDismissDialog,
-            icon = R.drawable.ic_check_circle_outline_24,
-            iconColor = Green500,
-            title = stringResource(R.string.success),
-            message = stringResource(R.string.success_message_welcome)
-        )
     }
 }
 
 @Preview(
     showBackground = true,
-    device = Devices.PIXEL_9_PRO
+    device = Devices.PIXEL_9_PRO,
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    device = Devices.PIXEL_9_PRO,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
 )
 @Composable
-fun OnboardingContentPreview() {
+private fun OnboardingContentPreview() {
     JetSpendingTheme {
         OnboardingContent(
-            onSignInClicked = {},
-            onGetStartedClicked = {},
-            showSuccessDialog = false,
-            uiState = UiState.Success(Unit),
-            onGoogleClicked = {},
-            onDismissDialog = {},
+            onNavigate = {}
         )
     }
 }

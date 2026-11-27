@@ -1,148 +1,132 @@
 package com.kevinfreyap.jetspending.ui.screen.edit_profile
 
-import android.content.res.Configuration
+import android.content.res.Configuration.UI_MODE_NIGHT_NO
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.repeatOnLifecycle
 import com.kevinfreyap.domain.error.Field
 import com.kevinfreyap.jetspending.R
-import com.kevinfreyap.jetspending.ui.components.ViewCustomDialog
-import com.kevinfreyap.jetspending.ui.components.ViewTextField
+import com.kevinfreyap.jetspending.ui.components.ViewAppDialog
+import com.kevinfreyap.jetspending.ui.components.ViewPrimaryButton
+import com.kevinfreyap.jetspending.ui.components.ViewTextInputField
 import com.kevinfreyap.jetspending.ui.components.ViewTopBar
 import com.kevinfreyap.jetspending.ui.components.ViewUserProfile
-import com.kevinfreyap.jetspending.ui.state.EditProfileAction
+import com.kevinfreyap.jetspending.ui.model.DialogType
+import com.kevinfreyap.jetspending.ui.action.EditProfileAction
+import com.kevinfreyap.jetspending.ui.navigation.EditProfileNavigation
 import com.kevinfreyap.jetspending.ui.state.EditProfileState
 import com.kevinfreyap.jetspending.ui.state.UiState
-import com.kevinfreyap.jetspending.ui.theme.Green500
-import com.kevinfreyap.jetspending.ui.theme.Grey500
 import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
-import com.kevinfreyap.jetspending.ui.theme.Orange700
-import com.kevinfreyap.jetspending.ui.theme.Red500
 import com.kevinfreyap.jetspending.ui.theme.Theme
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import com.kevinfreyap.jetspending.ui.state.UiEvent
 
 @Composable
 fun EditProfileScreen(
-    onBackClick: () -> Unit,
+    onNavigate: (EditProfileNavigation) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: EditProfileViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+
     val state by viewModel.state.collectAsState()
-    val uiState by viewModel.uiState.collectAsState()
-    val showSuccessDialog by viewModel.showSuccessDialog.collectAsState()
 
-    val (showConfirmationDialog, setShowConfirmationDialog) = remember { mutableStateOf(false) }
-    val (showComingSoonDialog, setShowComingSoonDialog) = remember { mutableStateOf(false) }
+    val handleBackAttempt = {
+        if (state.hasChanges) {
+            viewModel.onAction(
+                EditProfileAction.OnShowDiscardDialog(
+                    isVisible = true
+                )
+            )
+        } else {
+            onNavigate(EditProfileNavigation.NavigateUp)
+        }
+    }
 
-    val editAction = remember(viewModel) {
-        object : EditProfileAction {
-            override fun onUserNameChange(newUserName: String) {
-                viewModel.onUsernameChange(newUserName)
+    BackHandler(enabled = state.hasChanges) {
+        viewModel.onAction(
+            EditProfileAction.OnShowDiscardDialog(
+                isVisible = true
+            )
+        )
+    }
+
+    LaunchedEffect(viewModel.uiEvent, lifecycleOwner) {
+        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewModel.uiEvent.collect { event ->
+                when(event) {
+                    is UiEvent.Navigate -> {
+                        onNavigate(event.destination)
+                    }
+                    is UiEvent.ShowToast -> {
+                        Toast.makeText(
+                            context,
+                            event.asString(context),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
             }
-
-            override fun onImageSelected(newImageUrl: String) {
-                viewModel.onImageSelected(newImageUrl)
-            }
-
-            override fun dismissSuccessDialog() {
-                viewModel.onDismissSuccessDialog()
-                onBackClick()
-            }
-
-            override fun saveProfile() {
-                viewModel.saveProfile()
-            }
-
         }
     }
 
     EditProfileContent(
-        onBackClick = onBackClick,
-        onShowConfirmationDialog = {
-            setShowConfirmationDialog(it)
-        },
-        onShowComingSoonDialog = {
-            setShowComingSoonDialog(it)
-        },
-        uiState = uiState,
         state = state,
-        action = editAction,
-        showSuccessDialog = showSuccessDialog,
-        showConfirmationDialog = showConfirmationDialog,
-        showComingSoonDialog = showComingSoonDialog,
+        onBackAttempt = handleBackAttempt,
+        onAction = viewModel::onAction,
         modifier = modifier
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditProfileContent(
-    onBackClick: () -> Unit,
-    onShowConfirmationDialog: (Boolean) -> Unit,
-    onShowComingSoonDialog: (Boolean) -> Unit,
-    uiState: UiState<Unit>,
+private fun EditProfileContent(
     state: EditProfileState,
-    action: EditProfileAction,
-    showSuccessDialog: Boolean,
-    showConfirmationDialog: Boolean,
-    showComingSoonDialog: Boolean,
+    onBackAttempt: () -> Unit,
+    onAction: (EditProfileAction) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val scope = rememberCoroutineScope()
-
-    val usernameError = if (uiState is UiState.ValidationErrors) {
-        uiState.errors[Field.USERNAME]
+    val usernameError = if (state.uiState is UiState.ValidationErrors) {
+        state.uiState.errors[Field.USERNAME]
     } else null
-
-    BackHandler(
-        enabled = state.hasChanges
-    ) {
-        onShowConfirmationDialog(true)
-    }
 
     Scaffold(
         topBar = {
             ViewTopBar(
-                title = stringResource(R.string.edit_profile),
-                onBackClick = {
-                    if (!state.hasChanges) {
-                        onBackClick()
-                    } else {
-                        onShowConfirmationDialog(true)
-                    }
-                },
-                onSelectCurrency = {},
-                isLoading = uiState is UiState.Loading
+                title = stringResource(R.string.screen_edit_profile),
+                onBackClick = onBackAttempt,
+                isLoading = state.uiState is UiState.Loading
             )
         }
     ) { innerPadding ->
@@ -151,192 +135,162 @@ fun EditProfileContent(
             modifier = modifier
                 .padding(innerPadding)
                 .padding(
-                    top = 32.dp,
-                    bottom = 16.dp,
-                    start = 16.dp,
-                    end = 16.dp
+                    top = 12.dp,
+                    bottom = 24.dp,
+                    start = 24.dp,
+                    end = 24.dp
                 )
                 .fillMaxSize()
         ) {
             ViewUserProfile(
                 imageUrl = state.imageUrl,
                 name = state.userName,
-                size = 160.dp,
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
+                size = 88.dp,
+                textStyle = MaterialTheme.typography.headlineLarge
             )
-
-            TextButton(
-                onClick = {
-                    onShowComingSoonDialog(true)
-                }
-            ) {
-                Text(
-                    text = stringResource(R.string.change_picture),
-                    textDecoration = TextDecoration.Underline,
-                    color = Theme.custom.textColor,
-                    fontSize = 16.sp
-                )
-            }
 
             Spacer(
                 modifier = Modifier
-                    .height(16.dp)
+                    .height(32.dp)
             )
 
-            ViewTextField(
-                value = state.userName,
-                onValueChange = action::onUserNameChange,
-                label = stringResource(R.string.username),
-                isError = usernameError != null,
-                errorMessage = usernameError?.let { stringResource(it) } ?: "",
-                keyboardOptions = KeyboardOptions(
-                    imeAction = ImeAction.Done
+            Column(
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                ViewTextInputField(
+                    value = state.userName,
+                    onValueChange = {
+                        onAction(
+                            EditProfileAction.OnUsernameChange(
+                                name = it
+                            )
+                        )
+                    },
+                    label = stringResource(R.string.label_username),
+                    isError = usernameError != null,
+                    errorMessage = usernameError?.let { stringResource(it) } ?: "",
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text,
+                        imeAction = ImeAction.Done
+                    )
                 )
-            )
 
-            ViewTextField(
-                value = state.email,
-                onValueChange = {},
-                label = stringResource(R.string.email),
-                isEnabled = false
-            )
+                ViewTextInputField(
+                    value = state.email,
+                    onValueChange = {},
+                    label = stringResource(R.string.label_email),
+                    enabled = false,
+                    trailingIcon = {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_mail_24),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(20.dp)
+                        )
+                    }
+                )
+            }
+
+            Spacer(Modifier.height(4.dp))
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                modifier = Modifier
+                    .align(Alignment.Start)
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_info_24),
+                    contentDescription = null,
+                    tint = Theme.custom.secondaryTextColor.copy(0.6f),
+                    modifier = Modifier
+                        .size(12.dp)
+                )
+
+                Text(
+                    text = stringResource(R.string.hint_profile_email),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Theme.custom.secondaryTextColor.copy(0.6f)
+                )
+            }
 
             Spacer(
                 modifier = Modifier
                     .weight(1f)
             )
 
-            Button(
-                onClick = action::saveProfile,
-                enabled = state.hasChanges && uiState !is UiState.Loading,
+            ViewPrimaryButton(
+                text = stringResource(R.string.btn_save_changes),
+                enabled = state.hasChanges && state.userName.isNotBlank() && state.uiState !is UiState.Loading,
+                onClick = {
+                    onAction(
+                        EditProfileAction.OnSaveChanges
+                    )
+                },
+                icon = {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_check_24),
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp)
+                    )
+                },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.save_changes),
-                    fontSize = 18.sp
+            )
+        }
+    }
+
+    if (state.isDiscardDialogVisible) {
+        ViewAppDialog(
+            dialogType = DialogType.WARNING,
+            title = stringResource(R.string.dialog_discard_changes),
+            message = stringResource(R.string.description_discard_change_user),
+            confirmText = stringResource(R.string.btn_discard),
+            onConfirm = {
+                onAction(
+                    EditProfileAction.OnConfirmDiscard
                 )
-            }
-        }
 
-        if (showComingSoonDialog) {
-            LaunchedEffect(Unit) {
-                delay(3000)
-                onShowComingSoonDialog(false)
-            }
-
-            ViewCustomDialog(
-                onDismissRequest = { onShowComingSoonDialog(false) },
-                icon = R.drawable.ic_construction,
-                iconColor = Grey500,
-                title = stringResource(R.string.coming_soon),
-                message = stringResource(R.string.description_feature_coming_soon)
-            )
-        }
-
-        if (showSuccessDialog) {
-            LaunchedEffect(Unit) {
-                delay(1500)
-                action.dismissSuccessDialog()
-            }
-
-            ViewCustomDialog(
-                onDismissRequest = action::dismissSuccessDialog,
-                icon = R.drawable.ic_check_circle_outline_24,
-                iconColor = Green500,
-                title = stringResource(R.string.success),
-                message = stringResource(R.string.success_profile_update)
-            )
-        }
-
-        if (showConfirmationDialog) {
-            ViewCustomDialog(
-                onDismissRequest = {
-                    onShowConfirmationDialog(false)
-                },
-                icon = R.drawable.ic_error_outline_24,
-                iconColor = Orange700,
-                title = stringResource(R.string.discard_changes),
-                message = stringResource(R.string.description_discard_change),
-                positiveBtn = {
-                    Button(
-                        onClick = {
-                            onShowConfirmationDialog(false)
-                            scope.launch {
-                                delay(200)
-                                onBackClick()
-                            }
-                        },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Red500
-                        )
-                    ) {
-                        Text(
-                            text = stringResource(R.string.discard),
-                            style = MaterialTheme.typography.titleMedium
-                        )
-                    }
-                },
-                negativeBtn = {
-                    Button(
-                        onClick = {
-                            onShowConfirmationDialog(false)
-                        },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Grey500
-                        )
-                    ) {
-                        Text(
-                            text = stringResource(R.string.cancel),
-                            style = MaterialTheme.typography.titleMedium
-                        )
-                    }
-                }
-            )
-        }
+                onAction(
+                    EditProfileAction.OnShowDiscardDialog(
+                        isVisible = false
+                    )
+                )
+            },
+            dismissText = stringResource(R.string.btn_keep_editing),
+            onDismissRequest = {
+                onAction(
+                    EditProfileAction.OnShowDiscardDialog(
+                        isVisible = false
+                    )
+                )
+            },
+        )
     }
 }
 
 @Preview(
     showBackground = true,
     device = Devices.PIXEL_9_PRO,
-    uiMode = Configuration.UI_MODE_NIGHT_YES
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    device = Devices.PIXEL_9_PRO,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
 )
 @Composable
-fun EditProfilePreview() {
+private fun EditProfilePreview() {
     JetSpendingTheme {
         EditProfileContent(
-            onBackClick = {},
-            onShowConfirmationDialog = {},
-            onShowComingSoonDialog = {},
             state = EditProfileState(
                 userName = "John Doe",
-                email = "JohnDoe@gmail.com"
+                email = "JohnDoe@email.com"
             ),
-            action = object : EditProfileAction {
-                override fun onUserNameChange(newUserName: String) {
-
-                }
-
-                override fun onImageSelected(newImageUrl: String) {
-
-                }
-
-                override fun dismissSuccessDialog() {
-
-                }
-
-                override fun saveProfile() {
-
-                }
-
-            },
-            showSuccessDialog = false,
-            showConfirmationDialog = false,
-            showComingSoonDialog = false,
-            uiState = UiState.Idle
+            onAction = {},
+            onBackAttempt = {}
         )
     }
 }

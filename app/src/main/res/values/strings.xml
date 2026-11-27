@@ -1,20 +1,54 @@
 <resources>
     <string name="app_name">Spending</string>
-    <string name="tagline">Simple Expense Tracker</string>
+
+    <string name="bottom_nav_home">Home</string>
+    <string name="bottom_nav_transactions">Transactions</string>
+    <string name="bottom_nav_report">Reports</string>
+    <string name="bottom_nav_settings">Settings</string>
 
     <!-- Screen Name -->
-    <string name="dashboard">Dashboard</string>
-    <string name="report">Report</string>
-    <string name="settings">Settings</string>
-    <string name="transactions">Transactions</string>
-    <string name="transaction_detail">Transaction Detail</string>
+    <string name="screen_overview">Overview</string>
+    <string name="screen_report">Reports</string>
+    <string name="screen_settings">Settings</string>
+    <string name="screen_transactions">Transactions</string>
+    <string name="screen_transaction_detail">Transaction Detail</string>
+    <string name="screen_edit_transaction">Edit Transaction</string>
+    <string name="screen_add_transaction">Add Transaction</string>
+    <string name="screen_edit_profile">Edit Profile</string>
+    <string name="screen_notifications">Notifications</string>
+    <string name="screen_security">Privacy &amp; Security</string>
 
-    <!-- Card Title -->
-    <string name="balance_info">Balance Information</string>
-    <string name="recent_transaction">Recent Transaction</string>
-    <string name="spending_report">Spending Report</string>
-    <string name="categories_percentage">Categories Percentage</string>
-    <string name="category_detail">Category Detail</string>
+
+    <!-- Section Header -->
+    <string name="section_header_recent_transaction">Recent Transactions</string>
+    <string name="section_header_filter_transaction">Filter transactions</string>
+    <string name="section_header_by_category">By category</string>
+
+    <!--  Screen Header  -->
+    <string name="screen_header_settings_security">Keep your records private</string>
+    <string name="screen_header_settings_notification">Only the alerts that matter</string>
+
+    <string name="screen_subtitle_settings_security">Choose how to securely access your information.</string>
+    <string name="screen_subtitle_settings_notification">Choose which updates to receive. Leave the rest quiet.</string>
+
+    <!--  Dialog  -->
+    <string name="dialog_discard_changes">Discard changes?</string>
+    <string name="dialog_delete_transaction">Delete transaction?</string>
+    <string name="dialog_logout">Sign out?</string>
+
+    <string name="dialog_title_select_month">Select month</string>
+    <string name="dialog_title_select_year">Select year</string>
+    <string name="dialog_title_select_currency">Select currency</string>
+    <string name="dialog_title_select_theme">Select theme</string>
+    <string name="dialog_title_select_reminder_time">Select reminder time</string>
+    <string name="dialog_title_reset_password">Reset password</string>
+
+    <string name="description_log_out">Unsynced local data will be removed. Sign in again to restore synced data.</string>
+    <string name="description_delete_transaction">This transaction will be permanently removed and cannot be undone</string>
+    <string name="description_transaction_missing">This transaction may have been deleted or is unavailable</string>
+    <string name="description_discard_change_transaction">Your unsaved transaction details will be lost.</string>
+    <string name="description_discard_change_user">Your unsaved changes will be lost.</string>
+    <string name="description_reset_password">Enter your email to receive a reset link</string>
 
     <!-- Categories -->
     <string name="category_gift">Gifts</string>
@@ -23,7 +57,7 @@
     <string name="category_salary">Salary</string>
     <string name="category_education">Education</string>
     <string name="category_entertainment">Entertainment</string>
-    <string name="category_food">Food &amp; Dining</string>
+    <string name="category_food">Food &amp; Drink</string>
     <string name="category_grocery">Grocery</string>
     <string name="category_healthcare">Healthcare</string>
     <string name="category_household">Household</string>
@@ -33,142 +67,155 @@
     <string name="category_others">Others</string>
 
     <!-- Label -->
-    <string name="total_balance">Total Balance</string>
-    <string name="income">Income</string>
-    <string name="spending">Spending</string>
-    <string name="amount">Amount</string>
-    <string name="type">Type</string>
-    <string name="category">Category</string>
-    <string name="categories">Categories</string>
-    <string name="date">Date</string>
-    <string name="transaction_name">Transaction Name</string>
-    <string name="transaction_amount">Transaction Amount</string>
-    <string name="transaction_category">Transaction Category</string>
-    <string name="username">Username</string>
-    <string name="email">Email</string>
-    <string name="password">Password</string>
-    <string name="confirm_password">Confirm Password</string>
-    <string name="email_google_divider">or continue with</string>
-    <string name="have_account_already">Have an account already?</string>
-    <string name="do_not_have_account_label">Don\'t have an account?</string>
-    <string name="forgot_password">Forgot Password?</string>
-    <string name="general">General</string>
-    <string name="preference">Preferences</string>
-    <string name="support">Support</string>
-    <string name="search_transactions">Search Transactions</string>
-    <string name="transaction_filter">Transaction Filter</string>
-    <string name="date_range">Date Range</string>
-    <string name="by_time">By Time</string>
-    <string name="by_amount">By Amount</string>
-    <string name="by_type">By Type</string>
-    <string name="by_category">By Category</string>
+    <string name="label_chart_max">Max %1$s</string>
+    <string name="label_chart_title_weekly_expense">Weekly expense</string>
+    <string name="label_chart_title_monthly_expense">Monthly expense</string>
+    <string name="label_chart_title_yearly_expense">Yearly expense</string>
+    <string name="label_chart_title_weekly_income">Weekly income</string>
+    <string name="label_chart_title_monthly_income">Monthly income</string>
+    <string name="label_chart_title_yearly_income">Yearly income</string>
+
+    <string name="label_version">Version %1$s</string>
+
+    <string name="settings_header_preferences">PREFERENCES</string>
+    <string name="settings_header_app_settings">APP SETTINGS</string>
+    <string name="settings_header_app_access">APP ACCESS</string>
+    <string name="settings_header_account">ACCOUNT</string>
+    <string name="settings_notification_type">NOTIFICATION TYPES</string>
+
+    <string name="settings_base_currency">Base currency</string>
+    <string name="settings_appearance">Appearance</string>
+    <string name="settings_notification">Notifications</string>
+    <string name="settings_security">Privacy &amp; security</string>
+    <string name="settings_app_lock">App lock</string>
+    <string name="settings_block_screenshot">Screen privacy</string>
+    <string name="settings_change_password">Change password</string>
+    <string name="settings_create_password">Create password</string>
+    <string name="settings_delete_account">Delete account</string>
+    <string name="settings_master_notification">Allow notifications</string>
+    <string name="settings_notification_weekly_summary">Weekly summary</string>
+    <string name="settings_notification_daily_reminder">Daily reminder</string>
+
+    <string name="cd_switch_to_text_input">Switch to text input</string>
+    <string name="cd_switch_to_clock_dial">Switch to clock dial</string>
+    <string name="cd_swap_exchange_rates">Swap exchange rates</string>
+    <string name="cd_transaction_filter">Filter transactions</string>
+    <string name="cd_clear_search">Clear search query</string>
+    <string name="cd_clear_date">Clear selected date</string>
+    <string name="cd_add_transaction">Add transaction</string>
+
+    <string name="label_verify_identity">Verify your identity</string>
+    <string name="label_biometric_unavailable">Device authentication is unavailable on this device</string>
+    <string name="label_no_screen_lock">Set up a screen lock in device settings first</string>
+    <string name="label_app_locked">App Locked</string>
+
+    <string name="label_title_reminder_time">Reminder time</string>
+    <string name="label_subtitle_reminder_time">Daily notification schedule</string>
+
+    <string name="label_total_expense">Total expense</string>
+    <string name="label_total_income">Total income</string>
+    <string name="label_net">Net</string>
+    <string name="label_all">All</string>
+    <string name="label_amount">Amount</string>
+    <string name="label_income">Income</string>
+    <string name="label_expense">Expense</string>
+    <string name="label_total_balance">Total Balance</string>
+    <string name="label_category">Category</string>
+    <string name="label_date">Date</string>
+    <string name="label_original_currency">Original currency</string>
+    <string name="label_converted_amount">Converted amount</string>
+    <string name="label_exchange_rate">Exchange rate</string>
+    <string name="label_transaction_name">Transaction name</string>
+    <string name="label_from">From</string>
+    <string name="label_to">To</string>
+    <string name="label_notes_optional">Notes (Optional)</string>
+    <string name="label_notes">Notes</string>
+    <string name="label_currency">Currency</string>
+
+    <string name="label_username">Username</string>
+    <string name="label_email">Email</string>
+    <string name="label_password">Password</string>
+    <string name="label_confirm_password">Confirm password</string>
+    <string name="label_email_google_divider">or continue with</string>
+    <string name="label_forgot_password">Forgot Password?</string>
+    <string name="label_current_password">Current password</string>
+    <string name="label_new_password">New password</string>
+    <string name="label_app_lock">App Locked</string>
+
+    <string name="annotated_label_have_account_already">Have an account already?</string>
+    <string name="annotated_label_do_not_have_account_label">Don\'t have an account?</string>
+
+    <string name="label_rate_unavailable">Rate unavailable</string>
+
+    <string name="label_filter_date_range">Date range</string>
+    <string name="label_filter_type">Transaction type</string>
+
+    <!--  Time Filter Option  -->
+    <string name="all_time">All</string>
     <string name="last_7_days">Last 7 days</string>
     <string name="this_month">This Month</string>
-    <string name="pick_date">Pick Date</string>
-    <string name="from">From</string>
-    <string name="to">To</string>
-    <string name="select_currency">Select Currency</string>
-    <string name="transaction_type">Transaction Type</string>
-    <string name="transaction_notes">Transaction Notes</string>
-    <string name="transaction_notes_optional">Transaction Notes (Optional)</string>
-    <string name="notes">Notes</string>
-    <string name="transaction_deleted">Transaction Deleted</string>
-    <string name="discard_changes">Discard Changes?</string>
-    <string name="total_income">Total Income</string>
-    <string name="total_spending">Total Spending</string>
-    <string name="transaction_chart">Transactions Chart</string>
-    <string name="reset_password">Reset Password</string>
-    <string name="set_notification">Set notifications</string>
-    <string name="daily_reminder">Daily Reminder</string>
-    <string name="daily_reminder_time">Daily Reminder Time</string>
-    <string name="monthly_summary">Monthly Summary</string>
-    <string name="secure_access">App Privacy</string>
-    <string name="account_security">Account Security</string>
-    <string name="app_lock">App Lock</string>
-    <string name="app_lock_subtitle">Unlock with device credentials.</string>
-    <string name="block_screenshot">Block Screenshot</string>
-    <string name="block_screenshot_subtitle">Hide data in background previews &amp; screenshot</string>
-    <string name="change_password">Change Password</string>
-    <string name="create_password">Create Password</string>
-    <string name="current_password">Current Password</string>
-    <string name="new_password">New Password</string>
-    <string name="delete_account">Delete Account</string>
-    <string name="app_locked">App Locked</string>
-    <string name="verify_identity">Verify Your Identity</string>
-    <string name="coming_soon">Coming Soon</string>
+    <string name="pick_date">Custom</string>
 
     <!-- Button -->
-    <string name="cancel">Cancel</string>
-    <string name="confirm">Confirm</string>
-    <string name="save_transaction">Save Transaction</string>
-    <string name="edit_transaction">Edit Transaction</string>
-    <string name="see_all">See All</string>
-    <string name="add_transaction">Add Transaction</string>
-    <string name="back">Back</string>
-    <string name="get_started">Get Started</string>
-    <string name="continue_with_google">Continue with Google</string>
-    <string name="sign_in">Sign In</string>
-    <string name="sign_up">Sign Up</string>
-    <string name="logout">Log Out</string>
-    <string name="edit_profile">Edit Profile</string>
-    <string name="notifications">Notifications</string>
-    <string name="security">Privacy &amp; Security</string>
-    <string name="language">Language</string>
-    <string name="currency">Currency</string>
-    <string name="reset">Reset</string>
-    <string name="see_result">See Result</string>
-    <string name="set_date">Set Date</string>
-    <string name="edit">Edit</string>
-    <string name="delete_transaction">Delete Transaction</string>
-    <string name="update_transaction">Update Transaction</string>
-    <string name="discard">Discard</string>
-    <string name="show_less">Show Less</string>
-    <string name="show_all">Show All</string>
-    <string name="send_link">Send Link</string>
-    <string name="change_picture">Change Picture</string>
-    <string name="save_changes">Save Changes</string>
-    <string name="unlock">Unlock</string>
-    <string name="delete">Delete</string>
-    <string name="verify_with_google">Verify with Google</string>
-    <string name="verify_and_delete">Verify and Delete</string>
+    <string name="btn_get_started">Get Started</string>
+    <string name="btn_sign_in">Sign In</string>
+    <string name="btn_sign_up">Sign Up</string>
+    <string name="btn_continue_with_google">Continue with Google</string>
+    <string name="btn_settings">Settings</string>
+
+    <string name="btn_txt_see_all">See all</string>
+    <string name="btn_txt_edit_profile">Edit profile</string>
+
+    <string name="btn_keep_editing">Keep editing</string>
+    <string name="btn_apply_filters">Apply filters</string>
+    <string name="btn_retry">Retry</string>
+    <string name="btn_clear_query">Clear query</string>
+    <string name="btn_clear_filter">Clear filter</string>
+    <string name="btn_add_transaction">Add transaction</string>
+    <string name="btn_edit_transaction">Edit transaction</string>
+    <string name="btn_delete_transaction">Delete transaction</string>
+    <string name="btn_delete">Delete</string>
+    <string name="btn_back">Go back</string>
+    <string name="btn_previous">Previous</string>
+    <string name="btn_sign_out">Sign out</string>
+    <string name="btn_save_changes">Save changes</string>
+    <string name="btn_save">Save</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="btn_reset">Reset</string>
+    <string name="btn_confirm">Confirm</string>
+
+    <string name="btn_unlock_biometric">Unlock with biometrics</string>
+    <string name="btn_device_settings">Open device settings</string>
+
+    <string name="btn_update_transaction">Update Transaction</string>
+    <string name="btn_discard">Discard</string>
+    <string name="btn_send_link">Send Link</string>
 
     <!-- Theme -->
-    <string name="select_theme">Select Theme</string>
-    <string name="select_theme_subtitle">Choose your preferred appearance</string>
-    <string name="theme">Theme</string>
-    <string name="follow_system">Follow System</string>
-    <string name="light_mode">Light Mode</string>
-    <string name="dark_mode">Dark Mode</string>
-
-    <!-- Currency & Country Name -->
-    <string name="currency_idr">Indonesia (Rupiah | Rp)</string>
-    <string name="currency_twd">Taiwan (New Taiwan Dollar)</string>
-    <string name="currency_usd">USA (US Dollar)</string>
-    <string name="currency_myr">Malaysia (Ringgit)</string>
-
-    <!-- Country Name -->
-    <string name="country_id">Indonesia</string>
-    <string name="country_tw">Taiwan</string>
-    <string name="country_us">USA</string>
-    <string name="country_my">Malaysia</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="theme_system">System</string>
+    <string name="theme_follow_system">Follow System</string>
+    <string name="theme_light_mode">Light Mode</string>
+    <string name="theme_dark_mode">Dark Mode</string>
 
     <!-- Success Message -->
-    <string name="success">Success</string>
-    <string name="success_login_success">Sign In Success</string>
-    <string name="success_register_success">Sign Up Success</string>
+    <string name="success_login_success">Sign in success</string>
+    <string name="success_register_success">Sign up success</string>
     <string name="success_message_transaction_saved">Transaction saved successfully!</string>
-    <string name="success_message_register_success">Account created successfully</string>
-    <string name="success_message_welcome">Hi, Welcome!</string>
-    <string name="success_message_welcome_back">Welcome back!</string>
+    <string name="success_message_transaction_deleted">Transaction deleted!</string>
     <string name="success_message_transaction_updated">Transaction updated successfully!</string>
     <string name="success_email_sent">Email Sent!</string>
     <string name="success_profile_update">Profile updated successfully!</string>
-    <string name="success_change_password">Password Changed</string>
-    <string name="success_create_password">Password Created</string>
-    <string name="success_account_deleted">Account Deleted</string>
+    <string name="success_change_password">Password updated</string>
+    <string name="success_create_password">Password created</string>
+    <string name="success_account_deleted">Account deleted</string>
+    <string name="success_logout">Signed out</string>
 
     <!-- Error Message -->
     <string name="error_something_went_wrong">Something went wrong</string>
+    <string name="error_failed_to_load_transactions">Failed to load transactions</string>
+    <string name="error_failed_to_load_reports">Couldn’t load your reports. Please try again.</string>
     <string name="error_required_transaction_name">Please enter a name for this transaction</string>
     <string name="error_required_transaction_amount">Please enter a valid amount.</string>
     <string name="error_transaction_from_greater_than_to">Please enter a valid amount range</string>
@@ -181,46 +228,86 @@
     <string name="error_authentication_password_wrong">Incorrect password</string>
     <string name="error_authentication_confirm_password_blank">Please confirm your password</string>
     <string name="error_authentication_confirm_password_not_match">Passwords do not match</string>
-    <string name="error_loading_data">Error Loading Data</string>
-    <string name="error_no_transaction">No transaction yet</string>
-    <string name="error_transaction_not_found">No transactions found</string>
-    <string name="error_rate_unavailable">Rate Unavailable</string>
-    <string name="error_some_transaction_rate_unavailable">Some transaction\'s exchange rate unavailable</string>
-    <string name="error_transaction_missing">Transaction Not Found</string>
+    <string name="error_transaction_not_found">Transaction not found</string>
+    <string name="error_user_not_found">User not found</string>
     <string name="error_notes_too_long">Notes too long</string>
     <string name="error_transaction_currency">Currency data not loaded yet. Please wait.</string>
     <string name="error_network_offline">You are offline. Data will sync when online</string>
-    <string name="error_no_data">No data yet</string>
     <string name="error_username_blank">Username is required</string>
     <string name="error_img_url_blank">Selected image invalid</string>
-    <string name="error_create_password">Create password failed</string>
     <string name="error_relogin">Please authenticate before create password.</string>
-    <string name="error_no_biometric">Please set up a PIN or Fingerprint in your Device Settings first.</string>
     <string name="error_wrong_account">Wrong account selected. Please select the Google account linked to this profile.</string>
+    <string name="error_notification_permission_denied">Notification permission is required</string>
 
     <!-- Description -->
-    <string name="description_sign_up">Let\'s get started with a free account</string>
-    <string name="description_sign_in">Please enter your details</string>
-    <string name="description_log_out">Are you sure you want to log out?</string>
-    <string name="description_date_range">Select a date or range of date</string>
-    <string name="description_select_currency">Choose currency for your transactions</string>
-    <string name="description_delete_transaction">This action cannot be undone. Do you want to delete this transaction?</string>
-    <string name="description_transaction_missing">This transaction may have been deleted or is unavailable</string>
-    <string name="description_delete_transaction_success">Transaction deleted successfully</string>
-    <string name="description_discard_change">You have unsaved changes. Are you sure you want to discard them?</string>
-    <string name="description_reset_password">Enter your email to receive a reset link</string>
-    <string name="description_email_sent">We have sent a password recover instruction to your email</string>
-    <string name="description_notification_settings">Control how and when you receive updates. Tailor your notification preferences to ensure you always stay informed.</string>
-    <string name="description_secure_access">Restrict who can open the app and view your transactions.</string>
-    <string name="description_account_security">Update your login credentials or permanently delete your account.</string>
-    <string name="description_change_password">Confirm password and create new one.</string>
-    <string name="description_create_password">Enter new password.</string>
-    <string name="description_delete_account">This will permanently erase all your data.</string>
-    <string name="description_account_deleted">Your account was successfully deleted.</string>
-    <string name="description_feature_coming_soon">This feature is currently under development</string>
+    <string name="description_settings_base_currency">Used for totals and conversions</string>
+    <string name="description_settings_appearance">Choose your preferred theme</string>
+    <string name="description_settings_notification">Choose your preferences</string>
+    <string name="description_settings_security">App lock and data preferences</string>
+
+    <string name="description_settings_app_lock">Unlock with your fingerprint, face, or screen lock</string>
+    <string name="description_settings_block_screenshot">Block screenshots, recordings, and recent app previews</string>
+    <string name="description_settings_delete_account">Permanently remove your account and all data</string>
+    <string name="description_settings_password">Keep your account secure with a strong password</string>
+    <string name="description_settings_master_notification">Receive reminders and updates</string>
+    <string name="description_settings_weekly_summary">Get a weekly recap of your transactions</string>
 
     <!-- Period Option -->
     <string name="period_weekly">Weekly</string>
     <string name="period_monthly">Monthly</string>
     <string name="period_yearly">Yearly</string>
+
+    <!--  Placeholder  -->
+    <string name="placeholder_transaction_name">Lunch in Paris</string>
+    <string name="placeholder_transaction_amount">18.40</string>
+    <string name="placeholder_transaction_currency_code">EUR</string>
+    <string name="placeholder_transaction_converted_amount">USD 20.24</string>
+    <string name="placeholder_transaction_conversion_rate">1 EUR = 1.10 USD</string>
+    <string name="placeholder_select_a_category">Select a category</string>
+    <string name="placeholder_select_date">Select date</string>
+    <string name="placeholder_all_currency">All currency</string>
+    <string name="placeholder_all_category">All category</string>
+    <string name="placeholder_search_transactions">Search transactions</string>
+
+    <!--  Message  -->
+    <string name="title_message_onboarding">Less Clutter. \nMore Control.</string>
+    <string name="title_message_sign_in">Welcome back</string>
+    <string name="title_message_sign_up">Let\'s start</string>
+    <string name="title_message_locked">Verify your identity</string>
+
+    <string name="subtitle_message_onboarding">Track everyday expense in any currency. \nOne simple view of where your money goes.</string>
+    <string name="subtitle_message_sign_in">Track your expenses in one place</string>
+    <string name="subtitle_message_sign_up">Create your free account today</string>
+    <string name="subtitle_message_balance">All currencies synced • Balance up to date</string>
+    <string name="subtitle_message_locked">Use your fingerprint, face, or screen lock to unlock</string>
+    
+    <string name="greeting_morning">Good morning, %1$s</string>
+    <string name="greeting_afternoon">Good afternoon, %1$s</string>
+    <string name="greeting_evening">Good evening, %1$s</string>
+    
+    <string name="hint_custom_date_filter">Leave either date empty for an open-ended range</string>
+    <string name="hint_profile_email">Linked to your account and cannot be edited</string>
+    <string name="hint_locked_screen">Secure verification is handled by your device</string>
+    <string name="hint_notification">Device settings may also affect how notifications are delivered</string>
+
+    <string name="search_no_result">No matching transactions</string>
+    <string name="search_message_query_no_match">No transactions match. Clear query to see transactions</string>
+    <string name="search_message_filter_no_match">No transactions match applied filters. Clear filters to see transactions</string>
+
+    <string name="empty_transactions">No transactions recorded</string>
+    <string name="empty_transactions_message">Let\'s start keeping track of your expense and income.</string>
+
+    <!--  Warning  -->
+    <string name="warning_rates_missing">Offline: Some rates unavailable • Partial balance</string>
+    <string name="warning_custom_date_range_invalid">Invalid date range</string>
+
+    <!-- Weekly Summary Banner -->
+    <string name="weekly_banner_spent_less">Spent %1$d%% less than last week</string>
+    <string name="weekly_banner_spent_more">Spent %1$s more than last week</string>
+    <string name="weekly_banner_spent_same">Spent the same as last week</string>
+    <string name="weekly_banner_fallback_single">You spent %1$s across 1 transaction this week</string>
+    <string name="weekly_banner_fallback_plural">You spent %1$s across %2$d transactions this week</string>
+    <string name="weekly_banner_top_category">Top category: %1$s (%2$s)</string>
+    <string name="weekly_banner_no_expense">No expenses logged this week</string>
+    <string name="cd_dismiss_weekly_banner">Dismiss weekly summary banner</string>
 </resources>

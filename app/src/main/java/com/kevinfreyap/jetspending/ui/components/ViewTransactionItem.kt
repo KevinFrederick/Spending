@@ -1,228 +1,277 @@
 package com.kevinfreyap.jetspending.ui.components
 
-import android.content.res.Configuration
+import android.content.res.Configuration.UI_MODE_NIGHT_NO
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Devices
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.kevinfreyap.domain.model.TransactionType
 import com.kevinfreyap.jetspending.R
-import com.kevinfreyap.jetspending.ui.model.TransactionItemUi
-import com.kevinfreyap.jetspending.ui.theme.Green500
-import com.kevinfreyap.jetspending.ui.theme.Grey600
+import com.kevinfreyap.jetspending.ui.state.TransactionItemState
 import com.kevinfreyap.jetspending.ui.theme.JetSpendingTheme
-import com.kevinfreyap.jetspending.ui.theme.Red500
 import com.kevinfreyap.jetspending.ui.theme.Theme
-import com.kevinfreyap.jetspending.utils.rememberShimmerBrush
-import java.time.Instant
+import com.kevinfreyap.jetspending.utils.shimmerEffect
 
 @Composable
 fun ViewTransactionItem(
-    transaction: TransactionItemUi,
-    navigateToDetail: () -> Unit,
-    onCheckRate: (Instant) -> Unit,
-    modifier: Modifier = Modifier,
-    isNestedCard: Boolean = true,
+    state: TransactionItemState,
+    onClick: (String) -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    if (transaction.isConversionPending) {
-        LaunchedEffect(transaction.transactionId) {
-            onCheckRate(transaction.transactionDateRaw)
+    val formattedValue: String
+    val amountColor: Color
+
+    val currency: String = if (state.transactionConvertedAmount != null) {
+        state.transactionSelectedCurrency
+    } else {
+        state.transactionOriginalCurrency
+    }
+
+    when(state.transactionType) {
+        TransactionType.INCOME -> {
+            formattedValue = "+ ${state.transactionConvertedAmount ?: state.transactionOriginalAmount}"
+            amountColor = Theme.custom.statusPositive
+        }
+        TransactionType.SPENDING -> {
+            formattedValue = "- ${state.transactionConvertedAmount ?: state.transactionOriginalAmount}"
+            amountColor = Theme.custom.statusNegative
         }
     }
 
-    Card (
-        colors = CardDefaults.cardColors(
-            containerColor = if (isNestedCard) {
-                Theme.custom.nestedCardColor
-            } else {
-                Theme.custom.cardColor
-            },
-        ),
-        shape = RoundedCornerShape(16.dp),
-        onClick = navigateToDetail,
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
             .fillMaxWidth()
-            .padding(2.dp)
+            .clip(RoundedCornerShape(8.dp))
+            .clickable {
+                onClick(state.transactionId)
+            }
+            .padding(
+                vertical = 4.dp
+            )
     ) {
-        Row (
-            verticalAlignment = Alignment.CenterVertically,
+        Box(
+            contentAlignment = Alignment.Center,
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
-                .height(IntrinsicSize.Min)
-        ){
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(CircleShape)
-                    .background(transaction.transactionTypeBackground)
-            ) {
-                Icon(
-                    painter = painterResource(transaction.transactionCategoryIcon),
-                    contentDescription = "Transaction Icon",
-                    tint = Color.White,
-                    modifier = Modifier
-                        .size(28.dp)
+                .size(40.dp)
+                .clip(
+                    shape = RoundedCornerShape(12.dp)
                 )
-            }
+                .background(
+                    MaterialTheme.colorScheme.surfaceContainer
+                )
+        ) {
+            Icon(
+                painter = painterResource(state.transactionCategoryIcon),
+                contentDescription = null,
+                tint = Theme.custom.secondaryTextColor,
+                modifier = Modifier
+                    .size(18.dp)
+            )
+        }
 
-            Spacer(modifier = Modifier.width(8.dp))
+        Column(
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+            modifier = Modifier
+                .weight(1f)
+        ) {
+            Text(
+                text = state.transactionName,
+                style = MaterialTheme.typography.titleSmall,
+                color = Theme.custom.primaryTextColor,
+                maxLines = 1,
+                softWrap = false,
+                overflow = TextOverflow.Ellipsis
+            )
 
+            Text(
+                text = "${stringResource(state.transactionCategoryName)} · ${state.transactionDate}",
+                style = MaterialTheme.typography.bodySmall,
+                color = Theme.custom.secondaryTextColor,
+                maxLines = 1,
+                softWrap = false,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+
+        if (state.transactionSelectedCurrency == state.transactionOriginalCurrency) {
+            Text(
+                text = buildAnnotatedString {
+                    append(formattedValue)
+                    append(" ")
+                    withStyle(style = SpanStyle(
+                        fontSize = MaterialTheme.typography.labelSmall.fontSize,
+                        fontWeight = MaterialTheme.typography.labelSmall.fontWeight
+                    )) {
+                        append(currency)
+                    }
+                },
+                style = MaterialTheme.typography.titleSmall,
+                color = amountColor,
+                maxLines = 1,
+                softWrap = false,
+                overflow = TextOverflow.Ellipsis
+            )
+        } else {
             Column(
-                verticalArrangement = Arrangement.Center,
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxHeight()
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+                horizontalAlignment = Alignment.End
             ) {
                 Text(
-                    text = transaction.transactionName,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = Theme.custom.textColor,
+                    text = buildAnnotatedString {
+                        append(formattedValue)
+                        append(" ")
+                        withStyle(style = SpanStyle(
+                            fontSize = MaterialTheme.typography.labelSmall.fontSize,
+                            fontWeight = MaterialTheme.typography.labelSmall.fontWeight
+                        )) {
+                            append(currency)
+                        }
+                    },
+                    style = MaterialTheme.typography.titleSmall,
+                    color = amountColor,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier
-                        .fillMaxWidth()
+                    softWrap = false,
+                    overflow = TextOverflow.Ellipsis
                 )
+
                 Text(
-                    text = transaction.transactionDate,
-                    fontWeight = FontWeight.SemiBold,
+                    text = if (state.transactionConvertedAmount != null) {
+                        "${state.transactionOriginalAmount} ${state.transactionOriginalCurrency}"
+                    } else {
+                        stringResource(R.string.label_rate_unavailable)
+                    },
                     style = MaterialTheme.typography.bodySmall,
+                    color = Theme.custom.secondaryTextColor,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    color = Grey600,
-                    modifier = Modifier
-                        .fillMaxWidth()
+                    softWrap = false,
+                    overflow = TextOverflow.Ellipsis
                 )
-            }
-
-            Spacer(modifier = Modifier.width(8.dp))
-
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    text = transaction.transactionAmount,
-                    fontWeight = FontWeight.Bold,
-                    color = transaction.transactionTypeBackground
-                )
-
-                if (transaction.isConversionPending) {
-                    Text(
-                        text = stringResource(R.string.error_rate_unavailable),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Red500
-                    )
-                }
             }
         }
+
     }
 }
 
 @Composable
-fun ViewTransactionItemPlaceholder(
-    isNestedCard: Boolean = false
-) {
-    val brush = rememberShimmerBrush()
-
-    val placeholderColor = Theme.custom.hintColor
-
-    Card (
-        colors = CardDefaults.cardColors(
-            containerColor = if (isNestedCard) {
-                Theme.custom.nestedCardColor
-            } else {
-                Theme.custom.cardColor
-            },
-        ),
-        shape = RoundedCornerShape(16.dp),
+fun ViewTransactionItemPlaceholder() {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(2.dp)
+            .padding(
+                vertical = 4.dp
+            )
     ) {
-        Row (
-            verticalAlignment = Alignment.CenterVertically,
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
-                .height(IntrinsicSize.Min)
-        ){
-            Box(
+                .size(40.dp)
+                .clip(
+                    shape = RoundedCornerShape(12.dp)
+                )
+                .shimmerEffect(
+                    shimmerColor = Theme.custom.shimmerColor
+                )
+        )
+
+        Column(
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+            modifier = Modifier
+                .weight(1f)
+        ) {
+            Text(
+                text = "",
+                style = MaterialTheme.typography.titleSmall,
+                color = Color.Transparent,
+                maxLines = 1,
+                softWrap = false,
+                overflow = TextOverflow.Ellipsis,
                 modifier = Modifier
-                    .size(48.dp)
-                    .clip(CircleShape)
-                    .background(placeholderColor)
-                    .background(brush)
+                    .clearAndSetSemantics {}
+                    .fillMaxWidth(0.5f)
+                    .clip(RoundedCornerShape(50))
+                    .shimmerEffect(
+                        shimmerColor = Theme.custom.shimmerColor
+                    )
             )
 
-            Spacer(modifier = Modifier.width(8.dp))
-
-            Column(
-                verticalArrangement = Arrangement.Center,
+            Text(
+                text = "",
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.Transparent,
+                maxLines = 1,
+                softWrap = false,
+                overflow = TextOverflow.Ellipsis,
                 modifier = Modifier
-                    .weight(1f)
-                    .fillMaxHeight()
-            ) {
-                Box(
-                    modifier = Modifier
-                        .width(120.dp)
-                        .height(18.dp) // Match approx height of Title text
-                        .clip(RoundedCornerShape(4.dp))
-                        .background(placeholderColor)
-                        .background(brush)
-                )
+                    .clearAndSetSemantics {}
+                    .fillMaxWidth(0.8f)
+                    .clip(RoundedCornerShape(50))
+                    .shimmerEffect(
+                        shimmerColor = Theme.custom.shimmerColor
+                    )
+            )
+        }
 
-                Spacer(
-                    modifier = Modifier
-                        .height(4.dp)
-                )
-
-                Box(
-                    modifier = Modifier
-                        .width(80.dp)
-                        .height(12.dp) // Match approx height of Date text
-                        .clip(RoundedCornerShape(4.dp))
-                        .background(placeholderColor)
-                        .background(brush)
-                )
-            }
-
-            Box(
+        Column(
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+            horizontalAlignment = Alignment.End
+        ) {
+            Text(
+                text = "",
+                style = MaterialTheme.typography.titleSmall,
+                color = Color.Transparent,
+                maxLines = 1,
+                softWrap = false,
+                overflow = TextOverflow.Ellipsis,
                 modifier = Modifier
-                    .width(80.dp)
-                    .height(18.dp)
-                    .clip(RoundedCornerShape(4.dp))
-                    .background(placeholderColor)
-                    .background(brush)
+                    .clearAndSetSemantics {}
+                    .fillMaxWidth(0.15f)
+                    .clip(RoundedCornerShape(50))
+                    .shimmerEffect(
+                        shimmerColor = Theme.custom.shimmerColor
+                    )
+            )
+
+            Text(
+                text = "",
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.Transparent,
+                maxLines = 1,
+                softWrap = false,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier
+                    .clearAndSetSemantics {}
+                    .fillMaxWidth(0.25f)
+                    .clip(RoundedCornerShape(50))
+                    .shimmerEffect(
+                        shimmerColor = Theme.custom.shimmerColor
+                    )
             )
         }
     }
@@ -230,61 +279,48 @@ fun ViewTransactionItemPlaceholder(
 
 @Preview(
     showBackground = true,
-    device = Devices.PIXEL_9_PRO,
-    uiMode = Configuration.UI_MODE_NIGHT_NO
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
 )
 @Composable
-fun ViewTransactionItemPreview() {
+private fun ViewTransactionItemPreview() {
     JetSpendingTheme {
         ViewTransactionItem(
-            navigateToDetail = {},
-            transaction = TransactionItemUi(
-                transactionId = "",
-                transactionName = "Salary",
-                transactionTypeBackground = Green500,
-                transactionCategoryIcon = R.drawable.ic_salary_icon,
-                transactionAmount = "+ Rp 1.000.000",
-                transactionDate = "24 Oct 2025",
-                transactionDateRaw = Instant.now(),
-                isConversionPending = true,
+            state = TransactionItemState(
+                transactionId = "1",
+                transactionType = TransactionType.SPENDING,
+                transactionCategoryIcon = R.drawable.ic_food_icon,
+                transactionName = "Lunch",
+                transactionCategoryName = R.string.category_food,
+                transactionDate = "18 Sep 2026",
+                transactionMonthYear = "September 2026",
+                transactionOriginalAmount = "1.260.000",
+                transactionConvertedAmount = null,
+                transactionSelectedCurrency = "USD",
+                transactionOriginalCurrency = "IDR"
             ),
-            onCheckRate = {}
+            onClick = {}
         )
     }
 }
 
 @Preview(
     showBackground = true,
-    device = Devices.PIXEL_9_PRO,
-    uiMode = Configuration.UI_MODE_NIGHT_YES
+    backgroundColor = 0xFFFAFCFB,
+    uiMode = UI_MODE_NIGHT_NO
 )
-@Composable
-fun ViewTransactionItemDarkPreview() {
-    JetSpendingTheme {
-        ViewTransactionItem(
-            navigateToDetail = {},
-            transaction = TransactionItemUi(
-                transactionId = "",
-                transactionName = "Salary",
-                transactionTypeBackground = Green500,
-                transactionCategoryIcon = R.drawable.ic_salary_icon,
-                transactionAmount = "+ Rp 1.000.000",
-                transactionDate = "24 Oct 2025",
-                transactionDateRaw = Instant.now(),
-                isConversionPending = false
-            ),
-            onCheckRate = {}
-        )
-    }
-}
-
 @Preview(
     showBackground = true,
-    device = Devices.PIXEL_9_PRO,
-    uiMode = Configuration.UI_MODE_NIGHT_YES
+    backgroundColor = 0xFF121214,
+    uiMode = UI_MODE_NIGHT_YES
 )
 @Composable
-fun ViewTransactionItemPlaceholderPreview() {
+private fun ViewTransactionItemPlaceholderPreview() {
     JetSpendingTheme {
         ViewTransactionItemPlaceholder()
     }

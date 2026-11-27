@@ -4,6 +4,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.kevinfreyap.domain.model.AppCurrency
 import com.kevinfreyap.domain.model.AppTheme
@@ -23,14 +24,14 @@ class UserPreferences @Inject constructor(
             val uid = preferences[USER_UID]
 
             if (uid != null) {
-                val currency = preferences[CURRENCY_KEY] ?: "IDR"
+                val currency = preferences[CURRENCY_KEY] ?: AppCurrency.DEFAULT.name
 
                 User(
                     uid = uid,
                     email = preferences[EMAIL_KEY] ?: "",
                     displayName = preferences[USERNAME_KEY] ?: "",
                     photoUrl = preferences[PHOTO_URL_KEY],
-                    hasPassword = preferences[HAS_PASSWORD] ?: true,
+                    hasPassword = preferences[HAS_PASSWORD] ?: false,
                     currency = AppCurrency.valueOf(currency)
                 )
             } else {
@@ -41,25 +42,34 @@ class UserPreferences @Inject constructor(
 
     fun getCurrency(): Flow<AppCurrency> {
         return dataStore.data.map { preferences ->
-            val currency = preferences[CURRENCY_KEY] ?: "IDR"
+            val currency = preferences[CURRENCY_KEY] ?: AppCurrency.DEFAULT.name
             AppCurrency.valueOf(currency)
         }
     }
 
     fun getTheme(): Flow<AppTheme> {
         return dataStore.data.map { preferences ->
-            val theme = preferences[THEME_KEY] ?: "SYSTEM"
+            val theme = preferences[THEME_KEY] ?: AppTheme.DEFAULT.name
             AppTheme.valueOf(theme)
         }
     }
 
     fun getNotificationPreferences(): Flow<NotificationPreferences> {
         return dataStore.data.map { preferences ->
+            val hour = preferences[NOTIFICATION_TIME_HOUR]
+                ?: 20
+
+            val minute = preferences[NOTIFICATION_TIME_MINUTE]
+                ?: 0
+
+            val isMaster = preferences[MASTER_NOTIFICATION] ?: false
+
             NotificationPreferences(
-                isMonthlyEnabled = preferences[MONTHLY_NOTIFICATION] ?: false,
-                isDailyEnabled = preferences[DAILY_NOTIFICATION] ?: false,
-                reminderHour = preferences[NOTIFICATION_TIME_HOUR] ?: "21",
-                reminderMinute = preferences[NOTIFICATION_TIME_MINUTE] ?: "00"
+                isMasterEnabled = isMaster,
+                isWeeklyEnabled = isMaster && (preferences[WEEKLY_NOTIFICATION] ?: false),
+                isDailyEnabled = isMaster && (preferences[DAILY_NOTIFICATION] ?: false),
+                reminderHour = hour,
+                reminderMinute = minute
             )
         }
     }
@@ -72,7 +82,7 @@ class UserPreferences @Inject constructor(
 
     fun getBlockScreenPreference(): Flow<Boolean> {
         return dataStore.data.map { preferences ->
-            preferences[BLOCK_SCREEN_PREFERENCE] ?: true
+            preferences[BLOCK_SCREEN_PREFERENCE] ?: false
         }
     }
 
@@ -104,7 +114,8 @@ class UserPreferences @Inject constructor(
     suspend fun saveNotificationPref(notificationPref: NotificationPreferences) {
         dataStore.edit { preferences ->
             with(notificationPref) {
-                preferences[MONTHLY_NOTIFICATION] = isMonthlyEnabled
+                preferences[MASTER_NOTIFICATION] = isMasterEnabled
+                preferences[WEEKLY_NOTIFICATION] = isWeeklyEnabled
                 preferences[DAILY_NOTIFICATION] = isDailyEnabled
                 preferences[NOTIFICATION_TIME_HOUR] = reminderHour
                 preferences[NOTIFICATION_TIME_MINUTE] = reminderMinute
@@ -126,11 +137,9 @@ class UserPreferences @Inject constructor(
 
     suspend fun updateUser(
         newUsername: String?,
-        newImageUrl: String?
     ) {
         dataStore.edit { preferences ->
             if (!newUsername.isNullOrBlank()) preferences[USERNAME_KEY] = newUsername
-            if (!newImageUrl.isNullOrBlank()) preferences[PHOTO_URL_KEY] = newImageUrl
         }
     }
 
@@ -159,10 +168,11 @@ class UserPreferences @Inject constructor(
         private val HAS_PASSWORD = booleanPreferencesKey("has_password")
         private val THEME_KEY = stringPreferencesKey("theme_mode")
         private val CURRENCY_KEY = stringPreferencesKey("currency")
-        private val MONTHLY_NOTIFICATION = booleanPreferencesKey("monthly_notification")
+        private val MASTER_NOTIFICATION = booleanPreferencesKey("master_notification")
+        private val WEEKLY_NOTIFICATION = booleanPreferencesKey("weekly_notification")
         private val DAILY_NOTIFICATION = booleanPreferencesKey("daily_notification")
-        private val NOTIFICATION_TIME_HOUR = stringPreferencesKey("time_notification_hour")
-        private val NOTIFICATION_TIME_MINUTE = stringPreferencesKey("time_notification_minute")
+        private val NOTIFICATION_TIME_HOUR = intPreferencesKey("time_notification_hour")
+        private val NOTIFICATION_TIME_MINUTE = intPreferencesKey("time_notification_minute")
         private val APP_LOCK_PREFERENCE = booleanPreferencesKey("app_lock_preference")
         private val BLOCK_SCREEN_PREFERENCE = booleanPreferencesKey("block_screen_preference")
     }

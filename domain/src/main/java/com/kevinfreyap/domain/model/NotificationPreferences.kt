@@ -1,8 +1,9 @@
 package com.kevinfreyap.domain.model
 
 data class NotificationPreferences(
-    val isMonthlyEnabled: Boolean = false,
-    val isDailyEnabled: Boolean = false,
-    val reminderHour: String = "21",
-    val reminderMinute: String = "00"
+    val isMasterEnabled: Boolean,
+    val isWeeklyEnabled: Boolean,
+    val isDailyEnabled: Boolean,
+    val reminderHour: Int,
+    val reminderMinute: Int
 )

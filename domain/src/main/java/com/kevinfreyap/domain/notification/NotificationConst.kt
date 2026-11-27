@@ -5,9 +5,10 @@ object NotificationConst {
     const val DAILY_CHANNEL_NAME = "Daily Reminders"
     const val DAILY_CHANNEL_DESC = "Reminders to log your daily expenses"
 
-    const val MONTHLY_CHANNEL_ID = "monthly_summary_channel"
-    const val MONTHLY_CHANNEL_NAME = "Monthly Summary"
-    const val MONTHLY_CHANNEL_DESC = "Notification for your monthly summary"
+    const val WEEKLY_CHANNEL_ID = "weekly_summary_channel"
+    const val WEEKLY_CHANNEL_NAME = "Weekly Summary"
+    const val WEEKLY_CHANNEL_DESC = "Notification for your weekly summary"
 
-    const val IS_MONTHLY = "is_monthly"
+    const val IS_WEEKLY = "is_weekly"
+    const val EXTRA_OPEN_WEEKLY_SUMMARY = "extra_open_weekly_summary"
 }

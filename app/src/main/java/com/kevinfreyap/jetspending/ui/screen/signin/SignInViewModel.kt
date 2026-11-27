@@ -1,156 +1,200 @@
 package com.kevinfreyap.jetspending.ui.screen.signin
 
-import android.app.Activity
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kevinfreyap.domain.error.ErrorReporter
 import com.kevinfreyap.domain.error.Field
 import com.kevinfreyap.domain.resource.DomainResult
-import com.kevinfreyap.domain.usecase.authentication.AuthenticationUseCase
+import com.kevinfreyap.domain.usecase.authentication.AuthWithGoogleUseCase
+import com.kevinfreyap.domain.usecase.authentication.ResetPasswordUseCase
+import com.kevinfreyap.domain.usecase.authentication.SignInUseCase
+import com.kevinfreyap.jetspending.R
+import com.kevinfreyap.jetspending.ui.action.SignInAction
+import com.kevinfreyap.jetspending.ui.helper.error.removeError
+import com.kevinfreyap.jetspending.ui.helper.error.toUIError
+import com.kevinfreyap.jetspending.ui.navigation.SignInNavigation
+import com.kevinfreyap.jetspending.ui.state.SignInState
+import com.kevinfreyap.jetspending.ui.state.UiEvent
 import com.kevinfreyap.jetspending.ui.state.UiState
-import com.kevinfreyap.jetspending.utils.AuthUiValidation
-import com.kevinfreyap.jetspending.utils.ErrorHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class SignInViewModel @Inject constructor(
-    private val authenticationUseCase: AuthenticationUseCase
+    private val signInUseCase: SignInUseCase,
+    private val authWithGoogleUseCase: AuthWithGoogleUseCase,
+    private val resetPasswordUseCase: ResetPasswordUseCase,
+    private val errorReporter: ErrorReporter
 ): ViewModel(){
-    private val _email = MutableStateFlow("")
-    val email: StateFlow<String> = _email
+    private val _uiEvent = Channel<UiEvent<SignInNavigation>>()
+    val uiEvent = _uiEvent.receiveAsFlow()
 
-    private val _password = MutableStateFlow("")
-    val password: StateFlow<String> = _password
+    private val _state = MutableStateFlow(SignInState())
+    val state = _state.asStateFlow()
 
-    private val _resetEmail = MutableStateFlow("")
-    val resetEmail: StateFlow<String> = _resetEmail
-
-    private val _uiState = MutableStateFlow<UiState<Unit>>(UiState.Idle)
-    val uiState: StateFlow<UiState<Unit>> = _uiState
-
-    private val _showDialog = MutableStateFlow(false)
-    val showDialog: StateFlow<Boolean> = _showDialog
-
-    private val _showEmailSentDialog = MutableStateFlow(false)
-    val showEmailSentDialog = _showEmailSentDialog.asStateFlow()
-
-    fun onEmailChange(newEmail: String) {
-        _email.value = newEmail
-
-        _uiState.value = ErrorHelper.removeError(_uiState.value, Field.AUTHENTICATION_EMAIL)
+    fun onAction(action: SignInAction) {
+        when(action) {
+            is SignInAction.OnEmailChanged -> onEmailChange(action.email)
+            is SignInAction.OnPasswordChanged -> onPassChange(action.password)
+            is SignInAction.OnResetPasswordEmailChanged -> onResetEmailChange(action.resetEmail)
+            is SignInAction.OnGoogleAuthClicked -> onAuthWithGoogle(action.idToken)
+            is SignInAction.OnSignInClicked -> onSignInClicked()
+            is SignInAction.OnSendResetEmail -> onSendResetEmail()
+        }
     }
 
-    fun onPassChange(newPass: String) {
-        _password.value = newPass
-
-        _uiState.value = ErrorHelper.removeError(_uiState.value, Field.AUTHENTICATION_PASSWORD)
+    private fun onEmailChange(newEmail: String) {
+        _state.update { currentState ->
+            currentState.copy(
+                emailInput = newEmail,
+                authStatus = currentState.authStatus.removeError(Field.AUTHENTICATION_EMAIL)
+            )
+        }
     }
 
-    fun onResetEmailChange(email: String) {
-        _resetEmail.value = email
-
-        _uiState.value = ErrorHelper.removeError(_uiState.value, Field.AUTHENTICATION_CHANGE_PASSWORD_EMAIL)
+    private fun onPassChange(newPass: String) {
+        _state.update { currentState ->
+            currentState.copy(
+                passwordInput = newPass,
+                authStatus = currentState.authStatus.removeError(Field.AUTHENTICATION_PASSWORD)
+            )
+        }
     }
 
-    fun onSignInClicked() {
-        _uiState.value = UiState.Loading
+    private fun onResetEmailChange(email: String) {
+        _state.update { currentState ->
+            currentState.copy(
+                resetPasswordEmailInput = email,
+                authStatus = currentState.authStatus.removeError(Field.AUTHENTICATION_CHANGE_PASSWORD_EMAIL)
+            )
+        }
+    }
 
-        val validationRes = AuthUiValidation.validateEmailAndPassword(
-            email = _email.value,
-            password = _password.value
-        )
+    private fun onSignInClicked() {
+        if (_state.value.authStatus is UiState.Loading) return
 
-        if (validationRes.isNotEmpty()) {
-            _uiState.value = UiState.ValidationErrors(ErrorHelper.validationErrorsToUiError(validationRes))
-            return
+        _state.update { currentState ->
+            currentState.copy(
+                authStatus = UiState.Loading
+            )
         }
 
         viewModelScope.launch {
-            val result = authenticationUseCase.login(
-                email = _email.value,
-                password = _password.value
+            val result = signInUseCase(
+                email = _state.value.emailInput,
+                password = _state.value.passwordInput
             )
 
             when(result) {
                 is DomainResult.Success -> {
-                    _uiState.value = UiState.Success(Unit)
-                    _showDialog.value = true
+                    _state.update { currentState ->
+                        currentState.copy(
+                            authStatus = UiState.Success(Unit)
+                        )
+                    }
+
+                    _uiEvent.send(UiEvent.ShowToast(R.string.success_login_success))
+                    _uiEvent.send(UiEvent.Navigate(SignInNavigation.NavigateToDashboard))
+
+                    _state.value = SignInState()
                 }
                 is DomainResult.ValidationFailed -> {
-                    _uiState.value = UiState.ValidationErrors(ErrorHelper.validationErrorsToUiError(result.errors))
+                    _state.update { currentState ->
+                        currentState.copy(
+                            authStatus = UiState.ValidationErrors(result.errors.toUIError())
+                        )
+                    }
                 }
                 is DomainResult.Failure -> {
-                    Log.e(VIEW_MODEL_TAG, result.throwable.message ?: "Something Wrong")
-                    _uiState.value = UiState.Failure(result.throwable)
+                    errorReporter.recordException(result.throwable)
+                    _state.update { currentState ->
+                        currentState.copy(
+                            authStatus = UiState.Failure(result.throwable)
+                        )
+                    }
                 }
             }
         }
     }
 
-    fun onAuthWithGoogle(activity: Activity) {
-        viewModelScope.launch {
-            _uiState.value = UiState.Loading
+    private fun onAuthWithGoogle(idToken: String) {
+        if (_state.value.authStatus is UiState.Loading) return
 
-            val result = authenticationUseCase.authWithGoogle(activity)
-
-            when(result) {
-                is DomainResult.Success -> {
-                    _uiState.value = UiState.Success(Unit)
-                    _showDialog.value = true
-                }
-                is DomainResult.ValidationFailed -> {
-                    _uiState.value = UiState.ValidationErrors(ErrorHelper.validationErrorsToUiError(result.errors))
-                }
-                is DomainResult.Failure -> {
-                    Log.e(VIEW_MODEL_TAG, result.throwable.message ?: "Something Wrong")
-                    _uiState.value = UiState.Failure(result.throwable)
-                }
-            }
-        }
-    }
-
-    fun onSendResetEmail() {
-        val validationRes = AuthUiValidation.validateEmail(_resetEmail.value)
-
-        if (validationRes.isNotEmpty()) {
-            _uiState.value = UiState.ValidationErrors(ErrorHelper.validationErrorsToUiError(validationRes))
-            return
+        _state.update { currentState ->
+            currentState.copy(
+                authStatus = UiState.Loading
+            )
         }
 
         viewModelScope.launch {
-            val result = authenticationUseCase.resetPassword(_resetEmail.value)
-
-            when(result) {
+            when(
+                val result = authWithGoogleUseCase(idToken)
+            ) {
                 is DomainResult.Success -> {
-                    _uiState.value = UiState.Success(Unit)
-                    _showEmailSentDialog.value = true
+                    _state.update { currentState ->
+                        currentState.copy(
+                            authStatus = UiState.Success(Unit)
+                        )
+                    }
+
+                    _uiEvent.send(UiEvent.ShowToast(R.string.success_login_success))
+                    _uiEvent.send(UiEvent.Navigate(SignInNavigation.NavigateToDashboard))
                 }
                 is DomainResult.ValidationFailed -> {
-                    _uiState.value = UiState.ValidationErrors(ErrorHelper.validationErrorsToUiError(result.errors))
+                    _state.update { currentState ->
+                        currentState.copy(
+                            authStatus = UiState.ValidationErrors(result.errors.toUIError())
+                        )
+                    }
                 }
                 is DomainResult.Failure -> {
-                    Log.e(VIEW_MODEL_TAG, result.throwable.message ?: "Something Wrong")
-                    _uiState.value = UiState.Failure(result.throwable)
+                    errorReporter.recordException(result.throwable)
+                    _state.update { currentState ->
+                        currentState.copy(
+                            authStatus = UiState.Failure(result.throwable)
+                        )
+                    }
                 }
             }
         }
-
     }
 
-    fun onDismissDialog() {
-        _showDialog.value = false
-    }
+    private fun onSendResetEmail() {
+        viewModelScope.launch {
+            when(
+                val result = resetPasswordUseCase(_state.value.resetPasswordEmailInput)
+            ) {
+                is DomainResult.Success -> {
+                    _state.update { currentState ->
+                        currentState.copy(
+                            authStatus = UiState.Success(Unit)
+                        )
+                    }
 
-    fun onDismissEmailSentDialog() {
-        _showEmailSentDialog.value = false
-    }
-
-    companion object {
-        private const val VIEW_MODEL_TAG = "SignInViewModel"
+                    _uiEvent.send(UiEvent.ShowToast(R.string.success_email_sent))
+                }
+                is DomainResult.ValidationFailed -> {
+                    _state.update { currentState ->
+                        currentState.copy(
+                            authStatus = UiState.ValidationErrors(result.errors.toUIError())
+                        )
+                    }
+                }
+                is DomainResult.Failure -> {
+                    errorReporter.recordException(result.throwable)
+                    _state.update { currentState ->
+                        currentState.copy(
+                            authStatus = UiState.Failure(result.throwable)
+                        )
+                    }
+                }
+            }
+        }
     }
 }

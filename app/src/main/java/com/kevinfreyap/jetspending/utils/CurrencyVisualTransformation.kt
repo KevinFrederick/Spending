@@ -5,7 +5,6 @@ import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
 import com.kevinfreyap.domain.model.AppCurrency
-import com.kevinfreyap.jetspending.utils.formatter.CurrencyUiFormatter
 import java.lang.Exception
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
@@ -15,19 +14,16 @@ class CurrencyVisualTransformation (
 ): VisualTransformation {
 
     private val numberFormat: DecimalFormat
-    private val groupingChar: Char
     private val decimalChar: Char
 
     init {
-        val locale = CurrencyUiFormatter.getLocale(currencyCode)
+        val locale = currencyCode.getLocale()
 
         val symbols = DecimalFormatSymbols(locale)
-        groupingChar = symbols.groupingSeparator
         decimalChar = symbols.decimalSeparator
 
         numberFormat = (DecimalFormat.getNumberInstance(locale) as DecimalFormat).apply {
-            isParseBigDecimal = true
-            applyPattern("#,##0.##")
+            isGroupingUsed = true
         }
     }
 
@@ -49,8 +45,8 @@ class CurrencyVisualTransformation (
             intPart
         }
 
-        val formatted = if (fractionPart != null && fractionPart != "00") {
-            "$formattedInt.$fractionPart"
+        val formatted = if (fractionPart != null) {
+            "$formattedInt$decimalChar$fractionPart"
         } else {
             formattedInt
         }
@@ -89,7 +85,6 @@ class CurrencyVisualTransformation (
                 }
                 return inputIdx
             }
-
         }
         return TransformedText(AnnotatedString(formatted), offsetMapping)
     }

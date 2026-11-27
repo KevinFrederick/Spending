@@ -6,12 +6,11 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Upsert
 import com.kevinfreyap.data.source.local.entity.DailyRatesEntity
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ExchangeRatesDao {
     @Query("SELECT * FROM daily_rates WHERE dateKey = :key")
-    fun getExchangeRatesByDate(key: String): Flow<DailyRatesEntity?>
+    suspend fun getExchangeRatesByDate(key: String): DailyRatesEntity?
 
     // Check Availability
     @Query("SELECT * FROM daily_rates WHERE dateKey = :key")

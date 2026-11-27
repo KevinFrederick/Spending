@@ -1,19 +1,11 @@
 package com.kevinfreyap.data.repository
 
-import android.app.Activity
-import android.content.Context
-import android.util.Log
-import androidx.credentials.CredentialManager
-import androidx.credentials.CustomCredential
-import androidx.credentials.GetCredentialRequest
-import androidx.credentials.exceptions.GetCredentialCancellationException
 import androidx.room.withTransaction
-import com.google.android.libraries.identity.googleid.GetGoogleIdOption
-import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseUser
@@ -21,37 +13,42 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.userProfileChangeRequest
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-import com.kevinfreyap.data.BuildConfig
+import com.google.firebase.firestore.SetOptions
 import com.kevinfreyap.data.mapper.UserMapper
-import com.kevinfreyap.data.source.local.AppDatabase
 import com.kevinfreyap.data.source.local.UserPreferences
+import com.kevinfreyap.data.source.local.db.AppDatabase
 import com.kevinfreyap.data.source.remote.firebase.UserFirestore
 import com.kevinfreyap.data.utils.DataConstants.USER_COLLECTION
+import com.kevinfreyap.domain.error.ErrorReporter
 import com.kevinfreyap.domain.error.ValidationError
 import com.kevinfreyap.domain.model.AuthenticationRequest
 import com.kevinfreyap.domain.repository.IAuthenticationRepository
 import com.kevinfreyap.domain.resource.DomainResult
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import java.lang.Exception
 import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
 class AuthenticationRepository @Inject constructor(
     private val firebaseAuth: FirebaseAuth,
     private val firestore: FirebaseFirestore,
     private val userPreferences: UserPreferences,
     private val database: AppDatabase,
     private val userMapper: UserMapper,
-    @param:ApplicationContext private val context: Context
-): IAuthenticationRepository {
-    override fun getAuthState(): Flow<Boolean> = callbackFlow{
+    private val errorReporter: ErrorReporter,
+) : IAuthenticationRepository {
+
+    override fun getAuthState(): Flow<Boolean> = callbackFlow {
+        trySend(firebaseAuth.currentUser != null)
+
         val authListener = FirebaseAuth.AuthStateListener { auth ->
-            trySend(auth.currentUser != null)
+            val user = auth.currentUser
+            trySend(user != null)
+            if (user != null) {
+                errorReporter.setUserId(user.uid)
+            }
         }
 
         firebaseAuth.addAuthStateListener(authListener)
@@ -61,28 +58,31 @@ class AuthenticationRepository @Inject constructor(
         }
     }
 
-    override suspend fun authWithGoogle(activity: Activity): DomainResult<Unit> {
+    override suspend fun authWithGoogle(idToken: String): DomainResult<Unit> {
         return try {
-            val idToken = getGoogleIdToken(activity)
-                ?: return DomainResult.Failure(Exception("Sign In Canceled"))
-
             val authCredential = GoogleAuthProvider.getCredential(idToken, null)
             val authResult = firebaseAuth.signInWithCredential(authCredential).await()
             val user = authResult.user
 
             if (user != null) {
+                errorReporter.setUserId(user.uid)
                 val userFirestore = updateOrSaveToFirestore(user)
                 handleAuthResult(userFirestore)
             } else {
-                DomainResult.Failure(Exception("User is Null"))
+                DomainResult.Failure(Exception("Firebase returned null user after Google authentication"))
             }
         } catch (e: Exception) {
+            errorReporter.recordException(e)
             DomainResult.Failure(e)
         }
     }
 
     override suspend fun isUserLoggedIn(): Boolean {
-        return firebaseAuth.currentUser != null
+        val user = firebaseAuth.currentUser
+        if (user != null) {
+            errorReporter.setUserId(user.uid)
+        }
+        return user != null
     }
 
     override suspend fun register(authRequest: AuthenticationRequest): DomainResult<Unit> {
@@ -92,7 +92,10 @@ class AuthenticationRepository @Inject constructor(
                 authRequest.password
             ).await()
 
-            val user = response.user ?: return DomainResult.Failure(Throwable("Firebase returned null user"))
+            val user = response.user
+                ?: return DomainResult.Failure(Exception("Firebase returned null user"))
+
+            errorReporter.setUserId(user.uid)
 
             val defaultName = authRequest.email
                 .substringBefore("@")
@@ -114,11 +117,11 @@ class AuthenticationRepository @Inject constructor(
 
             handleAuthResult(userFirestore)
         } catch (_: FirebaseAuthUserCollisionException) {
-            DomainResult.ValidationFailed(listOf(
-                ValidationError.AuthenticationEmailAlreadyUsed
-            ))
-        }
-        catch (e: Exception){
+            DomainResult.ValidationFailed(
+                listOf(ValidationError.AuthenticationEmailAlreadyUsed)
+            )
+        } catch (e: Exception) {
+            errorReporter.recordException(e)
             DomainResult.Failure(e)
         }
     }
@@ -130,17 +133,23 @@ class AuthenticationRepository @Inject constructor(
                 authRequest.password
             ).await()
 
-            val user = response.user ?: return DomainResult.Failure(Throwable("Firebase returned null user"))
+            val user = response.user
+                ?: return DomainResult.Failure(Exception("Firebase returned null user"))
+
+            errorReporter.setUserId(user.uid)
 
             val userFirestore = updateOrSaveToFirestore(user)
-
             handleAuthResult(userFirestore)
         } catch (_: FirebaseAuthInvalidCredentialsException) {
-            DomainResult.ValidationFailed(listOf(
-                ValidationError.AuthenticationWrongPassword
-            ))
-        }
-        catch (e: Exception) {
+            DomainResult.ValidationFailed(
+                listOf(ValidationError.AuthenticationWrongPassword)
+            )
+        } catch (_: FirebaseAuthInvalidUserException) {
+            DomainResult.ValidationFailed(
+                listOf(ValidationError.AuthenticationWrongPassword)
+            )
+        } catch (e: Exception) {
+            errorReporter.recordException(e)
             DomainResult.Failure(e)
         }
     }
@@ -148,9 +157,9 @@ class AuthenticationRepository @Inject constructor(
     override suspend fun resetPassword(email: String): DomainResult<Unit> {
         return try {
             firebaseAuth.sendPasswordResetEmail(email).await()
-
             DomainResult.Success(Unit)
         } catch (e: Exception) {
+            errorReporter.recordException(e)
             DomainResult.Failure(e)
         }
     }
@@ -159,37 +168,49 @@ class AuthenticationRepository @Inject constructor(
         oldPassword: String,
         newPassword: String
     ): DomainResult<Unit> {
+        if (oldPassword.isBlank()) {
+            return DomainResult.ValidationFailed(listOf(ValidationError.AuthenticationPasswordBlank))
+        }
+        if (newPassword.isBlank()) {
+            return DomainResult.ValidationFailed(listOf(ValidationError.AuthenticationNewPasswordBlank))
+        }
+
         return try {
-            val currentUser = firebaseAuth.currentUser ?: throw Exception("User not logged in")
+            val currentUser = firebaseAuth.currentUser
+                ?: throw Exception("User not logged in")
+
             val email = currentUser.email
                 ?: currentUser.providerData.firstNotNullOfOrNull { it.email }
                 ?: throw Exception("User email is missing")
 
             val credential = EmailAuthProvider.getCredential(email, oldPassword)
-
             currentUser.reauthenticate(credential).await()
-
             currentUser.updatePassword(newPassword).await()
 
             DomainResult.Success(Unit)
         } catch (_: FirebaseAuthInvalidCredentialsException) {
-            DomainResult.ValidationFailed( listOf(
-                ValidationError.AuthenticationWrongPassword
-            ))
-
+            DomainResult.ValidationFailed(
+                listOf(ValidationError.AuthenticationWrongPassword)
+            )
         } catch (e: Exception) {
+            errorReporter.recordException(e)
             DomainResult.Failure(e)
         }
     }
 
     override suspend fun createPassword(newPassword: String): DomainResult<Unit> {
-        return try {
-            val currentUser = firebaseAuth.currentUser ?: throw Exception("User not logged in")
+        val currentUser = firebaseAuth.currentUser
+            ?: return DomainResult.Failure(Exception("User not logged in"))
 
-            currentUser.updatePassword(newPassword).await()
+        return try {
+            val email = currentUser.email
+                ?: currentUser.providerData.firstNotNullOfOrNull { it.email }
+                ?: throw Exception("Email missing")
+
+            val credential = EmailAuthProvider.getCredential(email, newPassword)
+            currentUser.linkWithCredential(credential).await()
 
             currentUser.reload().await()
-
             updatePasswordStatus(true)
 
             DomainResult.Success(Unit)
@@ -197,17 +218,26 @@ class AuthenticationRepository @Inject constructor(
             DomainResult.ValidationFailed( listOf(
                 ValidationError.AuthenticationReLogin
             ))
+        } catch (_: FirebaseAuthUserCollisionException) {
+            try {
+                currentUser.updatePassword(newPassword).await()
+                currentUser.reload().await()
+                updatePasswordStatus(true)
+                DomainResult.Success(Unit)
+            } catch (e: Exception) {
+                errorReporter.recordException(e)
+                DomainResult.Failure(e)
+            }
         } catch (e: Exception) {
+            errorReporter.recordException(e)
             DomainResult.Failure(e)
         }
     }
 
-    override suspend fun reauthenticateWithGoogle(activity: Activity): DomainResult<Unit> {
+    override suspend fun reauthenticateWithGoogle(idToken: String): DomainResult<Unit> {
         return try {
-            val user = firebaseAuth.currentUser ?: throw Exception("User not logged in")
-
-            val idToken = getGoogleIdToken(activity)
-                ?: return DomainResult.Failure(Exception("Verification Canceled"))
+            val user = firebaseAuth.currentUser
+                ?: throw Exception("User not logged in")
 
             val authCredential = GoogleAuthProvider.getCredential(idToken, null)
             user.reauthenticate(authCredential).await()
@@ -217,10 +247,11 @@ class AuthenticationRepository @Inject constructor(
             if (e.errorCode == "ERROR_USER_MISMATCH") {
                 DomainResult.ValidationFailed(listOf(ValidationError.AuthenticationUserMismatch))
             } else {
+                errorReporter.recordException(e)
                 DomainResult.Failure(e)
             }
-
-        }  catch (e: Exception) {
+        } catch (e: Exception) {
+            errorReporter.recordException(e)
             DomainResult.Failure(e)
         }
     }
@@ -228,84 +259,65 @@ class AuthenticationRepository @Inject constructor(
     override suspend fun logout(): DomainResult<Unit> {
         return try {
             userPreferences.clearSession()
-            database.withTransaction {
-                database.transactionDao().deleteAllTransactions()
+
+            try {
+                database.withTransaction {
+                    database.transactionDao().deleteAllTransactions()
+                }
+            } catch (e: Exception) {
+                errorReporter.log("Failed to clear database on logout: ${e.message}")
+                errorReporter.recordException(e)
             }
 
             try {
                 firebaseAuth.signOut()
             } catch (e: Exception) {
-                Log.e(TAG, "Server logout failed", e)
+                errorReporter.log("Server logout failed: ${e.message}")
+                errorReporter.recordException(e)
             }
 
             DomainResult.Success(Unit)
         } catch (e: Exception) {
+            errorReporter.recordException(e)
             DomainResult.Failure(e)
         }
     }
 
     override suspend fun deleteAccount(password: String?): DomainResult<Unit> {
         return try {
-            val user = firebaseAuth.currentUser ?: throw Exception("User not Logged In")
+            val user = firebaseAuth.currentUser
+                ?: throw Exception("User not logged in")
 
             val uid = user.uid
 
             if (password != null) {
-                val email = user.email ?: user.providerData.firstNotNullOfOrNull { it.email } ?: throw Exception("Email missing")
+                val email = user.email
+                    ?: user.providerData.firstNotNullOfOrNull { it.email }
+                    ?: throw Exception("Email missing")
                 val credential = EmailAuthProvider.getCredential(email, password)
                 user.reauthenticate(credential).await()
             }
+
             firestore.collection(USER_COLLECTION)
                 .document(uid)
                 .delete()
                 .await()
 
             userPreferences.clearSession()
-
             user.delete().await()
 
             DomainResult.Success(Unit)
         } catch (_: FirebaseAuthRecentLoginRequiredException) {
-            DomainResult.ValidationFailed(listOf(
-                ValidationError.AuthenticationReLogin
-            ))
+            DomainResult.ValidationFailed(
+                listOf(ValidationError.AuthenticationReLogin)
+            )
         } catch (_: FirebaseAuthInvalidCredentialsException) {
-            DomainResult.ValidationFailed(listOf(
-                ValidationError.AuthenticationWrongPassword
-            ))
+            DomainResult.ValidationFailed(
+                listOf(ValidationError.AuthenticationWrongPassword)
+            )
         } catch (e: Exception) {
+            errorReporter.recordException(e)
             DomainResult.Failure(e)
-        }
-    }
-
-    private suspend fun getGoogleIdToken(activity: Activity): String? {
-        return try {
-            val googleIdOption = GetGoogleIdOption.Builder()
-                .setFilterByAuthorizedAccounts(false)
-                .setServerClientId(BuildConfig.WEB_CLIENT_ID)
-                .setAutoSelectEnabled(false)
-                .build()
-
-            val request = GetCredentialRequest.Builder()
-                .addCredentialOption(googleIdOption)
-                .build()
-
-            val credentialManager = CredentialManager.create(context)
-            val result = credentialManager.getCredential(activity, request)
-
-            val credential = result.credential
-            if (credential is CustomCredential &&
-                credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
-            ) {
-                val googleCredentials = GoogleIdTokenCredential.createFrom(credential.data)
-                googleCredentials.idToken
-            } else {
-                null
-            }
-        } catch (_: GetCredentialCancellationException) {
-            null
-        } catch (_: Exception) {
-            null
         }
     }
 
@@ -313,9 +325,9 @@ class AuthenticationRepository @Inject constructor(
         return try {
             val domainUser = userMapper.mapFirebaseUserToUser(user)
             userPreferences.saveUser(domainUser)
-
             DomainResult.Success(Unit)
         } catch (e: Exception) {
+            errorReporter.recordException(e)
             DomainResult.Failure(e)
         }
     }
@@ -325,22 +337,49 @@ class AuthenticationRepository @Inject constructor(
         val snapshot = userDocRef.get().await()
 
         return if (snapshot.exists()) {
-            userDocRef.update("lastLogin", FieldValue.serverTimestamp()).await()
-
-            snapshot.toObject(UserFirestore::class.java) ?: throw IllegalStateException("Failed to map document ${user.uid} to FirestoreUser")
-        } else {
-            val fallbackName = user.displayName ?: user.email?.substringBefore("@") ?: "User"
-
-            // Save to FireAuth Too
-            val profileUpdates = userProfileChangeRequest {
-                displayName = fallbackName
+            try {
+                userDocRef.update("lastLogin", FieldValue.serverTimestamp()).await()
+            } catch (e: Exception) {
+                errorReporter.log("Failed to update lastLogin timestamp: ${e.message}")
             }
-            user.updateProfile(profileUpdates).await()
+
+            val firestoreUser = snapshot.toObject(UserFirestore::class.java)
+                ?: userMapper.mapFirebaseUserToFirestoreUser(user)
+
+            val fallbackName = user.displayName
+                ?: user.email?.substringBefore("@")
+                ?: "User"
+
+            firestoreUser.copy(
+                uid = firestoreUser.uid.ifBlank { user.uid },
+                email = firestoreUser.email.ifBlank { user.email ?: "" },
+                name = firestoreUser.name.ifBlank { fallbackName }
+            )
+        } else {
+            val fallbackName = user.displayName
+                ?: user.email?.substringBefore("@")
+                ?: "User"
+
+            try {
+                val profileUpdates = userProfileChangeRequest {
+                    displayName = fallbackName
+                }
+                user.updateProfile(profileUpdates).await()
+            } catch (e: Exception) {
+                errorReporter.log("Failed to update Firebase Auth profile: ${e.message}")
+            }
 
             val restoredUser = userMapper.mapFirebaseUserToFirestoreUser(user).copy(
                 name = fallbackName
             )
-            userDocRef.set(restoredUser).await()
+
+            try {
+                userDocRef.set(restoredUser, SetOptions.merge()).await()
+            } catch (e: Exception) {
+                errorReporter.log("Failed to save user to Firestore: ${e.message}")
+                errorReporter.recordException(e)
+            }
+
             restoredUser
         }
     }
@@ -350,13 +389,14 @@ class AuthenticationRepository @Inject constructor(
 
         val currentUserId = firebaseAuth.currentUser?.uid ?: return
 
-        firestore.collection(USER_COLLECTION)
-            .document(currentUserId)
-            .update("hasPassword", hasPassword)
-            .await()
-    }
-
-    companion object {
-        private const val TAG = "AuthenticationRepository"
+        try {
+            firestore.collection(USER_COLLECTION)
+                .document(currentUserId)
+                .set(mapOf("hasPassword" to hasPassword), SetOptions.merge())
+                .await()
+        } catch (e: Exception) {
+            errorReporter.log("Failed to update hasPassword in Firestore: ${e.message}")
+            errorReporter.recordException(e)
+        }
     }
 }

@@ -5,7 +5,6 @@ import com.kevinfreyap.domain.model.AppTheme
 import com.kevinfreyap.domain.model.NotificationPreferences
 import com.kevinfreyap.domain.model.User
 import com.kevinfreyap.domain.resource.DomainResult
-import com.kevinfreyap.domain.resource.Resource
 import kotlinx.coroutines.flow.Flow
 
 interface IUserRepository {
@@ -16,7 +15,6 @@ interface IUserRepository {
     suspend fun updateUserProfile(
         userId: String,
         newUsername: String?,
-        newImageUrl: String?
     ): DomainResult<Unit>
     suspend fun setCurrency(appCurrency: AppCurrency)
     suspend fun setNotificationPref(notificationPref: NotificationPreferences)

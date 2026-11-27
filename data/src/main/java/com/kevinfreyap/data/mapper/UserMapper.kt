@@ -28,7 +28,7 @@ class UserMapper @Inject constructor() {
             uid = firebaseUser.uid,
             email = firebaseUser.email ?: "",
             name = firebaseUser.displayName ?: "",
-            photoUrl = firebaseUser.photoUrl.toString(),
+            photoUrl = firebaseUser.photoUrl?.toString() ?: "",
             hasPassword = hasPassword,
         )
     }

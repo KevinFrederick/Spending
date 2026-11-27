@@ -5,20 +5,25 @@ sealed class Screen(val route: String) {
     data object SignUp: Screen("sign_up")
     data object SignIn: Screen("sign_in")
     data object Dashboard: Screen("dashboard")
-    data object Report: Screen("report")
+    data object Report: Screen("report") {
+        const val ROUTE_WITH_ARGS = "report?fromWeeklyNotification={fromWeeklyNotification}"
+        fun createRoute(fromWeeklyNotification: Boolean = false): String {
+            return "report?fromWeeklyNotification=$fromWeeklyNotification"
+        }
+    }
     data object Settings: Screen("settings")
-    data object AddTransaction: Screen("add_transaction") {
-        const val ROUTE_WITH_ARGS = "add_transaction?transactionId={transactionId}"
+    data object TransactionForm: Screen("transaction_form") {
+        const val ROUTE_WITH_ARGS = "transaction_form?transactionId={transactionId}"
         fun createRoute(transactionId: String? = null): String {
             return if (transactionId != null) {
-                "add_transaction?transactionId=$transactionId"
+                "transaction_form?transactionId=$transactionId"
             } else {
-                "add_transaction"
+                "transaction_form"
             }
         }
     }
     data object TransactionList: Screen("transactions")
-    data object TransactionDetail: Screen("detail/{transactionId}") { // detail/{transactionId} -> using '/' transaction is required
+    data object TransactionDetail: Screen("detail/{transactionId}") {
         fun createRoute(transactionId: String) = "detail/$transactionId"
     }
     data object EditProfile: Screen("edit_profile")

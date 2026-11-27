@@ -1,9 +1,10 @@
 package com.kevinfreyap.data.source.remote.firebase
 
 data class NotificationFirestore(
-    val monthlyNotification: Boolean = false,
-    val dailyNotification: Boolean = false,
-    val selectedHour: String = "21",
-    val selectedMinute: String = "00",
+    val masterNotification: Boolean = true,
+    val weeklyNotification: Boolean = true,
+    val dailyNotification: Boolean = true,
+    val selectedHour: Int = 20,
+    val selectedMinute: Int = 0,
     val lastUpdated: Long = System.currentTimeMillis()
 )
