@@ -1,8 +1,8 @@
 package com.kevinfreyap.jetspending.ui.screen.settings
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kevinfreyap.domain.error.ErrorReporter
 import com.kevinfreyap.domain.usecase.authentication.LogoutUseCase
 import com.kevinfreyap.domain.usecase.currency.GetCurrencyUseCase
 import com.kevinfreyap.domain.usecase.currency.SetCurrencyUseCase
@@ -15,8 +15,8 @@ import com.kevinfreyap.jetspending.ui.navigation.SettingsNavigation
 import com.kevinfreyap.jetspending.ui.screen.settings.state.ProfileCardState
 import com.kevinfreyap.jetspending.ui.screen.settings.state.SettingsDialogType
 import com.kevinfreyap.jetspending.ui.state.SettingsState
-import com.kevinfreyap.jetspending.ui.state.UiState
 import com.kevinfreyap.jetspending.ui.state.UiEvent
+import com.kevinfreyap.jetspending.ui.state.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,7 +35,8 @@ class SettingsViewModel @Inject constructor(
     getTheme: GetThemeUseCase,
     private val setCurrency: SetCurrencyUseCase,
     private val setTheme: SetThemeUseCase,
-    private val logout: LogoutUseCase
+    private val logout: LogoutUseCase,
+    private val errorReporter: ErrorReporter
 ): ViewModel() {
     private val _uiEvent = Channel<UiEvent<SettingsNavigation>>()
     val uiEvent = _uiEvent.receiveAsFlow()
@@ -115,12 +116,8 @@ class SettingsViewModel @Inject constructor(
                 _uiEvent.send(UiEvent.ShowToast(R.string.success_logout))
                 _uiEvent.send(UiEvent.Navigate(SettingsNavigation.NavigateToOnBoard))
             } catch (e: Exception) {
-                Log.e(VIEW_MODEL_TAG, "Logout failed", e)
+                errorReporter.recordException(e)
             }
         }
-    }
-
-    companion object {
-        private const val VIEW_MODEL_TAG = "SettingsViewModel"
     }
 }

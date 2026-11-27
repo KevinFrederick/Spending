@@ -1,6 +1,6 @@
 package com.kevinfreyap.domain.usecase.rates
 
-import android.util.Log
+import com.kevinfreyap.domain.error.ErrorReporter
 import com.kevinfreyap.domain.repository.IConnectivityRepository
 import com.kevinfreyap.domain.repository.IExchangeRatesRepository
 import com.kevinfreyap.domain.repository.ITransactionRepository
@@ -12,7 +12,8 @@ import javax.inject.Inject
 class RatesHealerUseCase @Inject constructor(
     private val transactionRepository: ITransactionRepository,
     private val connectivityRepository: IConnectivityRepository,
-    private val ratesRepository: IExchangeRatesRepository
+    private val ratesRepository: IExchangeRatesRepository,
+    private val errorReporter: ErrorReporter,
 ) {
     suspend operator fun invoke() {
         combine(
@@ -28,7 +29,8 @@ class RatesHealerUseCase @Inject constructor(
                 try {
                     ratesRepository.ensureRatesExist(date)
                 } catch (e: Exception) {
-                    Log.e("ExchangeRatesInteractor", e.message ?: "Something Wrong")
+                    errorReporter.setCustomKey("rate_heal_date", date)
+                    errorReporter.recordException(e)
                 }
             }
         }

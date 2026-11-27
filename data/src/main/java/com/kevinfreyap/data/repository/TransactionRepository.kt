@@ -1,6 +1,5 @@
 package com.kevinfreyap.data.repository
 
-import android.util.Log
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -16,6 +15,7 @@ import com.kevinfreyap.data.source.remote.firebase.TransactionFirestore
 import com.kevinfreyap.data.utils.DataConstants.TRANSACTION_COLLECTION
 import com.kevinfreyap.data.utils.DataConstants.USER_COLLECTION
 import com.kevinfreyap.data.source.local.query.TransactionQuery
+import com.kevinfreyap.domain.error.ErrorReporter
 import com.kevinfreyap.domain.model.Transaction
 import com.kevinfreyap.domain.model.TransactionFilter
 import com.kevinfreyap.domain.model.TransactionMathWithRates
@@ -40,7 +40,8 @@ class TransactionRepository @Inject constructor(
     private val transactionQuery: TransactionQuery,
     private val transactionMapper: TransactionMapper,
     private val firestore: FirebaseFirestore,
-    private val fireAuth: FirebaseAuth
+    private val fireAuth: FirebaseAuth,
+    private val errorReporter: ErrorReporter,
 ): ITransactionRepository {
     override fun getTransactions(
         query: String,
@@ -121,19 +122,17 @@ class TransactionRepository @Inject constructor(
         val listenerRegistration = query.addSnapshotListener { snapshot, error ->
             if (error != null) {
                 trySend(false)
+                errorReporter.log("Firestore transaction snapshot listener error: ${error.message}")
+                errorReporter.recordException(error)
                 return@addSnapshotListener
             }
 
             if (snapshot != null) {
-                // Launch a coroutine within the flow's scope to do the DB write
                 launch {
                     val toInsert = mutableListOf<TransactionEntity>()
                     val toDeleteIds = mutableListOf<String>()
 
                     for (change in snapshot.documentChanges) {
-                        // Check metadata: Did this update come from THIS device?
-                        // If hasPendingWrites is true, it means we just wrote it offline/locally.
-                        // Skip saving to Room because Room already has it.
                         if (change.document.metadata.hasPendingWrites()) continue
 
                         when(change.type) {
@@ -172,7 +171,9 @@ class TransactionRepository @Inject constructor(
             try {
                 insertTransactionToFirestore(transaction, currentTimeStamp)
             } catch (e: Exception) {
-                Log.e(TAG + "Insert", e.message ?: "Something Wrong")
+                errorReporter.setCustomKey("transaction_action", "insert_firestore")
+                errorReporter.log("Failed to insert transaction to Firestore: ${e.message}")
+                errorReporter.recordException(e)
             }
         }
     }
@@ -188,7 +189,9 @@ class TransactionRepository @Inject constructor(
             try {
                 insertTransactionToFirestore(transaction, currentTimeStamp)
             } catch (e: Exception) {
-                Log.e(TAG + "Update", e.message ?: "Something Wrong")
+                errorReporter.setCustomKey("transaction_action", "update_firestore")
+                errorReporter.log("Failed to update transaction in Firestore: ${e.message}")
+                errorReporter.recordException(e)
             }
         }
     }
@@ -200,7 +203,9 @@ class TransactionRepository @Inject constructor(
             try {
                 deleteTransactionFromFirestore(transactionId)
             } catch (e: Exception) {
-                Log.e(TAG + "Delete", e.message ?: "Something Wrong")
+                errorReporter.setCustomKey("transaction_action", "delete_firestore")
+                errorReporter.log("Failed to delete transaction from Firestore: ${e.message}")
+                errorReporter.recordException(e)
             }
         }
     }
@@ -228,9 +233,5 @@ class TransactionRepository @Inject constructor(
             .document(transactionId)
             .delete()
             .await()
-    }
-
-    companion object {
-        private const val TAG = "TransactionRepo"
     }
 }

@@ -52,7 +52,7 @@ fun JetSpendingApp(
         currentRoute in setOf(
             Screen.Dashboard.route,
             Screen.TransactionList.route,
-            Screen.Report.route,
+            Screen.Report.ROUTE_WITH_ARGS,
             Screen.Settings.route
         )
     }

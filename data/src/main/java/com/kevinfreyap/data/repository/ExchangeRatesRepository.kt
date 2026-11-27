@@ -1,6 +1,5 @@
 package com.kevinfreyap.data.repository
 
-import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 import com.kevinfreyap.data.BuildConfig
 import com.kevinfreyap.data.mapper.ExchangeRatesMapper
@@ -9,6 +8,7 @@ import com.kevinfreyap.data.source.remote.firebase.ExchangeRatesFirestore
 import com.kevinfreyap.data.source.remote.retrofit.network.ApiService
 import com.kevinfreyap.data.utils.DataConstants.BASE_CURRENCY_QUERY
 import com.kevinfreyap.data.utils.DataConstants.EXCHANGE_RATES_COLLECTION
+import com.kevinfreyap.domain.error.ErrorReporter
 import com.kevinfreyap.domain.model.AppCurrency
 import com.kevinfreyap.domain.model.ExchangeRates
 import com.kevinfreyap.domain.repository.IExchangeRatesRepository
@@ -26,7 +26,8 @@ class ExchangeRatesRepository @Inject constructor(
     private val apiService: ApiService,
     private val exchangeRatesDao: ExchangeRatesDao,
     private val firestore: FirebaseFirestore,
-    private val exchangeRatesMapper: ExchangeRatesMapper
+    private val exchangeRatesMapper: ExchangeRatesMapper,
+    private val errorReporter: ErrorReporter,
 ): IExchangeRatesRepository {
     override suspend fun getRates(dateKey: String): ExchangeRates? {
         return exchangeRatesDao.getExchangeRatesByDate(dateKey)?.let { exchangeRatesMapper.mapRatesEntityToDomain(it) }
@@ -62,12 +63,14 @@ class ExchangeRatesRepository @Inject constructor(
                     if (isDataComplete) {
                         return@withContext
                     } else {
-                        Log.e(TAG + "Check Firestore", "Firestore data incomplete")
+                        errorReporter.log("Firestore exchange rate data incomplete for date: $dateKey")
                     }
                 }
             }
         } catch (e: Exception) {
-            Log.e(TAG + "Check Firestore", e.message ?: "Something Wrong")
+            errorReporter.setCustomKey("failed_rate_date", dateKey)
+            errorReporter.log("Check Firestore error: ${e.message}")
+            errorReporter.recordException(e)
         }
 
         // Check API
@@ -82,12 +85,18 @@ class ExchangeRatesRepository @Inject constructor(
 
             exchangeRatesDao.insertRates(entity)
             CoroutineScope(Dispatchers.IO).launch {
-                firestore.collection(EXCHANGE_RATES_COLLECTION)
-                    .document(dateKey)
-                    .set(firestoreObj)
+                try {
+                    firestore.collection(EXCHANGE_RATES_COLLECTION)
+                        .document(dateKey)
+                        .set(firestoreObj)
+                } catch (e: Exception) {
+                    errorReporter.recordException(e)
+                }
             }
         } catch (e: Exception) {
-            Log.e(TAG + "Check API", e.message ?: "Something Wrong")
+            errorReporter.setCustomKey("failed_api_rate_date", dateKey)
+            errorReporter.log("Check API error: ${e.message}")
+            errorReporter.recordException(e)
         }
     }
 
@@ -95,7 +104,10 @@ class ExchangeRatesRepository @Inject constructor(
         firestore.collection(EXCHANGE_RATES_COLLECTION)
             .addSnapshotListener { snapshot, error ->
                 if (error != null || snapshot == null) {
-                    Log.e(TAG, error?.message ?: "Sync Rates Error")
+                    if (error != null) {
+                        errorReporter.log("Sync Rates Error: ${error.message}")
+                        errorReporter.recordException(error)
+                    }
                     return@addSnapshotListener
                 }
 
@@ -106,12 +118,12 @@ class ExchangeRatesRepository @Inject constructor(
                 }
 
                 CoroutineScope(Dispatchers.IO).launch {
-                    exchangeRatesDao.upsertRates(rates)
+                    try {
+                        exchangeRatesDao.upsertRates(rates)
+                    } catch (e: Exception) {
+                        errorReporter.recordException(e)
+                    }
                 }
             }
-    }
-
-    companion object {
-        private const val TAG = "ExchangeRatesRepository"
     }
 }

@@ -38,7 +38,7 @@ private val bottomNavItems = listOf(
     BottomNavItem(
         titleRes = R.string.bottom_nav_report,
         iconRes = R.drawable.ic_bar_chart_24,
-        route = Screen.Report.route
+        route = Screen.Report.ROUTE_WITH_ARGS
     ),
     BottomNavItem(
         titleRes = R.string.bottom_nav_settings,

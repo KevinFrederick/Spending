@@ -9,6 +9,7 @@ import com.kevinfreyap.data.source.remote.firebase.UserFirestore
 import com.kevinfreyap.data.utils.DataConstants.NOTIFICATION_SUB_DOCUMENT
 import com.kevinfreyap.data.utils.DataConstants.SETTINGS_SUB_COLLECTION
 import com.kevinfreyap.data.utils.DataConstants.USER_COLLECTION
+import com.kevinfreyap.domain.error.ErrorReporter
 import com.kevinfreyap.domain.model.AppCurrency
 import com.kevinfreyap.domain.model.AppTheme
 import com.kevinfreyap.domain.model.NotificationPreferences
@@ -30,7 +31,8 @@ class UserRepository @Inject constructor(
     private val userPreferences: UserPreferences,
     private val firebaseAuth: FirebaseAuth,
     private val firestore: FirebaseFirestore,
-    private val notificationMapper: NotificationPrefMapper
+    private val notificationMapper: NotificationPrefMapper,
+    private val errorReporter: ErrorReporter,
 ): IUserRepository {
     override fun getUserProfile(): Flow<User?> = callbackFlow {
         val preferencesJob = launch {
@@ -98,7 +100,8 @@ class UserRepository @Inject constructor(
                             } else {
                                 userPreferences.saveUser(fallbackUser)
                             }
-                        } catch (_: Exception) {
+                        } catch (e: Exception) {
+                            errorReporter.recordException(e)
                             userPreferences.saveUser(fallbackUser)
                         }
                     }
@@ -141,6 +144,7 @@ class UserRepository @Inject constructor(
 
             DomainResult.Success(Unit)
         } catch (e: Exception) {
+            errorReporter.recordException(e)
             DomainResult.Failure(e)
         }
     }
@@ -157,7 +161,8 @@ class UserRepository @Inject constructor(
                     .update("currency", appCurrency.name)
                     .await()
             } catch (e: Exception) {
-                e.printStackTrace()
+                errorReporter.setCustomKey("user_action", "set_currency")
+                errorReporter.recordException(e)
             }
         }
     }
@@ -178,7 +183,8 @@ class UserRepository @Inject constructor(
                     .set(notificationFirestore)
                     .await()
             } catch (e: Exception) {
-                e.printStackTrace()
+                errorReporter.setCustomKey("user_action", "set_notification_pref")
+                errorReporter.recordException(e)
             }
         }
     }

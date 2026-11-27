@@ -1,8 +1,8 @@
 package com.kevinfreyap.jetspending.ui.screen.signin
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kevinfreyap.domain.error.ErrorReporter
 import com.kevinfreyap.domain.error.Field
 import com.kevinfreyap.domain.resource.DomainResult
 import com.kevinfreyap.domain.usecase.authentication.AuthWithGoogleUseCase
@@ -14,8 +14,8 @@ import com.kevinfreyap.jetspending.ui.helper.error.removeError
 import com.kevinfreyap.jetspending.ui.helper.error.toUIError
 import com.kevinfreyap.jetspending.ui.navigation.SignInNavigation
 import com.kevinfreyap.jetspending.ui.state.SignInState
-import com.kevinfreyap.jetspending.ui.state.UiState
 import com.kevinfreyap.jetspending.ui.state.UiEvent
+import com.kevinfreyap.jetspending.ui.state.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,7 +29,8 @@ import javax.inject.Inject
 class SignInViewModel @Inject constructor(
     private val signInUseCase: SignInUseCase,
     private val authWithGoogleUseCase: AuthWithGoogleUseCase,
-    private val resetPasswordUseCase: ResetPasswordUseCase
+    private val resetPasswordUseCase: ResetPasswordUseCase,
+    private val errorReporter: ErrorReporter
 ): ViewModel(){
     private val _uiEvent = Channel<UiEvent<SignInNavigation>>()
     val uiEvent = _uiEvent.receiveAsFlow()
@@ -111,7 +112,7 @@ class SignInViewModel @Inject constructor(
                     }
                 }
                 is DomainResult.Failure -> {
-                    Log.e(VIEW_MODEL_TAG, result.throwable.message ?: "Something Wrong")
+                    errorReporter.recordException(result.throwable)
                     _state.update { currentState ->
                         currentState.copy(
                             authStatus = UiState.Failure(result.throwable)
@@ -153,7 +154,7 @@ class SignInViewModel @Inject constructor(
                     }
                 }
                 is DomainResult.Failure -> {
-                    Log.e(VIEW_MODEL_TAG, result.throwable.message ?: "Something Wrong")
+                    errorReporter.recordException(result.throwable)
                     _state.update { currentState ->
                         currentState.copy(
                             authStatus = UiState.Failure(result.throwable)
@@ -186,7 +187,7 @@ class SignInViewModel @Inject constructor(
                     }
                 }
                 is DomainResult.Failure -> {
-                    Log.e(VIEW_MODEL_TAG, result.throwable.message ?: "Something Wrong")
+                    errorReporter.recordException(result.throwable)
                     _state.update { currentState ->
                         currentState.copy(
                             authStatus = UiState.Failure(result.throwable)
@@ -195,9 +196,5 @@ class SignInViewModel @Inject constructor(
                 }
             }
         }
-    }
-
-    companion object {
-        private const val VIEW_MODEL_TAG = "SignInViewModel"
     }
 }

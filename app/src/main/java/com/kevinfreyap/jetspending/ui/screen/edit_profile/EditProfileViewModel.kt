@@ -1,20 +1,20 @@
 package com.kevinfreyap.jetspending.ui.screen.edit_profile
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kevinfreyap.domain.error.ErrorReporter
 import com.kevinfreyap.domain.error.Field
 import com.kevinfreyap.domain.resource.DomainResult
 import com.kevinfreyap.domain.usecase.user.GetUserUseCase
 import com.kevinfreyap.domain.usecase.user.UpdateUserUseCase
 import com.kevinfreyap.jetspending.R
 import com.kevinfreyap.jetspending.ui.action.EditProfileAction
-import com.kevinfreyap.jetspending.ui.state.EditProfileState
-import com.kevinfreyap.jetspending.ui.state.UiState
 import com.kevinfreyap.jetspending.ui.helper.error.removeError
 import com.kevinfreyap.jetspending.ui.helper.error.toUIError
 import com.kevinfreyap.jetspending.ui.navigation.EditProfileNavigation
+import com.kevinfreyap.jetspending.ui.state.EditProfileState
 import com.kevinfreyap.jetspending.ui.state.UiEvent
+import com.kevinfreyap.jetspending.ui.state.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,7 +28,8 @@ import javax.inject.Inject
 @HiltViewModel
 class EditProfileViewModel @Inject constructor (
     private val getUser: GetUserUseCase,
-    private val updateUser: UpdateUserUseCase
+    private val updateUser: UpdateUserUseCase,
+    private val errorReporter: ErrorReporter
 ): ViewModel() {
     private val _uiEvent = Channel<UiEvent<EditProfileNavigation>>()
     val uiEvent = _uiEvent.receiveAsFlow()
@@ -117,7 +118,7 @@ class EditProfileViewModel @Inject constructor (
                     }
                 }
                 is DomainResult.Failure -> {
-                    Log.e(VIEWMODEL_TAG, result.throwable.message ?: "Something went wrong")
+                    errorReporter.recordException(result.throwable)
                     _state.update { currentState ->
                         currentState.copy(
                             uiState = UiState.Failure(result.throwable)
@@ -132,9 +133,5 @@ class EditProfileViewModel @Inject constructor (
                 }
             }
         }
-    }
-
-    companion object {
-        private const val VIEWMODEL_TAG = "EditProfileViewModel"
     }
 }

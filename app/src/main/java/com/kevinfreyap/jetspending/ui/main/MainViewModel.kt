@@ -1,6 +1,5 @@
 package com.kevinfreyap.jetspending.ui.main
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kevinfreyap.domain.usecase.authentication.GetAuthStatusUseCase
@@ -99,7 +98,6 @@ class MainViewModel @Inject constructor(
     }
 
     fun onEvent(event: MainEvent) {
-        Log.d("AppLock", "Event received: $event")
         when(event) {
             is MainEvent.RateMissing -> {
                 val dateString = event.date.toDateKey()

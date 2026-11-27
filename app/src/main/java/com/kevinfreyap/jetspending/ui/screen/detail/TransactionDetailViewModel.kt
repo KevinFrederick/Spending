@@ -1,9 +1,9 @@
 package com.kevinfreyap.jetspending.ui.screen.detail
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kevinfreyap.domain.error.ErrorReporter
 import com.kevinfreyap.domain.model.AppCurrency
 import com.kevinfreyap.domain.model.ExchangeRates
 import com.kevinfreyap.domain.model.Transaction
@@ -20,9 +20,9 @@ import com.kevinfreyap.jetspending.ui.navigation.TransactionDetailNavigation
 import com.kevinfreyap.jetspending.ui.screen.detail.state.TransactionDetailSummaryState
 import com.kevinfreyap.jetspending.ui.state.TransactionDetailState
 import com.kevinfreyap.jetspending.ui.state.TransactionDetailUIState
-import com.kevinfreyap.jetspending.ui.state.UiState
 import com.kevinfreyap.jetspending.ui.state.UiEvent
 import com.kevinfreyap.jetspending.ui.state.UiEvent.*
+import com.kevinfreyap.jetspending.ui.state.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -44,8 +44,9 @@ class TransactionDetailViewModel @Inject constructor(
     private val getTransactionById: GetTransactionByIdUseCase,
     private val getCurrency: GetCurrencyUseCase,
     private val calculateAmount: CalculateAmountBasedOnRatesUseCase,
-    private val deleteTransaction: DeleteTransactionUseCase
-): ViewModel(){
+    private val deleteTransaction: DeleteTransactionUseCase,
+    private val errorReporter: ErrorReporter
+): ViewModel() {
     val transactionId: String? = savedStateHandle["transactionId"]
 
     private val _uiEvent = Channel<UiEvent<TransactionDetailNavigation>>()
@@ -97,7 +98,7 @@ class TransactionDetailViewModel @Inject constructor(
                         _uiEvent.send(ShowToast(R.string.success_message_transaction_deleted))
                         _uiEvent.send(Navigate(TransactionDetailNavigation.NavigateUp))
                     } catch (e: Exception) {
-                        Log.e(VIEW_MODEL_TAG, e.message ?: "Something Wrong")
+                        errorReporter.recordException(e)
                         _state.update { currentState ->
                             currentState.copy(
                                 isDeleting = false,
@@ -235,9 +236,5 @@ class TransactionDetailViewModel @Inject constructor(
         }
 
         return rateText
-    }
-
-    companion object {
-        private const val VIEW_MODEL_TAG = "TransactionDetailViewModel"
     }
 }

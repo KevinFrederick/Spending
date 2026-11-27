@@ -1,9 +1,9 @@
 package com.kevinfreyap.jetspending.ui.screen.transaction_form
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kevinfreyap.domain.error.ErrorReporter
 import com.kevinfreyap.domain.error.Field
 import com.kevinfreyap.domain.model.ExchangeRates
 import com.kevinfreyap.domain.model.TransactionType
@@ -26,8 +26,8 @@ import com.kevinfreyap.jetspending.ui.helper.error.toUIError
 import com.kevinfreyap.jetspending.ui.navigation.TransactionFormNavigation
 import com.kevinfreyap.jetspending.ui.screen.transaction_form.state.AmountEntryState
 import com.kevinfreyap.jetspending.ui.state.TransactionFormState
-import com.kevinfreyap.jetspending.ui.state.UiState
 import com.kevinfreyap.jetspending.ui.state.UiEvent
+import com.kevinfreyap.jetspending.ui.state.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
@@ -53,7 +53,8 @@ class TransactionFormViewModel @Inject constructor(
     private val calculateAmountBasedOnRates: CalculateAmountBasedOnRatesUseCase,
     private val getTransactionById: GetTransactionByIdUseCase,
     private val insertTransaction: InsertTransactionUseCase,
-    private val updateTransaction: UpdateTransactionUseCase
+    private val updateTransaction: UpdateTransactionUseCase,
+    private val errorReporter: ErrorReporter
 ): ViewModel() {
     private val _uiEvent = Channel<UiEvent<TransactionFormNavigation>>()
     val uiEvent = _uiEvent.receiveAsFlow()
@@ -294,7 +295,7 @@ class TransactionFormViewModel @Inject constructor(
                     }
                 }
                 is DomainResult.Failure -> {
-                    Log.e(VIEW_MODEL_TAG, result.throwable.message ?: "Something Wrong")
+                    errorReporter.recordException(result.throwable)
                     _state.update { currentState ->
                         currentState.copy(
                             uiState = UiState.Failure(result.throwable)
@@ -423,9 +424,5 @@ class TransactionFormViewModel @Inject constructor(
                 loadExchangeRates(newDate)
             }
         }
-    }
-
-    companion object {
-        private const val VIEW_MODEL_TAG = "TransactionFormViewModel"
     }
 }

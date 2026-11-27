@@ -1,11 +1,11 @@
 package com.kevinfreyap.data.repository
 
-import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 import com.kevinfreyap.data.mapper.TransactionCategoryMapper
 import com.kevinfreyap.data.source.local.dao.CategoryDao
 import com.kevinfreyap.data.source.remote.firebase.TransactionCategoryFirestore
 import com.kevinfreyap.data.utils.DataConstants.CATEGORY_COLLECTION
+import com.kevinfreyap.domain.error.ErrorReporter
 import com.kevinfreyap.domain.model.Category
 import com.kevinfreyap.domain.repository.ICategoryRepository
 import kotlinx.coroutines.flow.Flow
@@ -18,7 +18,8 @@ import javax.inject.Singleton
 class CategoryRepository @Inject constructor(
     private val categoryDao: CategoryDao,
     private val transactionCategoryMapper: TransactionCategoryMapper,
-    private val firestore: FirebaseFirestore
+    private val firestore: FirebaseFirestore,
+    private val errorReporter: ErrorReporter,
 ): ICategoryRepository {
     override fun getAllCategories(): Flow<List<Category>> {
         return categoryDao.getAllCategory()
@@ -55,7 +56,9 @@ class CategoryRepository @Inject constructor(
             }
 
         } catch (e: Exception) {
-            Log.e("CategoryRepository", "Failed to sync admin categories: ${e.message}")
+            errorReporter.setCustomKey("sync_action", "sync_categories")
+            errorReporter.log("Failed to sync admin categories: ${e.message}")
+            errorReporter.recordException(e)
         }
     }
 }

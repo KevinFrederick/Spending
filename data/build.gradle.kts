@@ -78,6 +78,8 @@ dependencies {
 
     coreLibraryDesugaring(libs.android.desugarJdkLibs)
 
+    implementation(libs.firebase.crashlytics)
+
     testImplementation(libs.junit)
     testImplementation(libs.mockk)
     testImplementation(libs.kotlin.coroutine.test)

@@ -1,8 +1,8 @@
 package com.kevinfreyap.jetspending.ui.screen.privacy_security
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kevinfreyap.domain.error.ErrorReporter
 import com.kevinfreyap.domain.error.Field
 import com.kevinfreyap.domain.resource.DomainResult
 import com.kevinfreyap.domain.usecase.authentication.ChangePasswordUseCase
@@ -17,13 +17,13 @@ import com.kevinfreyap.domain.usecase.user.GetUserUseCase
 import com.kevinfreyap.jetspending.R
 import com.kevinfreyap.jetspending.ui.action.PrivacySecurityAction
 import com.kevinfreyap.jetspending.ui.helper.error.removeError
-import com.kevinfreyap.jetspending.ui.state.PrivacySecurityState
-import com.kevinfreyap.jetspending.ui.state.UiState
 import com.kevinfreyap.jetspending.ui.helper.error.toUIError
 import com.kevinfreyap.jetspending.ui.navigation.PrivacySecurityNavigation
 import com.kevinfreyap.jetspending.ui.screen.privacy_security.state.PasswordFormState
 import com.kevinfreyap.jetspending.ui.screen.privacy_security.state.PrivacySecurityDialogType
+import com.kevinfreyap.jetspending.ui.state.PrivacySecurityState
 import com.kevinfreyap.jetspending.ui.state.UiEvent
+import com.kevinfreyap.jetspending.ui.state.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -46,7 +46,8 @@ class PrivacySecurityViewModel @Inject constructor(
     private val changePassword: ChangePasswordUseCase,
     private val createPassword: CreatePasswordUseCase,
     private val deleteAccount: DeleteAccountUseCase,
-    private val resetPassword: ResetPasswordUseCase
+    private val resetPassword: ResetPasswordUseCase,
+    private val errorReporter: ErrorReporter
 ): ViewModel() {
     private val _uiEvent = Channel<UiEvent<PrivacySecurityNavigation>>()
     val uiEvent = _uiEvent.receiveAsFlow()
@@ -157,7 +158,7 @@ class PrivacySecurityViewModel @Inject constructor(
                     _uiState.value = UiState.ValidationErrors(result.errors.toUIError())
                 }
                 is DomainResult.Failure -> {
-                    Log.e(VIEW_MODEL_TAG, result.throwable.message ?: "Something went wrong")
+                    errorReporter.recordException(result.throwable)
                     _uiState.value = UiState.Failure(result.throwable)
 
                     _uiEvent.send(
@@ -190,7 +191,7 @@ class PrivacySecurityViewModel @Inject constructor(
                     _uiState.value = UiState.ValidationErrors(result.errors.toUIError())
                 }
                 is DomainResult.Failure -> {
-                    Log.e(VIEW_MODEL_TAG, result.throwable.message ?: "Failed to delete account")
+                    errorReporter.recordException(result.throwable)
                     _uiState.value = UiState.Failure(result.throwable)
 
                     _uiEvent.send(
@@ -220,7 +221,7 @@ class PrivacySecurityViewModel @Inject constructor(
                     _uiState.value = UiState.ValidationErrors(result.errors.toUIError())
                 }
                 is DomainResult.Failure -> {
-                    Log.e(VIEW_MODEL_TAG, result.throwable.message ?: "Failed to send reset email")
+                    errorReporter.recordException(result.throwable)
                     _uiState.value = UiState.Failure(result.throwable)
 
                     _uiEvent.send(
@@ -231,9 +232,5 @@ class PrivacySecurityViewModel @Inject constructor(
                 }
             }
         }
-    }
-
-    companion object {
-        private const val VIEW_MODEL_TAG = "PrivacySecurityViewModel"
     }
 }
