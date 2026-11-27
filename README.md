@@ -14,7 +14,8 @@ The codebase strictly adheres to **Clean Architecture** principles across a mult
 - **Flexible Authentication**: Sign in using Google Authentication or Email/Password. Supports password recovery via email.
 - **App Lock & Biometric Security**: Secure app access using Fingerprint, Face, or Device Credentials. Automatically locks when backgrounded and requires authentication to disable.
 - **Screen Privacy Protection**: Toggle `FLAG_SECURE` to block screenshots and hide app contents in recent app previews.
-- **Customizable Notifications**: Set daily expense logging reminders with a custom Material 3 time picker and weekly summary notifications.
+- **Customizable Notifications**: Set daily expense logging reminders with a custom Material 3 time picker and weekly summary notifications that deep-link directly to financial reports.
+- **Production Observability & Analytics**: Integrated Firebase Crashlytics and Analytics with a clean `ErrorReporter` domain abstraction for crash monitoring, non-fatal logging, and usage metrics.
 - **Dynamic Dark & Light Themes**: Seamlessly follows System, Dark, or Light themes with custom color palettes.
 
 ---
@@ -43,8 +44,8 @@ JetSpending is structured as a 3-module Clean Architecture codebase following th
 ```
 
 * **`:app` (Presentation Layer)**: Houses Jetpack Compose UI screens, state hoisting (`UiState`), ViewModels, Navigation Graphs (`AppNavHost`), and system integrations (Biometric, Window Flags).
-* **`:domain` (Domain Layer)**: Pure Kotlin module with zero Android framework dependencies. Defines data models (`Transaction`, `User`, `AppCurrency`), repository interfaces, and focused Use Cases (`SignInUseCase`, `SignUpUseCase`, `GetTransactionsUseCase`, etc.).
-* **`:data` (Data Layer)**: Implements repository interfaces using Room Database, DataStore Preferences, Retrofit REST API, and Firebase (Auth + Firestore). Handles background alarm scheduling (`AlarmManager`, `BootReceiver`) and offline sync.
+* **`:domain` (Domain Layer)**: Pure Kotlin module with zero Android framework dependencies. Defines data models (`Transaction`, `User`, `AppCurrency`), repository interfaces, error reporting abstractions (`ErrorReporter`), and focused Use Cases (`SignInUseCase`, `SignUpUseCase`, `GetTransactionsUseCase`, etc.).
+* **`:data` (Data Layer)**: Implements repository interfaces using Room Database, DataStore Preferences, Retrofit REST API, and Firebase (Auth + Firestore + Crashlytics). Handles background alarm scheduling (`AlarmManager`, `BootReceiver`) and offline sync.
 
 ---
 
@@ -59,6 +60,7 @@ JetSpending is structured as a 3-module Clean Architecture codebase following th
   * **Preferences DataStore**: Reactive type-safe user settings and session caching.
 * **Networking**: Retrofit 2, Gson, OkHttp
 * **Cloud & Backend**: Firebase Authentication & Cloud Firestore
+* **Observability & Analytics**: Firebase Crashlytics & Firebase Analytics (via domain `ErrorReporter` interface)
 * **Asynchronous Programming**: Kotlin Coroutines & `Flow` / `StateFlow`
 * **Security & Biometrics**: AndroidX Biometric API & Window `FLAG_SECURE`
 * **Notifications**: `AlarmManager` with `BroadcastReceiver` and `NotificationManagerCompat`
@@ -79,9 +81,11 @@ JetSpending/
 ├── domain/               # Pure Kotlin Core Domain
 │   ├── model/            # Transaction, User, Currency, NotificationPreferences
 │   ├── repository/       # Repository Interfaces (IUserRepository, ITransactionRepository, etc.)
+│   ├── error/            # ErrorReporter domain abstraction
 │   └── usecase/          # Granular Use Cases (SignInUseCase, GetTransactionsUseCase, etc.)
 └── data/                 # Data Sources & Repositories
     ├── repository/       # Repository implementations (UserRepository, AuthenticationRepository, etc.)
+    ├── logging/          # CrashlyticsErrorReporter implementation
     ├── source/
     │   ├── local/        # Room Database, DAOs, UserPreferences DataStore
     │   └── remote/       # Retrofit ApiService, Firebase Firestore & Auth
@@ -97,7 +101,7 @@ JetSpending/
 * **Android Studio**: Ladybug or newer
 * **JDK**: 17 or higher
 * **Android Device / Emulator**: Android 7.1 (API Level 25) or higher
-* **Firebase Project**: Configured for Google Sign-In and Cloud Firestore
+* **Firebase Project**: Configured for Google Sign-In, Cloud Firestore, and Crashlytics
 
 ### Installation & Setup
 
@@ -123,5 +127,3 @@ JetSpending/
    * Open the project in Android Studio.
    * Sync Gradle files (`Gradle Sync`).
    * Select an emulator or connected device and press **Run (Shift + F10)**.
-
----
