@@ -480,7 +480,7 @@ private fun ReportsScreenPreview() {
                                 sortOrder = 1,
                                 name = R.string.category_food,
                                 iconRes = R.drawable.ic_food_icon,
-                                types = emptyList()
+                                type = TransactionType.SPENDING
                             ),
                             percentage = 0.7f,
                             percentageText = 0.7f.toLocalePercentageText(),
@@ -493,7 +493,7 @@ private fun ReportsScreenPreview() {
                                 sortOrder = 2,
                                 name = R.string.category_food,
                                 iconRes = R.drawable.ic_food_icon,
-                                types = emptyList()
+                                type = TransactionType.SPENDING
                             ),
                             percentage = 0.7f,
                             percentageText = 0.7f.toLocalePercentageText(),
@@ -506,7 +506,7 @@ private fun ReportsScreenPreview() {
                                 sortOrder = 3,
                                 name = R.string.category_food,
                                 iconRes = R.drawable.ic_food_icon,
-                                types = emptyList()
+                                type = TransactionType.SPENDING
                             ),
                             percentage = 0.7f,
                             percentageText = 0.7f.toLocalePercentageText(),

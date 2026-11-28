@@ -99,7 +99,7 @@ fun FilterBottomSheet(
                         val validCategory = when {
                             action.type == null -> currentCategory
                             currentCategory == null -> null
-                            action.type in currentCategory.types -> currentCategory
+                            action.type == currentCategory.type -> currentCategory
                             else -> null
                         }
 
@@ -196,7 +196,7 @@ private fun FilterBottomSheetContent(
     val categoryOptions = remember(categories, state.filterType) {
         val filtered = when (val type = state.filterType) {
             null -> categories
-            else -> categories.filter { type in it.types }
+            else -> categories.filter { type == it.type }
         }.sortedBy { it.sortOrder }
 
         listOf(null) + filtered

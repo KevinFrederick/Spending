@@ -6,11 +6,9 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.insertSeparators
 import androidx.paging.map
-import com.kevinfreyap.domain.usecase.category.GetAllCategoryUseCase
 import com.kevinfreyap.domain.usecase.currency.GetCurrencyUseCase
 import com.kevinfreyap.domain.usecase.transaction.GetTransactionsUseCase
 import com.kevinfreyap.jetspending.ui.action.TransactionListAction
-import com.kevinfreyap.jetspending.ui.helper.category.toCategoryUI
 import com.kevinfreyap.jetspending.ui.helper.filter.toDomain
 import com.kevinfreyap.jetspending.ui.helper.state.toTransactionItemState
 import com.kevinfreyap.jetspending.ui.model.TransactionsUI
@@ -28,7 +26,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -36,7 +33,6 @@ import kotlin.time.Duration.Companion.milliseconds
 class TransactionListViewModel @Inject constructor(
     getCurrency: GetCurrencyUseCase,
     private val getTransactions: GetTransactionsUseCase,
-    private val getAllCategory: GetAllCategoryUseCase
 ): ViewModel() {
     private val _state = MutableStateFlow(TransactionListState())
     val state: StateFlow<TransactionListState> = _state.asStateFlow()
@@ -88,10 +84,6 @@ class TransactionListViewModel @Inject constructor(
         }
     }.cachedIn(viewModelScope)
 
-    init {
-        loadCategories()
-    }
-
     fun onAction(action: TransactionListAction) {
         when(action) {
             is TransactionListAction.OnApplyFilter -> {
@@ -115,20 +107,6 @@ class TransactionListViewModel @Inject constructor(
                     )
                 }
             }
-        }
-    }
-
-    private fun loadCategories() {
-        viewModelScope.launch {
-            getAllCategory()
-                .map { categories -> categories.map { it.toCategoryUI() } }
-                .collect { categories ->
-                    _state.update { currentState ->
-                        currentState.copy(
-                            categories = categories
-                        )
-                    }
-                }
         }
     }
 }

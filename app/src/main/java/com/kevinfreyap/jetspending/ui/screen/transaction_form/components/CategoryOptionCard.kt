@@ -129,7 +129,7 @@ private fun CategoryOptionCardPreview_Selected() {
                 sortOrder = 1,
                 name = R.string.category_food,
                 iconRes = R.drawable.ic_food_icon,
-                types = listOf(TransactionType.SPENDING)
+                type = TransactionType.SPENDING
             ),
             isSelected = true,
             onClick = {  },
@@ -156,7 +156,7 @@ private fun CategoryOptionCardPreview_NotSelected() {
                 sortOrder = 1,
                 name = R.string.category_food,
                 iconRes = R.drawable.ic_food_icon,
-                types = listOf(TransactionType.SPENDING)
+                type = TransactionType.SPENDING
             ),
             isSelected = false,
             onClick = {  },

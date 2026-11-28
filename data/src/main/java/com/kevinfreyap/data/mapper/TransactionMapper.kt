@@ -6,6 +6,7 @@ import com.kevinfreyap.data.source.local.entity.TransactionEntity
 import com.kevinfreyap.data.source.local.model.TransactionMath
 import com.kevinfreyap.data.source.remote.firebase.TransactionFirestore
 import com.kevinfreyap.domain.model.AppCurrency
+import com.kevinfreyap.domain.model.Category
 import com.kevinfreyap.domain.model.Transaction
 import com.kevinfreyap.domain.model.TransactionMathWithRates
 import com.kevinfreyap.domain.model.TransactionType
@@ -15,7 +16,6 @@ import java.time.Instant
 import javax.inject.Inject
 
 class TransactionMapper @Inject constructor(
-    private val categoryMapper: TransactionCategoryMapper,
     private val exchangeRatesMapper: ExchangeRatesMapper,
 ) {
     // Local
@@ -26,7 +26,7 @@ class TransactionMapper @Inject constructor(
             amount = entity.transaction.amount,
             currency = entity.transaction.currency,
             type = entity.transaction.type,
-            category = categoryMapper.mapCategoryEntityToDomain(entity.category),
+            category = Category.fromIdOrDefault(entity.transaction.categoryId, entity.transaction.type),
             date = entity.transaction.date,
             stringDate = entity.transaction.stringDate,
             notes = entity.transaction.notes,
@@ -61,7 +61,7 @@ class TransactionMapper @Inject constructor(
             amount = entity.amount,
             currency = entity.currency,
             type = entity.type,
-            category = categoryMapper.mapCategoryEntityToDomain(entity.category),
+            category = Category.fromIdOrDefault(entity.categoryId, entity.type),
             date = entity.date,
             stringDate = entity.stringDate,
             rates = entity.rate?.let { exchangeRatesMapper.mapRatesEntityToDomain(it) }

@@ -12,7 +12,6 @@ import com.kevinfreyap.domain.usecase.privacy_security.GetBlockScreenPrefUseCase
 import com.kevinfreyap.domain.usecase.privacy_security.SetAppLockPrefUseCase
 import com.kevinfreyap.domain.usecase.rates.EnsureRatesExistUseCase
 import com.kevinfreyap.domain.usecase.rates.RatesHealerUseCase
-import com.kevinfreyap.domain.usecase.sync.SyncCategoriesUseCase
 import com.kevinfreyap.domain.usecase.sync.SyncRatesUseCase
 import com.kevinfreyap.domain.usecase.sync.SyncTransactionsUseCase
 import com.kevinfreyap.domain.usecase.user.GetThemeUseCase
@@ -42,7 +41,6 @@ class MainViewModel @Inject constructor(
     checkConnection: ConnectivityUseCase,
     private val logout: LogoutUseCase,
     private val syncTransactions: SyncTransactionsUseCase,
-    private val syncCategories: SyncCategoriesUseCase,
     private val syncRates: SyncRatesUseCase,
     private val ratesHealer: RatesHealerUseCase,
     private val ensureRatesExist: EnsureRatesExistUseCase,
@@ -146,7 +144,6 @@ class MainViewModel @Inject constructor(
                 .collectLatest { isLoggedIn ->
                     if (isLoggedIn) {
                         coroutineScope {
-                            launch { syncCategories() }
                             launch { syncRates() }
                             launch { ratesHealer() }
                             launch { syncTransactions().collect() }

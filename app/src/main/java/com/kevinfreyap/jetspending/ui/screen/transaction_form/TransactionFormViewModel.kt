@@ -5,10 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kevinfreyap.domain.error.ErrorReporter
 import com.kevinfreyap.domain.error.Field
+import com.kevinfreyap.domain.model.Category
 import com.kevinfreyap.domain.model.ExchangeRates
 import com.kevinfreyap.domain.model.TransactionType
 import com.kevinfreyap.domain.resource.DomainResult
-import com.kevinfreyap.domain.usecase.category.GetCategoryByTypeUseCase
 import com.kevinfreyap.domain.usecase.currency.CalculateAmountBasedOnRatesUseCase
 import com.kevinfreyap.domain.usecase.currency.GetCurrencyUseCase
 import com.kevinfreyap.domain.usecase.currency.GetExchangeRatesByDateUseCase
@@ -35,7 +35,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -48,7 +47,6 @@ import javax.inject.Inject
 class TransactionFormViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val getCurrency: GetCurrencyUseCase,
-    private val getCategoryByType: GetCategoryByTypeUseCase,
     private val getExchangeRatesByDate: GetExchangeRatesByDateUseCase,
     private val calculateAmountBasedOnRates: CalculateAmountBasedOnRatesUseCase,
     private val getTransactionById: GetTransactionByIdUseCase,
@@ -87,8 +85,7 @@ class TransactionFormViewModel @Inject constructor(
                 val existing = getTransactionById(transactionId).first()
                 if (existing != null) {
                     val transaction = existing.transaction
-                    val categories = getCategoryByType(transaction.type)
-                        .first()
+                    val categories = Category.forType(transaction.type)
                         .map { it.toCategoryUI() }
 
                     cachedRates = existing.rates ?: getExchangeRatesByDate(transaction.date)
@@ -124,8 +121,7 @@ class TransactionFormViewModel @Inject constructor(
                     _uiEvent.send(UiEvent.Navigate(TransactionFormNavigation.NavigateUp))
                 }
             } else {
-                val categories = getCategoryByType(_state.value.transactionType)
-                    .first()
+                val categories = Category.forType(_state.value.transactionType)
                     .map { category ->
                         category.toCategoryUI()
                     }
@@ -153,11 +149,10 @@ class TransactionFormViewModel @Inject constructor(
 
     private fun loadCategories(type: TransactionType) {
         viewModelScope.launch {
-            val categories = getCategoryByType(type)
+            val categories = Category.forType(type)
                 .map { categories ->
-                    categories.map { it.toCategoryUI() }
+                    categories.toCategoryUI()
                 }
-                .first()
 
             _state.update { currentState ->
                 val isCategoryValid = categories.any { it.id == currentState.selectedCategory?.id }

@@ -11,7 +11,6 @@ import androidx.room.Update
 import androidx.sqlite.db.SimpleSQLiteQuery
 import com.kevinfreyap.data.source.local.entity.DailyRatesEntity
 import com.kevinfreyap.data.source.local.model.PopulatedTransaction
-import com.kevinfreyap.data.source.local.entity.TransactionCategoryEntity
 import com.kevinfreyap.data.source.local.entity.TransactionEntity
 import com.kevinfreyap.data.source.local.model.TransactionMath
 import kotlinx.coroutines.flow.Flow
@@ -30,7 +29,6 @@ interface TransactionDao {
     @Transaction
     @RawQuery(observedEntities = [
         TransactionEntity::class,
-        TransactionCategoryEntity::class,
         DailyRatesEntity::class
     ])
     fun getTransactions(rawQuery: SimpleSQLiteQuery): PagingSource<Int, PopulatedTransaction>

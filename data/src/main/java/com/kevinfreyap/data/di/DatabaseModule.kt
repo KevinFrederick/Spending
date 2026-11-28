@@ -3,7 +3,6 @@ package com.kevinfreyap.data.di
 import android.content.Context
 import androidx.room.Room
 import com.kevinfreyap.data.source.local.db.AppDatabase
-import com.kevinfreyap.data.source.local.dao.CategoryDao
 import com.kevinfreyap.data.source.local.dao.ExchangeRatesDao
 import com.kevinfreyap.data.source.local.dao.TransactionDao
 import com.kevinfreyap.data.source.local.db.MIGRATION_1_2
@@ -31,9 +30,6 @@ class DatabaseModule {
 
     @Provides
     fun provideTransactionDao(database: AppDatabase): TransactionDao = database.transactionDao()
-
-    @Provides
-    fun provideCategoryDao(database: AppDatabase): CategoryDao = database.categoryDao()
 
     @Provides
     fun provideExchangeRateDao(database: AppDatabase): ExchangeRatesDao = database.exchangeRateDao()

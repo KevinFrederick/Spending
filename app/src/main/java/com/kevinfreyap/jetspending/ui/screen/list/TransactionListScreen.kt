@@ -522,7 +522,7 @@ private fun TransactionListContentPreview() {
             TransactionItemState(
                 transactionId = "2",
                 transactionType = TransactionType.INCOME,
-                transactionCategoryIcon = R.drawable.ic_salary_icon,
+                transactionCategoryIcon = R.drawable.ic_salary_24,
                 transactionName = "Salary",
                 transactionCategoryName = R.string.category_salary,
                 transactionDate = "15 Dec 2026",

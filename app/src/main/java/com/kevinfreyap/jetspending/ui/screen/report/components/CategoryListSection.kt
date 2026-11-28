@@ -20,6 +20,7 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kevinfreyap.domain.model.AppCurrency
+import com.kevinfreyap.domain.model.TransactionType
 import com.kevinfreyap.jetspending.R
 import com.kevinfreyap.jetspending.ui.helper.other.toLocalePercentageText
 import com.kevinfreyap.jetspending.ui.model.CategoryUI
@@ -119,7 +120,7 @@ private fun CategoryListSectionPreview() {
                         sortOrder = 1,
                         name = R.string.category_food,
                         iconRes = R.drawable.ic_food_icon,
-                        types = emptyList()
+                        type = TransactionType.SPENDING
                     ),
                     percentage = 0.7f,
                     percentageText = 0.7f.toLocalePercentageText(),
@@ -132,7 +133,7 @@ private fun CategoryListSectionPreview() {
                         sortOrder = 2,
                         name = R.string.category_food,
                         iconRes = R.drawable.ic_food_icon,
-                        types = emptyList()
+                        type = TransactionType.SPENDING
                     ),
                     percentage = 0.7f,
                     percentageText = 0.7f.toLocalePercentageText(),
@@ -145,7 +146,7 @@ private fun CategoryListSectionPreview() {
                         sortOrder = 3,
                         name = R.string.category_food,
                         iconRes = R.drawable.ic_food_icon,
-                        types = emptyList()
+                        type = TransactionType.SPENDING
                     ),
                     percentage = 0.7f,
                     percentageText = 0.7f.toLocalePercentageText(),

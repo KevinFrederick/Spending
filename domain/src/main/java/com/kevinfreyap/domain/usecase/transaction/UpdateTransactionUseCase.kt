@@ -1,9 +1,9 @@
 package com.kevinfreyap.domain.usecase.transaction
 
 import com.kevinfreyap.domain.model.AppCurrency
+import com.kevinfreyap.domain.model.Category
 import com.kevinfreyap.domain.model.Transaction
 import com.kevinfreyap.domain.model.TransactionType
-import com.kevinfreyap.domain.repository.ICategoryRepository
 import com.kevinfreyap.domain.repository.ITransactionRepository
 import com.kevinfreyap.domain.resource.DomainResult
 import com.kevinfreyap.domain.usecase.rates.EnsureRatesExistUseCase
@@ -15,7 +15,6 @@ import javax.inject.Inject
 
 class UpdateTransactionUseCase @Inject constructor(
     private val transactionRepository: ITransactionRepository,
-    private val categoryRepository: ICategoryRepository,
     private val ensureRatesExist: EnsureRatesExistUseCase
 ) {
     suspend operator fun invoke(
@@ -29,7 +28,7 @@ class UpdateTransactionUseCase @Inject constructor(
         stringDate: String,
         notes: String
     ): DomainResult<Unit> {
-        val category = categoryRepository.getCategoryById(categoryId)
+        val category = Category.fromId(categoryId)
 
         val errors = validateTransaction(
             name = name,

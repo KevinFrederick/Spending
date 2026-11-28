@@ -220,7 +220,7 @@ private fun TransactionDetailSectionPreview() {
                     sortOrder = 1,
                     name = R.string.category_food,
                     iconRes = R.drawable.ic_food_icon,
-                    types = listOf(TransactionType.SPENDING)
+                    type = TransactionType.SPENDING
                 ),
                 dateText = "18 September 2026",
                 originalCurrency = AppCurrency.IDR,

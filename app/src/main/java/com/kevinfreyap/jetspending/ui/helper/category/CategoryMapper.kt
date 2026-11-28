@@ -5,140 +5,123 @@ import com.kevinfreyap.jetspending.R
 import com.kevinfreyap.jetspending.ui.model.CategoryUI
 
 fun Category.toCategoryUI(): CategoryUI {
-    return when(this.id) {
-        "CAT_GIFT" -> {
-            CategoryUI(
-                id = this.id,
-                sortOrder = this.sortOrder,
-                name = R.string.category_gift,
-                iconRes = R.drawable.ic_gift_icon,
-                types = this.types
-            )
-        }
-        "CAT_INCOMING" -> {
-            CategoryUI(
-                id = this.id,
-                sortOrder = this.sortOrder,
-                name = R.string.category_incoming,
-                iconRes = R.drawable.ic_incoming_icon,
-                types = this.types
-            )
-        }
-        "CAT_INVESTMENT" -> {
-            CategoryUI(
-                id = this.id,
-                sortOrder = this.sortOrder,
-                name = R.string.category_investment,
-                iconRes = R.drawable.ic_investment_icon,
-                types = this.types
-            )
-        }
-        "CAT_SALARY" -> {
-            CategoryUI(
-                id = this.id,
-                sortOrder = this.sortOrder,
-                name = R.string.category_salary,
-                iconRes = R.drawable.ic_salary_icon,
-                types = this.types
-            )
-        }
-        "CAT_EDUCATION" -> {
-            CategoryUI(
-                id = this.id,
-                sortOrder = this.sortOrder,
-                name = R.string.category_education,
-                iconRes = R.drawable.ic_school_icon,
-                types = this.types
-            )
-        }
-        "CAT_ENTERTAINMENT" -> {
-            CategoryUI(
-                id = this.id,
-                sortOrder = this.sortOrder,
-                name = R.string.category_entertainment,
-                iconRes = R.drawable.ic_entertainment_icon,
-                types = this.types
-            )
-        }
-        "CAT_FOOD" -> {
+    return when(this) {
+        Category.FOOD_DINING -> {
             CategoryUI(
                 id = this.id,
                 sortOrder = this.sortOrder,
                 name = R.string.category_food,
                 iconRes = R.drawable.ic_food_icon,
-                types = this.types
+                type = this.type
             )
         }
-        "CAT_GROCERY" -> {
+        Category.GROCERIES -> {
             CategoryUI(
                 id = this.id,
                 sortOrder = this.sortOrder,
                 name = R.string.category_grocery,
                 iconRes = R.drawable.ic_grocery_icon,
-                types = this.types
+                type = this.type
             )
         }
-        "CAT_HEALTHCARE" -> {
+        Category.TRANSPORT -> {
             CategoryUI(
                 id = this.id,
                 sortOrder = this.sortOrder,
-                name = R.string.category_healthcare,
-                iconRes = R.drawable.ic_healthcare_icon,
-                types = this.types
+                name = R.string.category_transportation,
+                iconRes = R.drawable.ic_transportation_24,
+                type = this.type
             )
         }
-        "CAT_HOUSEHOLD" -> {
+        Category.BILLS_UTILITIES -> {
             CategoryUI(
                 id = this.id,
                 sortOrder = this.sortOrder,
-                name = R.string.category_household,
-                iconRes = R.drawable.ic_home_24,
-                types = this.types
+                name = R.string.category_bills_utilities,
+                iconRes = R.drawable.ic_bills_24,
+                type = this.type
             )
         }
-        "CAT_PAYMENT_TRANSFER" -> {
-            CategoryUI(
-                id = this.id,
-                sortOrder = this.sortOrder,
-                name = R.string.category_payment_transfer,
-                iconRes = R.drawable.ic_payment_icon,
-                types = this.types
-            )
-        }
-        "CAT_SHOPPING" -> {
+        Category.SHOPPING -> {
             CategoryUI(
                 id = this.id,
                 sortOrder = this.sortOrder,
                 name = R.string.category_shopping,
                 iconRes = R.drawable.ic_shopping_icon,
-                types = this.types
+                type = this.type
             )
         }
-        "CAT_TRANSPORTATION" -> {
+        Category.BILLS_SUBSCRIPTIONS -> {
             CategoryUI(
                 id = this.id,
                 sortOrder = this.sortOrder,
-                name = R.string.category_transportation,
-                iconRes = R.drawable.ic_transportation_icon,
-                types = this.types
+                name = R.string.category_subscriptions,
+                iconRes = R.drawable.ic_subscriptions_24,
+                type = this.type
             )
         }
-        "CAT_OTHER" -> {
+        Category.HEALTH_MEDICAL -> {
             CategoryUI(
                 id = this.id,
                 sortOrder = this.sortOrder,
-                name = R.string.category_others,
+                name = R.string.category_health_medical,
+                iconRes = R.drawable.ic_healthcare_icon,
+                type = this.type
+            )
+        }
+        Category.ENTERTAINMENT -> {
+            CategoryUI(
+                id = this.id,
+                sortOrder = this.sortOrder,
+                name = R.string.category_entertainment,
+                iconRes = R.drawable.ic_entertainment_24,
+                type = this.type
+            )
+        }
+        Category.TRAVEL -> {
+            CategoryUI(
+                id = this.id,
+                sortOrder = this.sortOrder,
+                name = R.string.category_travel,
+                iconRes = R.drawable.ic_flight_24,
+                type = this.type
+            )
+        }
+        Category.OTHER_EXPENSE -> {
+            CategoryUI(
+                id = this.id,
+                sortOrder = this.sortOrder,
+                name = R.string.category_other_expense,
                 iconRes = R.drawable.ic_others_icon,
-                types = this.types
+                type = this.type
             )
         }
-        else -> {
+
+        Category.SALARY -> {
             CategoryUI(
                 id = this.id,
                 sortOrder = this.sortOrder,
-                name = R.string.category_others,
+                name = R.string.category_salary,
+                iconRes = R.drawable.ic_salary_24,
+                type = this.type
+            )
+        }
+        Category.INVESTMENTS -> {
+            CategoryUI(
+                id = this.id,
+                sortOrder = this.sortOrder,
+                name = R.string.category_investment,
+                iconRes = R.drawable.ic_investment_icon,
+                type = this.type
+            )
+        }
+        Category.OTHER_INCOME -> {
+            CategoryUI(
+                id = this.id,
+                sortOrder = this.sortOrder,
+                name = R.string.category_other_income,
                 iconRes = R.drawable.ic_others_icon,
-                types = this.types
+                type = this.type
             )
         }
     }

@@ -179,7 +179,7 @@ private fun CategorySelectorCardPreview() {
                 sortOrder = 1,
                 name = R.string.category_food,
                 iconRes = R.drawable.ic_food_icon,
-                types = listOf(TransactionType.SPENDING)
+                type = TransactionType.SPENDING
             ),
             onClick = {  },
             isError = false,

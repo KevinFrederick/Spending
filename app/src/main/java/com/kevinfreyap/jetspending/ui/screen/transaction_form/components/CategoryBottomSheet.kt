@@ -127,28 +127,28 @@ private fun CategoryBottomSheetPreview() {
                     sortOrder = 1,
                     name = R.string.category_food,
                     iconRes = R.drawable.ic_food_icon,
-                    types = listOf(TransactionType.SPENDING)
+                    type = TransactionType.SPENDING
                 ),
                 CategoryUI(
                     id = "2",
                     sortOrder = 2,
                     name = R.string.category_food,
                     iconRes = R.drawable.ic_food_icon,
-                    types = listOf(TransactionType.SPENDING)
+                    type = TransactionType.SPENDING
                 ),
                 CategoryUI(
                     id = "3",
                     sortOrder = 3,
-                    name = R.string.category_payment_transfer,
+                    name = R.string.category_bills_utilities,
                     iconRes = R.drawable.ic_food_icon,
-                    types = listOf(TransactionType.SPENDING)
+                    type = TransactionType.SPENDING
                 ),
                 CategoryUI(
                     id = "4",
                     sortOrder = 4,
                     name = R.string.category_food,
                     iconRes = R.drawable.ic_food_icon,
-                    types = listOf(TransactionType.SPENDING)
+                    type = TransactionType.SPENDING
                 )
             ),
             selectedCategory = CategoryUI(
@@ -156,7 +156,7 @@ private fun CategoryBottomSheetPreview() {
                 sortOrder = 1,
                 name = R.string.category_food,
                 iconRes = R.drawable.ic_food_icon,
-                types = listOf(TransactionType.SPENDING)
+                type = TransactionType.SPENDING
             ),
             onSelectCategory = {  },
         )

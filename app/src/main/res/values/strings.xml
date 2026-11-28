@@ -51,20 +51,19 @@
     <string name="description_reset_password">Enter your email to receive a reset link</string>
 
     <!-- Categories -->
-    <string name="category_gift">Gifts</string>
-    <string name="category_incoming">Incoming</string>
-    <string name="category_investment">Investment</string>
-    <string name="category_salary">Salary</string>
-    <string name="category_education">Education</string>
-    <string name="category_entertainment">Entertainment</string>
-    <string name="category_food">Food &amp; Drink</string>
-    <string name="category_grocery">Grocery</string>
-    <string name="category_healthcare">Healthcare</string>
-    <string name="category_household">Household</string>
-    <string name="category_payment_transfer">Payment &amp; Transfer</string>
-    <string name="category_shopping">Shopping</string>
+    <string name="category_food">Food &amp; Dining</string>
+    <string name="category_grocery">Groceries</string>
     <string name="category_transportation">Transportation</string>
-    <string name="category_others">Others</string>
+    <string name="category_bills_utilities">Bills &amp; Utilities</string>
+    <string name="category_shopping">Shopping</string>
+    <string name="category_subscriptions">Subscriptions</string>
+    <string name="category_health_medical">Health &amp; Medical</string>
+    <string name="category_entertainment">Entertainment</string>
+    <string name="category_travel">Travel</string>
+    <string name="category_other_expense">Other Expense</string>
+    <string name="category_salary">Salary</string>
+    <string name="category_investment">Investment</string>
+    <string name="category_other_income">Other Income</string>
 
     <!-- Label -->
     <string name="label_chart_max">Max %1$s</string>

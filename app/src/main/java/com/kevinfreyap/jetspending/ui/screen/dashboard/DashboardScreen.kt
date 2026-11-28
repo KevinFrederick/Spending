@@ -329,7 +329,7 @@ private fun DashboardContentPreview(){
                             transactionType = TransactionType.INCOME,
                             transactionCategoryIcon = R.drawable.ic_food_icon,
                             transactionName = "Salary",
-                            transactionCategoryName = R.string.category_incoming,
+                            transactionCategoryName = R.string.category_salary,
                             transactionDate = "18 Sep 2026",
                             transactionMonthYear = "September 2026",
                             transactionOriginalAmount = "710.00",

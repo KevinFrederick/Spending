@@ -9,5 +9,5 @@ data class CategoryUI(
     val sortOrder: Int,
     @param:StringRes val name: Int,
     @param:DrawableRes val iconRes: Int,
-    val types: List<TransactionType>
+    val type: TransactionType
 )
