@@ -2,6 +2,7 @@ package com.kevinfreyap.data.repository
 
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.userProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
 import com.kevinfreyap.data.mapper.NotificationPrefMapper
 import com.kevinfreyap.data.source.local.UserPreferences
@@ -69,8 +70,6 @@ class UserRepository @Inject constructor(
                         currency = localUser.takeIf { isSameUser }?.currency ?: AppCurrency.DEFAULT
                     )
 
-                    trySend(fallbackUser)
-
                     this@callbackFlow.launch(Dispatchers.IO) {
                         try {
                             val snapshot = firestore.collection(USER_COLLECTION)
@@ -80,11 +79,11 @@ class UserRepository @Inject constructor(
 
                             if (snapshot.exists()) {
                                 val firestoreUser = snapshot.toObject(UserFirestore::class.java)
-                                if (firestoreUser != null) {
+                                if (firestoreUser != null && firestoreUser.name.isNotBlank()) {
                                     val updatedUser = User(
                                         uid = currentUser.uid,
                                         email = firestoreUser.email.ifBlank { currentUser.email ?: "" },
-                                        displayName = firestoreUser.name.ifBlank { fallbackName },
+                                        displayName = firestoreUser.name,
                                         photoUrl = firestoreUser.photoUrl.ifBlank { currentUser.photoUrl?.toString() },
                                         hasPassword = userHasPassword || firestoreUser.hasPassword,
                                         currency = try {
@@ -94,15 +93,19 @@ class UserRepository @Inject constructor(
                                         }
                                     )
                                     userPreferences.saveUser(updatedUser)
+                                    trySend(updatedUser)
                                 } else {
                                     userPreferences.saveUser(fallbackUser)
+                                    trySend(fallbackUser)
                                 }
                             } else {
                                 userPreferences.saveUser(fallbackUser)
+                                trySend(fallbackUser)
                             }
                         } catch (e: Exception) {
                             errorReporter.recordException(e)
                             userPreferences.saveUser(fallbackUser)
+                            trySend(fallbackUser)
                         }
                     }
                 } else {
@@ -129,7 +132,21 @@ class UserRepository @Inject constructor(
         return try {
             val updates = mutableMapOf<String, Any>()
 
-            if (!newUsername.isNullOrBlank()) updates["name"] = newUsername
+            if (!newUsername.isNullOrBlank()) {
+                updates["name"] = newUsername
+
+                val currentUser = firebaseAuth.currentUser
+                if (currentUser != null) {
+                    try {
+                        val profileUpdates = userProfileChangeRequest {
+                            displayName = newUsername
+                        }
+                        currentUser.updateProfile(profileUpdates).await()
+                    } catch (e: Exception) {
+                        errorReporter.recordException(e)
+                    }
+                }
+            }
 
             if (updates.isNotEmpty()) {
                 firestore.collection(USER_COLLECTION)

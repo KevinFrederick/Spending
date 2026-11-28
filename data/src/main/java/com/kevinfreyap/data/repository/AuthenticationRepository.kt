@@ -1,5 +1,6 @@
 package com.kevinfreyap.data.repository
 
+import android.util.Log
 import androidx.room.withTransaction
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
@@ -346,18 +347,22 @@ class AuthenticationRepository @Inject constructor(
             val firestoreUser = snapshot.toObject(UserFirestore::class.java)
                 ?: userMapper.mapFirebaseUserToFirestoreUser(user)
 
-            val fallbackName = user.displayName
-                ?: user.email?.substringBefore("@")
-                ?: "User"
+            Log.d("Auth", firestoreUser.name)
+
+            val savedName = firestoreUser.name.ifBlank {
+                user.displayName?.ifBlank { null }
+                    ?: user.email?.substringBefore("@")?.replaceFirstChar { it.uppercase() }
+                    ?: "User"
+            }
 
             firestoreUser.copy(
                 uid = firestoreUser.uid.ifBlank { user.uid },
                 email = firestoreUser.email.ifBlank { user.email ?: "" },
-                name = firestoreUser.name.ifBlank { fallbackName }
+                name = savedName
             )
         } else {
-            val fallbackName = user.displayName
-                ?: user.email?.substringBefore("@")
+            val fallbackName = user.displayName?.ifBlank { null }
+                ?: user.email?.substringBefore("@")?.replaceFirstChar { it.uppercase() }
                 ?: "User"
 
             try {
