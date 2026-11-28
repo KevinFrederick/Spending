@@ -176,7 +176,11 @@ class TransactionFormViewModel @Inject constructor(
 
             _state.update { currentState ->
                 currentState.copy(
-                    amountEntry = recalculateAmountEntry(currentState.amountEntry)
+                    amountEntry = recalculateAmountEntry(
+                        currentState.amountEntry.copy(
+                            rateDate = date
+                        )
+                    )
                 )
             }
         }
