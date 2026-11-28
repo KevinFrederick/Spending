@@ -1,5 +1,6 @@
 package com.kevinfreyap.jetspending.ui.main
 
+import android.app.UiModeManager
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -7,6 +8,7 @@ import android.view.WindowManager
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
@@ -14,6 +16,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -35,9 +38,9 @@ class MainActivity : FragmentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
+        enableEdgeToEdge()
 
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
 
         handleWeeklySummaryIntent(intent)
 
@@ -120,6 +123,25 @@ private fun MainContent(
         AppTheme.LIGHT -> false
         AppTheme.DARK -> true
         AppTheme.SYSTEM -> isSystemInDarkTheme()
+    }
+
+    LaunchedEffect(state.theme) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val uiModeManager = context.getSystemService(UiModeManager::class.java)
+            val mode = when (state.theme) {
+                AppTheme.LIGHT -> UiModeManager.MODE_NIGHT_NO
+                AppTheme.DARK -> UiModeManager.MODE_NIGHT_YES
+                AppTheme.SYSTEM -> UiModeManager.MODE_NIGHT_AUTO
+            }
+            uiModeManager.setApplicationNightMode(mode)
+        } else {
+            val mode = when (state.theme) {
+                AppTheme.LIGHT -> AppCompatDelegate.MODE_NIGHT_NO
+                AppTheme.DARK -> AppCompatDelegate.MODE_NIGHT_YES
+                AppTheme.SYSTEM -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+            }
+            AppCompatDelegate.setDefaultNightMode(mode)
+        }
     }
 
     JetSpendingTheme (

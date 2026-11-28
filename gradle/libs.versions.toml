@@ -33,6 +33,7 @@ mockk = "1.14.12"
 coroutineTest = "1.11.0"
 metadata = "2.3.21"
 biometricKtx = "1.4.0-alpha02"
+appcompat = "1.8.0"
 
 firebaseCrashlytics = "3.0.8"
 
@@ -52,6 +53,7 @@ androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-man
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 # Coroutines
 coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutineAndroid" }
 coroutine-play-services = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services", version.ref = "coroutinePlayService"}

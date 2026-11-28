@@ -74,6 +74,7 @@ kotlin{
 dependencies {
     implementation(project(":data"))
     implementation(project(":domain"))
+    implementation(libs.androidx.appcompat)
 
     implementation(libs.androidx.biometric.ktx)
 
